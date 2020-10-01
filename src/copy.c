@@ -44,12 +44,12 @@ int copy(const char *path_tar, const char *path_file_source, const char *path_fi
 
     for(int i = 0; i < shift * BLOCK_SIZE; i++){
         if(buf[i] == '\0') {
-            nb_char = i;
+            nb_char_in_buf = i;
             break;
         }
     }
 
-    size_write = write(fd_dest, buf, nb_char);
+    size_write = write(fd_dest, buf, nb_char_in_buf);
     if(size_write == -1) perror("write");
 
     int ret = shift * BLOCK_SIZE;
@@ -57,8 +57,9 @@ int copy(const char *path_tar, const char *path_file_source, const char *path_fi
     return ret;
 
 }
-
+/*
 int main(int argc, char *argv[]){
     copy(argv[1], argv[2], argv[3]);
     return 0;
 }
+*/
