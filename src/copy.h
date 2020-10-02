@@ -9,6 +9,6 @@
 
 char buffer_block[BLOCK_SIZE];
 
-int copy(const char *path_tar, const char *path_file_source, const char *path_file_dest);
+void *copy(const char *path_tar, const char *path_file_source);
 
 #endif
