@@ -5,108 +5,110 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "tar.h"
+#include "types/posix_header.h"
+#include "list_file.h"
 
 
 
-const char * tarName = "test.tar";
-const char * chemin = "dos1/"; //doit etre dans un dossier ou à l'origine
-
-
-int ls(int);
-
-
-int main(void)
+int ls(const char * path_tar, const char * path_loc)
 {
-	int fd = open(tarName, O_RDONLY);
-	if (fd < 0)
+	/*
+	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent
+	- ls(...) : renvoie 0 si tout s'est bien passé et -1 sinon
+	- path_tar : chemin du tar (exemple "chemin/.../test.tar")
+	- path_loc : chemin de la localisation de l'utilisateur à partir du tar avec un '/' à la fin (exemple "dos1/dos2/dos3/")
+	*/
+
+	struct posix_header p;
+	int n, i, j;
+	char name[100];
+	char buf[BLOCK_SIZE];
+	char message[500] = ""; //surement à améliorer
+
+	int fd = open(path_tar, O_RDONLY);
+	if(fd < 0)
 	{
-		perror("open tarball");
+		perror("open");
 		return -1;
 	}
 
-	ls(fd);
-
-	close(fd);
-
-	return 0;
-}
-
-
-int ls(int fd)
-{
-	struct posix_header p;
-	int n;
-	char message[500] = ""; //voir quelle valeur mettre.. ou chaine de taille variable??
-	char buf[BLOCKSIZE];
-
-	while((n = read(fd, buf, BLOCKSIZE)) > 0)
+	while((n = read(fd, buf, BLOCK_SIZE)) > 0)
 	{
-		if (*(buf) == '\0')
+		if(*(buf) == '\0')
 		{
-			//end of file
-			strcat(message,"\n");
-			n = write(STDOUT_FILENO, message, 500);
-			if (n < 0)
+			/* fin du tar */
+			close(fd);
+			if (strlen(message) != 0)
 			{
-				perror("write");
-				return -1;
+				strcat(message, "\n");
+				/* écrit le message, un seul appel de write */
+				n = write(STDOUT_FILENO, message, 500);
+				if (n < 0)
+				{
+					perror("write");
+					return -1;
+				}
 			}
 			return 0;
 		}
 
-		for (int i = 0; i < sizeof(p.name); i++)
+		/* récupère le nom complet du fichier */
+		for (i = 0; i < sizeof(p.name); i++)
 		{
-			*(p.name + i) = *(buf + i);
+			p.name[i] = buf[i];
+		}
+		/* récupère la taille du fichier */
+		for (i = 0; i < sizeof(p.size); i++)
+		{
+			p.size[i] = buf[124+i];
 		}
 
-		for (int i = 0; i < sizeof(p.size); i++)
+		/* vérifie que le fichier est à afficher et ajoute son nom exact au message si il l'est */
+		if((strncmp(path_loc, p.name, (strlen(path_loc)-1)) == 0) || (strcmp(path_loc,"") == 0))
 		{
-			*(p.size + i) = *(buf + 124 + i);
-			//124 correspond à la position du début de size (voir tar.h)
-		}
-
-		//regarde si chemin est au debut du nom
-		if(strncmp(p.name, chemin, strlen(chemin)) == 0)
-		{
-			//exclu chemin = position actuelle de l'affichage
-			if (strcmp(p.name, chemin) != 0)
+			/* exclu le nom de l'emplacement (dossier) dans lequel on est cf localisation */
+			if(strcmp(path_loc,p.name) != 0)
 			{
-				//exclure les fichiers de profondeur > |chemin| + 1
-				strcat(strcat(message,p.name),"  ");
+				for(i = 0,j = strlen(path_loc); j < sizeof(p.name)-strlen(path_loc) ; i++, j++)
+				{
+					name[i] = p.name[j];
+				}
+				/* name = nom_exact ou nom_exact/ ou encore nom_exact/... */
+
+				int size_name = strlen(name);
+				strtok(name, "/");
+				/* name = nom_exact ou nom_exact/ */
+				/* ce if permet d'exclure les name = nom_exact/... */
+				if(size_name <=  strlen(name) + 1)
+				{
+					/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
+					strcat(strcat(message, name), "\t");
+				}
 			}
 		}
 
-		for (int i = 0; i < ((atoi(p.size) + BLOCKSIZE -1)/BLOCKSIZE); i++)
+		/* passe à l'en-tête suivant */
+		for (i = 0; i < ((atoi(p.size) + BLOCK_SIZE -1)/BLOCK_SIZE); i++)
 		{
-			n = read(fd, buf, BLOCKSIZE);
+			/* saute les contenus des fichiers */
+			n = read(fd, buf, BLOCK_SIZE);
 			if (n < 0)
 			{
-				perror("read");
+				perror("read 2");
 				return -1;
 			}
 		}
+		/* prêt à lire l'en-tête suivant */
 	}
-	perror("read");
+	perror("read 1");
 	return -1;
+
 }
 
-
-
 /*
-//cette fonction remplacera le code de la ligne 71 à 79
-char * getName(char * chemin, char * nom)
+int main(void)
 {
-	//la fonction vérifie si nom est bien à renvoyer et renvoie le nom à afficher si c'est le cas et renvoie "" sinon.
-	//chemin est du type ...doc1/doc2/...
-	//nom est du type /chemin/nom...
-
-	//verifie que nom est dans le dossier
-	if (strncmp(nom, chemin, strlen(chemin)) == 0)
-	{
-
-	}
-
-
+	ls("test.tar", "dos1/dos2/dos3/");
+	return 0;
 }
 */
