@@ -105,10 +105,3 @@ int ls(const char * path_tar, const char * path_loc)
 
 }
 
-/*
-int main(void)
-{
-	ls("test.tar", "dos1/dos2/dos3/");
-	return 0;
-}
-*/
