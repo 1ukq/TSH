@@ -10,8 +10,6 @@
 
 void copy_test(const char *path_tar, const char *path_file_source, const char *path_file_dest, int file_source_size){
 
-    //int nb_blocks_in_tar = file_source_size % BLOCK_SIZE == 0 ? file_source_size / BLOCK_SIZE : (file_source_size / BLOCK_SIZE) + 1;
-
     char *str = "targets/";
     char root[strlen(str) + strlen(path_file_source) + 1];
     strcpy(root, str);
@@ -46,11 +44,16 @@ void copy_test(const char *path_tar, const char *path_file_source, const char *p
 }
 
 void ls_test(const char * path_tar, const char * path_loc){
-    ls(path_tar, path_loc);
+    int ret = ls(path_tar, path_loc);
+
+    munit_assert_int(0, ==, ret);
 }
 
 int main(void){
+
    copy_test("targets/test.tar", "bar", "targets/dest", 2105);
    copy_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
    copy_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
+
+   ls_test("targets/test.tar", "");
 }
