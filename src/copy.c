@@ -22,7 +22,7 @@ int copy(const char *path_tar, const char *path_file_source, const char *path_fi
         return -1;
     }
 
-    int fd_dest = open(path_file_dest, O_WRONLY|O_CREAT, 0000700);
+    int fd_dest = open(path_file_dest, O_WRONLY|O_CREAT|O_TRUNC, 0000700);
     if(fd_dest == -1){
         perror("open");
         return -1;
