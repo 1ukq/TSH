@@ -41,12 +41,26 @@ void copy_test(const char *path_tar, const char *path_file_source, const char *p
 
     munit_assert_int(file_source_size, ==, ret_copy);
     munit_assert_memory_equal(BUF_SIZE, buf_source, buf_dest);
+
+    close(fd_dest);
+    close(fd_source);
+    free(buf_dest);
+    free(buf_source);
 }
 
-void ls_test(const char * path_tar, const char * path_loc){
-    int ret = ls(path_tar, path_loc);
+void ls_test(const char *path_tar, const char *path_file_source, const char *path_file_dest, char *expected_list){
 
-    munit_assert_int(0, ==, ret);
+    int fd_dest = open(path_file_dest, O_RDWR|O_TRUNC);
+    dup2(fd_dest, STDOUT_FILENO);
+    int ret = ls(path_tar, path_file_source);
+
+    char *buf = malloc(ret + 1);
+    int n = write(fd_dest, buf, ret);
+    buf[ret] = '\0';
+    printf("%s\n", buf);
+
+    munit_assert_int(5, ==, ret);
+    //munit_assert_memory_equal(ret + 1, buf, expected_list);
 }
 
 int main(void){
@@ -55,5 +69,7 @@ int main(void){
    copy_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
    copy_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
 
-   ls_test("targets/test.tar", "");
+   ls_test("targets/test.tar", "", "targets/dest", "bar	");
+
+   return 0;
 }
