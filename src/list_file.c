@@ -20,7 +20,7 @@ int ls(const char * path_tar, const char * path_loc)
 	*/
 
 	struct posix_header p;
-	int n, i, j;
+	int n, i, j, size;
 	char name[100];
 	char buf[BLOCK_SIZE];
 	char message[500] = ""; //surement à améliorer
@@ -61,6 +61,7 @@ int ls(const char * path_tar, const char * path_loc)
 		for (i = 0; i < sizeof(p.size); i++)
 		{
 			p.size[i] = buf[124+i];
+			sscanf(p.size, "%o", &size); //créer fonction conversion octal vers decimal
 		}
 
 		/* vérifie que le fichier est à afficher et ajoute son nom exact au message si il l'est */
@@ -88,7 +89,7 @@ int ls(const char * path_tar, const char * path_loc)
 		}
 
 		/* passe à l'en-tête suivant */
-		for (i = 0; i < ((atoi(p.size) + BLOCK_SIZE -1)/BLOCK_SIZE); i++)
+		for (i = 0; i < ((size + BLOCK_SIZE -1)/BLOCK_SIZE); i++)
 		{
 			/* saute les contenus des fichiers */
 			n = read(fd, buf, BLOCK_SIZE);
@@ -104,4 +105,3 @@ int ls(const char * path_tar, const char * path_loc)
 	return -1;
 
 }
-
