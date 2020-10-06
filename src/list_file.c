@@ -20,7 +20,7 @@ int ls(const char * path_tar, const char * path_loc)
 	*/
 
 	struct posix_header p;
-	int n, i, j, size;
+	int n, i, j, size, shift;
 	char name[100];
 	char buf[BLOCK_SIZE];
 	char message[500] = ""; //surement à améliorer
@@ -89,16 +89,13 @@ int ls(const char * path_tar, const char * path_loc)
 		}
 
 		/* passe à l'en-tête suivant */
-		for (i = 0; i < ((size + BLOCK_SIZE -1)/BLOCK_SIZE); i++)
+		shift = (size + BLOCK_SIZE -1)/BLOCK_SIZE;
+		if(lseek(fd,shift*BLOCK_SIZE, SEEK_CUR) < 0)
 		{
-			/* saute les contenus des fichiers */
-			n = read(fd, buf, BLOCK_SIZE);
-			if (n < 0)
-			{
-				perror("read 2");
-				return -1;
-			}
+			perror("lseek");
+			return -1;
 		}
+
 		/* prêt à lire l'en-tête suivant */
 	}
 	perror("read 1");
