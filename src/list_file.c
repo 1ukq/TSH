@@ -61,8 +61,8 @@ int ls(const char * path_tar, const char * path_loc)
 		for (i = 0; i < sizeof(p.size); i++)
 		{
 			p.size[i] = buf[124+i];
-			sscanf(p.size, "%o", &size); //créer fonction conversion octal vers decimal
 		}
+		sscanf(p.size, "%o", &size); //créer fonction conversion octal vers decimal
 
 		/* vérifie que le fichier est à afficher et ajoute son nom exact au message si il l'est */
 		if((strncmp(path_loc, p.name, (strlen(path_loc)-1)) == 0) || (strcmp(path_loc,"") == 0))
@@ -103,4 +103,10 @@ int ls(const char * path_tar, const char * path_loc)
 	perror("read");
 	return -1;
 
+}
+
+int main(void)
+{
+	ls("Lucas.tar", "");
+	return 0;
 }
