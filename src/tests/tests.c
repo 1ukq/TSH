@@ -8,11 +8,13 @@
 
 void copy_test(const char *path_tar, const char *path_file_source, const char *path_file_dest, int file_source_size){
 
+    int fd_dest = open(path_file_dest, O_RDWR|O_CREAT|O_TRUNC, 0000700);
+
     char *str = "targets/";
     char root[strlen(str) + strlen(path_file_source) + 1];
     strcpy(root, str);
 
-    int ret_copy = copy(path_tar, path_file_source, path_file_dest);
+    int ret_copy = copy(path_tar, path_file_source, fd_dest);
     if(ret_copy == -1){
         perror("copy");
         return;
@@ -23,7 +25,7 @@ void copy_test(const char *path_tar, const char *path_file_source, const char *p
     //On concatène "targets" et path_file_source parce path_file_source correspond au chemin absolu de file_source à l'intérieur d'un tarball
     strcat(root, path_file_source);
     int fd_source = open(root, O_RDONLY);
-    int fd_dest = open(path_file_dest, O_RDONLY);
+    fd_dest = open(path_file_dest, O_RDONLY);
 
     int size_source = read(fd_source, buf_source, file_source_size);
     if(size_source == -1){

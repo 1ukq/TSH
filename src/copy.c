@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 
-int copy(const char *path_tar, const char *path_file_source, const char *path_file_dest){
+int copy(const char *path_tar, const char *path_file_source, int fd_dest){
 
     ssize_t size_read;
     ssize_t size_write;
@@ -18,12 +18,6 @@ int copy(const char *path_tar, const char *path_file_source, const char *path_fi
 
     int fd_source = open(path_tar, O_RDONLY);
     if(fd_source == -1){
-        perror("open");
-        return -1;
-    }
-
-    int fd_dest = open(path_file_dest, O_WRONLY|O_CREAT|O_TRUNC, 0000700);
-    if(fd_dest == -1){
         perror("open");
         return -1;
     }
