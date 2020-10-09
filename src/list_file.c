@@ -104,9 +104,3 @@ int ls(const char * path_tar, const char * path_loc)
 	return -1;
 
 }
-
-int main(void)
-{
-	ls("Lucas.tar", "");
-	return 0;
-}
