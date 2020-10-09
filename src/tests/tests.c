@@ -46,12 +46,10 @@ void copy_test(const char *path_tar, const char *path_file_source, const char *p
     free(buf_source);
 }
 
-void ls_test(const char *path_tar, const char *path_file_source, const char *path_file_dest, char *expected_list){
+void ls_test(const char *path_tar, const char *path_file_source, int expected_nb_files){
 
     int ret = ls(path_tar, path_file_source);
-    printf("%d\n", ret);
-    //munit_assert_int(5, ==, ret);
-    //munit_assert_memory_equal(ret + 1, buf, expected_list);
+    munit_assert_int(expected_nb_files, ==, ret);
 }
 
 int main(void){
@@ -60,7 +58,8 @@ int main(void){
    copy_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
    copy_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
 
-   ls_test("targets/test.tar", "test_dir/", "targets/dest", "bar	");
+   ls_test("targets/test.tar", "test_dir/", 2);
+   ls_test("targets/test.tar", "", 2);
 
    return 0;
 }
