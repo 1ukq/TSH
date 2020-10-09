@@ -14,25 +14,25 @@ int ls(const char * path_tar, const char * path_loc)
 {
 	/*
 	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent
-	- ls(...) : renvoie 0 si tout s'est bien passé et -1 sinon
+	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
 	- path_tar : chemin du tar (exemple "chemin/.../test.tar")
 	- path_loc : chemin de la localisation de l'utilisateur à partir du tar avec un '/' à la fin (exemple "dos1/dos2/dos3/")
 	*/
 
 	struct posix_header p;
-	int n, i, j, size;
+	int n, i, j, fd, size, shift, count = 0;
 	char name[100];
 	char buf[BLOCK_SIZE];
-	char message[500] = ""; //surement à améliorer
+	char message[1000] = ""; //surement à améliorer
 
-	int fd = open(path_tar, O_RDONLY);
+	fd = open(path_tar, O_RDONLY);
 	if(fd < 0)
 	{
 		perror("open");
 		return -1;
 	}
 
-	while((n = read(fd, buf, BLOCK_SIZE)) > 0)
+	while(read(fd, buf, BLOCK_SIZE) > 0)
 	{
 		if(*(buf) == '\0')
 		{
@@ -49,7 +49,7 @@ int ls(const char * path_tar, const char * path_loc)
 					return -1;
 				}
 			}
-			return 0;
+			return count;
 		}
 
 		/* récupère le nom complet du fichier */
@@ -84,24 +84,23 @@ int ls(const char * path_tar, const char * path_loc)
 				{
 					/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
 					strcat(strcat(message, name), "\t");
+					count++;
 				}
 			}
 		}
 
 		/* passe à l'en-tête suivant */
-		for (i = 0; i < ((size + BLOCK_SIZE -1)/BLOCK_SIZE); i++)
+		shift = (size + BLOCK_SIZE -1)/BLOCK_SIZE;
+		n = lseek(fd,shift*BLOCK_SIZE, SEEK_CUR);
+		if(n < 0)
 		{
-			/* saute les contenus des fichiers */
-			n = read(fd, buf, BLOCK_SIZE);
-			if (n < 0)
-			{
-				perror("read 2");
-				return -1;
-			}
+			perror("lseek");
+			return -1;
 		}
+
 		/* prêt à lire l'en-tête suivant */
 	}
-	perror("read 1");
+	perror("read");
 	return -1;
 
 }
