@@ -65,9 +65,15 @@ int copy(const char *path_tar, const char *path_file_source, int fd_dest){
     }
 
     close(fd_source);
-    close(fd_dest);
     free(buf);
     
     return nb_char_in_buf;
+
+}
+
+void cat(const char *path_tar, const char *path_file_source){
+
+    int n = copy(path_tar, path_file_source, STDOUT_FILENO);
+    if(n == -1) perror("");
 
 }

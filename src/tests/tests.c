@@ -48,6 +48,13 @@ void copy_test(const char *path_tar, const char *path_file_source, const char *p
     free(buf_source);
 }
 
+void cat_test(const char *path_tar, const char *path_file_source){
+
+    copy(path_tar, path_file_source, STDOUT_FILENO);
+    printf("\n");
+
+}
+
 void ls_test(const char *path_tar, const char *path_file_source, int expected_nb_files){
 
     int ret = ls(path_tar, path_file_source);
@@ -56,12 +63,16 @@ void ls_test(const char *path_tar, const char *path_file_source, int expected_nb
 
 int main(void){
 
-   copy_test("targets/test.tar", "bar", "targets/dest", 2105);
-   copy_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
-   copy_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
+    copy_test("targets/test.tar", "bar", "targets/dest", 2105);
+    copy_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
+    copy_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
+    
+    cat_test("targets/test.tar", "bar");
+    cat_test("targets/test.tar", "test_dir/helloworld");
+    cat_test("targets/test.tar", "test_dir/foo");
 
-   ls_test("targets/test.tar", "test_dir/", 2);
-   ls_test("targets/test.tar", "", 2);
+    ls_test("targets/test.tar", "test_dir/", 2);
+    ls_test("targets/test.tar", "", 2);
 
    return 0;
 }
