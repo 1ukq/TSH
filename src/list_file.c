@@ -9,12 +9,13 @@
 #include "list_file.h"
 
 
-
-int ls(const char * path_tar, const char * path_loc)
+int ls(int fd_out, char option, const char * path_tar, const char * path_loc)
 {
 	/*
 	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
+	- fd_out : le fd de l'affichage, don STDOUT_FILENO pour les tests
+	- option : 'l' pour ls -l ou ' ' pour ls sans option
 	- path_tar : chemin du tar (exemple "chemin/.../test.tar")
 	- path_loc : chemin de la localisation de l'utilisateur à partir du tar avec un '/' à la fin (exemple "dos1/dos2/dos3/")
 	*/
@@ -40,9 +41,12 @@ int ls(const char * path_tar, const char * path_loc)
 			close(fd);
 			if (strlen(message) != 0)
 			{
-				strcat(message, "\n");
+				if(option != 'l')
+				{
+					strcat(message, "\n");
+				}
 				/* écrit le message, un seul appel de write */
-				n = write(STDOUT_FILENO, message, 500);
+				n = write(fd_out, message, 1000);
 				if (n < 0)
 				{
 					perror("write");
@@ -79,12 +83,63 @@ int ls(const char * path_tar, const char * path_loc)
 				int size_name = strlen(name);
 				strtok(name, "/");
 				/* name = nom_exact ou nom_exact/ */
+
 				/* ce if permet d'exclure les name = nom_exact/... */
 				if(size_name <=  strlen(name) + 1)
 				{
-					/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
-					strcat(strcat(message, name), "\t");
-					count++;
+					if(option == 'l')
+					{
+						/* récupère les permissions + ajout */
+						for (i = 0; i < sizeof(p.mode); i++)
+						{
+							p.mode[i] = buf[100+i];
+						}
+						strcat(message, p.mode);
+						strcat(message, " ");
+
+						/* récupère le uname + ajout */
+						for (i = 0; i < sizeof(p.uname); i++)
+						{
+							p.uname[i] = buf[265+i];
+						}
+						strcat(message, p.uname);
+						strcat(message, " ");
+
+						/* récupère le gname + ajout */
+						for (i = 0; i < sizeof(p.gname); i++)
+						{
+							p.gname[i] = buf[297+i];
+						}
+						strcat(message, p.gname);
+						strcat(message, " ");
+
+						/* ajoute taille à message */
+						strcat(message, p.size);
+						strcat(message, " ");
+						//pour l'instant on garde p.size mais conversion necessaire
+
+						/* récupère la date de dernière modification + ajout */
+						for (i = 0; i < sizeof(p.mtime); i++)
+						{
+							p.mtime[i] = buf[136+i];
+						}
+						strcat(message, p.mtime);
+						strcat(message, " ");
+
+						/* ajout nom à message */
+						strcat(message, name);
+						strcat(message,"\n");
+
+						count++;
+					}
+					else
+					{
+						/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
+						strcat(message, name);
+						strcat(message, "\t");
+
+						count++;
+					}
 				}
 			}
 		}
@@ -102,5 +157,4 @@ int ls(const char * path_tar, const char * path_loc)
 	}
 	perror("read");
 	return -1;
-
 }

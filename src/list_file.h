@@ -3,6 +3,6 @@
 
 #define BLOCK_SIZE 512
 
-int ls(const char * path_tar, const char * path_loc);
+int ls(int fd_out, char option, const char * path_tar, const char * path_loc);
 
 #endif
