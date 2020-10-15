@@ -5,6 +5,7 @@
 #include <string.h> //strlen strcat...
 #include <stdio.h> //perror
 #include <stdlib.h> //atoi
+#include <time.h> //gmtime
 
 
 
@@ -105,6 +106,72 @@ void get_permissions(char * perm_oct, char * perm_str)
 	}
 
 	perm_str[sizeof(perm_str)+1] = '\0';
+}
+
+void get_time(char * time_oct, char * time)
+{
+	int i;
+	int time_dec;
+	sscanf(time_oct, "%o", &time_dec);
+
+	time_t time_dec_t = time_dec;
+	struct tm * t = localtime(&time_dec_t);
+
+	char year[4];
+	char month[2];
+	char day[2];
+	char hour[2];
+	char min[2];
+
+	sprintf(year, "%i", 1900+(*t).tm_year);
+	sprintf(month, "%i", (*t).tm_mon);
+	sprintf(day, "%i", (*t).tm_mday);
+	sprintf(hour, "%i", (*t).tm_hour);
+	sprintf(min, "%i", (*t).tm_min);
+
+	if(strlen(month) == 1)
+	{
+		month[1] = month[0];
+		month[0] = '0';
+	}
+
+	if(strlen(day) == 1)
+	{
+		day[1] = day[0];
+		day[0] = '0';
+	}
+
+	if(strlen(hour) == 1)
+	{
+		hour[1] = hour[0];
+		hour[0] = '0';
+	}
+
+	if(strlen(min) == 1)
+	{
+		min[1] = min[0];
+		min[0] = '0';
+	}
+
+
+	for(i = 0; i < 4; i++)
+	{
+		time[i] = year[i];
+	}
+
+	for(i = 0; i < 2; i++)
+	{
+		time[i+5] = month[i];
+		time[i+8] = day[i];
+		time[i+11] = hour[i];
+		time[i+14] = min[i];
+	}
+	time[4] = ' ';
+	time[7] = ' ';
+	time[10] = ' ';
+	time[13] = ':';
+	time[16] = '\0';
+
 }
 
 int ls(int fd_out, char option, const char * path_tar, const char * path_loc);

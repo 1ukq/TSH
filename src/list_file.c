@@ -29,7 +29,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 
 	char type[1];
 
-	char time_str[sizeof(p.mtime)];
+	char time_str[16];
 
 	char perm_str[sizeof(p.mode)];
 
@@ -106,7 +106,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 				}
 				get_permissions(p.mode, perm_str);
 				strcat(affichage, perm_str);
-				strcat(affichage, " ");
+				strcat(affichage, "  ");
 
 				/* récupère le uname + ajout */
 				for (i = 0; i < sizeof(p.uname); i++)
@@ -122,19 +122,19 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 					p.gname[i] = buf[297+i];
 				}
 				strcat(affichage, p.gname);
-				strcat(affichage, " ");
+				strcat(affichage, "  ");
 
 				/* ajoute taille à message */
 				sprintf(size_str, "%i", size_dec); //conversion int -> str
 				strcat(affichage, size_str);
-				strcat(affichage, "  ");
+				strcat(affichage, "\t");
 
 				/* récupère la date de dernière modification + ajout */
 				for (i = 0; i < sizeof(p.mtime); i++)
 				{
 					p.mtime[i] = buf[136+i];
 				}
-				oct_to_dec(p.mtime, time_str);
+				get_time(p.mtime, time_str);
 				strcat(affichage, time_str);
 				strcat(affichage, "  ");
 
