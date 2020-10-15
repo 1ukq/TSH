@@ -73,7 +73,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 		{
 			p.size[i] = buf[124+i];
 		}
-		sscanf(p.size, "%o", &size_dec); //conversion char * octal -> int décimal
+		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
 
 
 		/* Vérification + conversion (à gauche) que le fichier est à afficher */
@@ -115,18 +115,16 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 				/* ajoute taille à message */
 				sprintf(size_str, "%i", size_dec);
 				strcat(affichage, size_str);
-				strcat(affichage, " \t");
-				//pour l'instant on garde p.size mais conversion necessaire
+				strcat(affichage, "  ");
 
 				/* récupère la date de dernière modification + ajout */
 				for (i = 0; i < sizeof(p.mtime); i++)
 				{
 					p.mtime[i] = buf[136+i];
 				}
-				sscanf(p.mtime, "%o", &time_dec);
-				sprintf(time_str, "%i", time_dec);
+				oct_to_dec(p.mtime, time_str);
 				strcat(affichage, time_str);
-				strcat(affichage, "\t");
+				strcat(affichage, "  ");
 
 				/* ajout nom à message */
 				strcat(affichage, name);
@@ -136,7 +134,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 			{
 				/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
 				strcat(affichage, name);
-				strcat(affichage, "\t");
+				strcat(affichage, "  ");
 			}
 
 			total++;

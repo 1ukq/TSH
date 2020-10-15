@@ -58,6 +58,14 @@ void get_type(char ptypeflag, char * type)
 	type[1] = '\0';
 }
 
+void oct_to_dec(char * oct, char * dec)
+{
+	int dec_int;
+
+	sscanf(oct, "%o", &dec_int);
+	sprintf(dec, "%i", dec_int);
+}
+
 void dec_to_bin(char * dec, char * bin)
 {
 	int i;
@@ -72,12 +80,9 @@ void dec_to_bin(char * dec, char * bin)
 
 void oct_to_bin(char * oct, char * bin)
 {
-	int dec_int;
-	char dec_str[10];
+	char * dec_str;
 
-	sscanf(oct, "%o", &dec_int);
-	sprintf(dec_str, "%i", dec_int);
-
+	oct_to_dec(oct, dec_str);
 	dec_to_bin(dec_str, bin);
 }
 
@@ -98,7 +103,7 @@ void get_permissions(char * perm_oct, char * perm_str)
 			perm_str[i] = '-';
 		}
 	}
-
+	
 	perm_str[9] = '\0';
 }
 
