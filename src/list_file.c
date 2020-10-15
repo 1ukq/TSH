@@ -3,31 +3,43 @@
 
 int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 {
+	/*
+	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent
+	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
+	- fd_out : sortie pour affichage (STDOUT_FILENO pour les tests) ce sera le fd du tshell
+	- option : ' ' pour un ls et 'l' pour un ls -l
+	- path_tar : chemin du tar (exemple "chemin/.../test.tar")
+	- path_cwd : chemin de la localisation de l'utilisateur (cwd) à partir du tar avec un '/' à la fin (exemple "dos1/dos2/dos3/") ou "" si il est à la racine du tar
+	*/
+
 	struct posix_header p;
 
 	char buf[BLOCK_SIZE];
 	char affichage[BLOCK_SIZE] = "";
 
 	int total = 0;
-	int n, i, j, shift;
-	int len_path_cwd = strlen(path_cwd);
+	int n, i, shift;
 
+	int size_psize = sizeof(p.size);
 	int size_dec;
-	char size_str[sizeof(p.size)];
+	char size_str[size_psize];
 
 	int size_pname = sizeof(p.name);
 	char name[size_pname];
 
 	char type[1];
 
-	int time_dec;
-	char time_str[sizeof(p.mode)];
+	char time_str[sizeof(p.mtime)];
 
-	char perm_str[9];
-
+	char perm_str[sizeof(p.mode)];
 
 
 
+
+	if(option != 'l' && option != ' ')
+	{
+		return -1;
+	}
 
 
 	int fd = open(path_tar, O_RDONLY);
@@ -69,7 +81,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 		}
 
 		/* Récupère la taille du fichier + conversion */
-		for (i = 0; i < size_pname; i++)
+		for (i = 0; i < size_psize; i++)
 		{
 			p.size[i] = buf[124+i];
 		}
@@ -113,7 +125,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 				strcat(affichage, " ");
 
 				/* ajoute taille à message */
-				sprintf(size_str, "%i", size_dec);
+				sprintf(size_str, "%i", size_dec); //conversion int -> str
 				strcat(affichage, size_str);
 				strcat(affichage, "  ");
 
@@ -134,7 +146,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 			{
 				/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
 				strcat(affichage, name);
-				strcat(affichage, "  ");
+				strcat(affichage, "\t");
 			}
 
 			total++;

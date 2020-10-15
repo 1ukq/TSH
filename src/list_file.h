@@ -103,8 +103,8 @@ void get_permissions(char * perm_oct, char * perm_str)
 			perm_str[i] = '-';
 		}
 	}
-	
-	perm_str[9] = '\0';
+
+	perm_str[sizeof(perm_str)+1] = '\0';
 }
 
 int ls(int fd_out, char option, const char * path_tar, const char * path_loc);
