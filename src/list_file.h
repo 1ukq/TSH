@@ -11,6 +11,8 @@
 #ifndef LIST_FILE
 #define LIST_FILE
 #define BLOCK_SIZE 512
+#define LTYPE "-7lcbdps"
+#define LPERM "rwxrwxrwx"
 
 int verif_convert_name(char * name, char * fullname, const char * path_cwd)
 {
@@ -51,33 +53,53 @@ int verif_convert_name(char * name, char * fullname, const char * path_cwd)
 
 void get_type(char ptypeflag, char * type)
 {
-	char * ltype = "-7lcbdps";
-	type[0] = ltype[atoi(&ptypeflag)];
+	//char * ltype = "-7lcbdps";
+	type[0] = LTYPE[atoi(&ptypeflag)];
 	type[1] = '\0';
 }
 
 void dec_to_bin(char * dec, char * bin)
 {
+	int i;
+	int nb = atoi(dec);
 
+	for(i = 8; nb > 0; i--)
+	{
+		bin[i] = (nb%2) ? '1' : '0';
+		nb = nb/2;
+	}
 }
 
-void get_permissions(char * perm_dec, char * perm_str)
+void oct_to_bin(char * oct, char * bin)
 {
-	char * lperm = "rwxrwxrwx";
-	char * perm_bin;
-	dec_to_bin(perm_dec, perm_bin);
+	int dec_int;
+	char dec_str[10];
+
+	sscanf(oct, "%o", &dec_int);
+	sprintf(dec_str, "%i", dec_int);
+
+	dec_to_bin(dec_str, bin);
+}
+
+void get_permissions(char * perm_oct, char * perm_str)
+{
+	//char * lperm = "rwxrwxrwx";
+	char perm_bin[10];
+	oct_to_bin(perm_oct, perm_bin);
 
 	for(int i = 0; i < 9; i++)
 	{
 		if(perm_bin[i] == '1')
 		{
-			perm_str[i] = lperm[i];
+			perm_str[i] = LPERM[i];
 		}
 		else
 		{
 			perm_str[i] = '-';
 		}
 	}
+
+	perm_str[9] = '\0';
 }
 
 int ls(int fd_out, char option, const char * path_tar, const char * path_loc);

@@ -1,4 +1,4 @@
-#include "new_ls.h"
+#include "list_file.h"
 #include "types/posix_header.h"
 
 int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
@@ -18,10 +18,12 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 	int size_pname = sizeof(p.name);
 	char name[size_pname];
 
-	char type[2];
+	char type[1];
 
 	int time_dec;
 	char time_str[sizeof(p.mode)];
+
+	char perm_str[9];
 
 
 
@@ -90,7 +92,8 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 				{
 					p.mode[i] = buf[100+i];
 				}
-				strcat(affichage, p.mode);
+				get_permissions(p.mode, perm_str);
+				strcat(affichage, perm_str);
 				strcat(affichage, " ");
 
 				/* récupère le uname + ajout */
