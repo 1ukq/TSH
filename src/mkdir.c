@@ -6,7 +6,6 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 {
 	struct posix_header p;
 	char buf[BLOCK_SIZE];
-	char entete[BLOCK_SIZE];
 
 	int i, n;
 	int shift;
@@ -40,18 +39,10 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 			{
 				p.name[i] = '\0';
 			}
-			for(i = 0; i < sizeof(p.name); i++)
-			{
-				entete[i] = p.name[i];
-			}
 			printf("p.name : %s\n", p.name);
 
 			/* p.mode */
 			sprintf(p.mode, "%s", "0000755");
-			for(i = 0; i < sizeof(p.mode); i++)
-			{
-				entete[100 + i] = p.mode[i];
-			}
 			printf("p.mode : %s\n", p.mode);
 
 			/* uid */
@@ -62,10 +53,6 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 				{
 					p.uid[i] = '0';
 				}
-			}
-			for(i = 0; i < sizeof(p.uid); i++)
-			{
-				entete[108 + i] = p.uid[i];
 			}
 			printf("p.uid : %s\n", p.uid);
 
@@ -78,10 +65,6 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 					p.gid[i] = '0';
 				}
 			}
-			for(i = 0; i < sizeof(p.gid); i++)
-			{
-				entete[116 + i] = p.gid[i];
-			}
 			printf("p.gid : %s\n", p.gid);
 
 			/* size */
@@ -90,18 +73,10 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 				p.size[i] = '0';
 			}
 			p.size[sizeof(p.size)] = '\0';
-			for(i = 0; i < sizeof(p.size); i++)
-			{
-				entete[124 + i] = p.size[i];
-			}
 			printf("p.size : %s\n", p.size);
 
 			/* mtime */
 			sprintf(p.mtime, "%li", time(NULL));
-			for(i = 0; i < sizeof(p.mtime); i++)
-			{
-				entete[136 + i] = p.mtime[i];
-			}
 			printf("p.mtime : %s\n", p.mtime);
 
 			/* chksum */
@@ -109,7 +84,6 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 
 			/* typeflag */
 			p.typeflag = '5';
-			entete[156] = p.typeflag;
 			printf("p.typeflag : %c\n", p.typeflag);
 
 			/* linkname */
@@ -142,7 +116,8 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 
 
 			// puis on ecrit tout dans l'ordre et la taille indiqué dans le posix_header en completant avec des '\0'
-			//n = write(fd, entete, BLOCK_SIZE);
+			printf("%s\n");
+			//n = write(fd, p, BLOCK_SIZE);
 
 
 			close(fd);
