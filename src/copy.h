@@ -17,10 +17,14 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
 void cat(const char *path_tar, const char *path_file_source);
 
+char *buffarize(const char *path_file_source, struct stat *restrict buf);
+
 char file_type(struct stat *restrict buf);
 
 int file_mode(struct stat *restrict buf);
 
 void create_file_header(const char *restrict path_file_source, const char *file_name, struct stat *restrict buf, struct posix_header *header);
+
+void insert_file_in_tar(const char *path_tar, const char *path_file_source, const char *file_name);
 
 #endif

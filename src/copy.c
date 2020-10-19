@@ -81,6 +81,39 @@ void cat(const char *path_tar, const char *path_file_source){
 
 }
 
+char *buffarize(const char *restrict path_file_source, struct stat *restrict buf){
+
+    int check_ret = stat(path_file_source, buf);
+    if(check_ret == -1){
+        perror("stat in buffarize");
+        return NULL;
+    }
+
+    int fd_source = open(path_file_source, O_RDONLY);
+    if(fd_source == -1){
+        perror("open in buffarize");
+        return NULL;
+    }
+
+    off_t size = buf -> st_size;
+
+    int nb_blocks = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+    char *file_source_buf = malloc(sizeof(char) * BLOCK_SIZE * nb_blocks);
+    if(file_source_buf == NULL){
+        perror("malloc in buffarize");
+        return NULL;
+    }
+
+    int nb_char_read = read(fd_source, file_source_buf, size);
+    if(nb_char_read == -1){
+        perror("read in buffarize");
+        return NULL;
+    }
+
+    return file_source_buf;
+
+}
+
 void set_checksum(struct posix_header *hd) {
     memset(hd->chksum,' ',8);
     unsigned int sum = 0;
@@ -149,4 +182,30 @@ void create_file_header(const char *restrict path_file_source, const char *file_
 
 }
 
-void insert_file_in_tar(const char *path_tar, const char *path_file_source){}
+void insert_file_in_tar(const char *path_tar, const char *path_file_source, const char *file_name){
+
+    int fd_tar = open(path_tar, O_RDWR);
+    if(fd_tar == -1){
+        perror("open");
+    }
+
+    int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END);
+    if(lseek_ret == -1){
+        perror("lseek");
+    }
+    printf("LSEEK %d\n", lseek_ret);
+
+    struct stat stat_buf_source;
+    char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
+
+    struct posix_header header;
+    struct stat buf;
+    create_file_header(path_file_source, file_name, &buf, &header);
+
+    int wr = write(fd_tar, &header, BLOCK_SIZE);
+
+    int size = stat_buf_source.st_size;
+    int nb_blocks = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+    wr = write(fd_tar, file_source_buf, nb_blocks * BLOCK_SIZE);
+
+}
