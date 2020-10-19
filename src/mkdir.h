@@ -5,6 +5,8 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <time.h>
+#include <pwd.h>
+#include <grp.h>
 
 
 #define BLOCK_SIZE 512

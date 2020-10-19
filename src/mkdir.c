@@ -7,6 +7,8 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 	struct posix_header p;
 	char buf[BLOCK_SIZE];
 
+	//struct passwd pswd;
+
 	int i, n;
 	int shift;
 
@@ -47,13 +49,14 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 
 			/* uid */
 			sprintf(p.uid, "%7o", getuid());
-			for(i = 0; i < sizeof(p.uid); i++)
+			for(i = 0; i < sizeof(p.uid)-1; i++)
 			{
 				if(p.uid[i] == ' ')
 				{
 					p.uid[i] = '0';
 				}
 			}
+			p.uid[sizeof(p.uid)-1] = '\0';
 			printf("p.uid : %s\n", p.uid);
 
 			/* gid */
@@ -65,6 +68,7 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 					p.gid[i] = '0';
 				}
 			}
+			p.gid[sizeof(p.gid)-1] = '\0';
 			printf("p.gid : %s\n", p.gid);
 
 			/* size */
@@ -72,7 +76,7 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 			{
 				p.size[i] = '0';
 			}
-			p.size[sizeof(p.size)] = '\0';
+			p.size[sizeof(p.size)-1] = '\0';
 			printf("p.size : %s\n", p.size);
 
 			/* mtime */
@@ -87,38 +91,74 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 			printf("p.typeflag : %c\n", p.typeflag);
 
 			/* linkname */
+			for(i = 0; i < sizeof(p.linkname); i++)
+			{
+				p.linkname[i] = '\0';
+			}
 			printf("p.linkname : %s\n", p.linkname);
 
 			/* magic */
+			sprintf(p.magic, "ustar");
 			printf("p.magic : %s\n", p.magic);
 
 			/* version */
+			sprintf(p.version, "00");
 			printf("p.version : %s\n", p.version);
 
 			/* uname */
-			//sprintf(p.uname, "%s", getlogin());
+			struct passwd * pswd = getpwuid(getgid());
+			sprintf(p.uname, "%s", (*pswd).pw_name);
+			for(i = strlen(p.uname); i < sizeof(p.uname); i++)
+			{
+				p.uname[i] = '\0';
+			}
 			printf("p.uname : %s\n", p.uname);
 
 			/* gname */
+			struct group * grp = getgrgid(getgid());
+			sprintf(p.gname, "%s", (*grp).gr_name);
+			for(i = strlen(p.gname); i < sizeof(p.gname); i++)
+			{
+				p.gname[i] = '\0';
+			}
 			printf("p.gname : %s\n", p.gname);
 
 			/* devmajor */
+			for(i = 0; i < 6; i++)
+			{
+				p.devmajor[i] = '0';
+			}
+			p.devmajor[sizeof(p.devmajor)-2] = '\0';
+			p.devmajor[sizeof(p.devmajor)-1] = '\0';
 			printf("p.devmajor : %s\n", p.devmajor);
 
 			/* devminor */
+			for(i = 0; i < 6; i++)
+			{
+				p.devminor[i] = '0';
+			}
+			p.devminor[sizeof(p.devminor)-2] = '\0';
+			p.devminor[sizeof(p.devminor)-1] = '\0';
 			printf("p.devminor : %s\n", p.devminor);
 
 			/* prefix */
+			for(i = 0; i < sizeof(p.prefix); i++)
+			{
+				p.prefix[i] = '\0';
+			}
 			printf("p.prefix : %s\n", p.prefix);
 
 			/* junk */
+			for(i = 0; i < sizeof(p.junk); i++)
+			{
+				p.junk[i] = '\0';
+			}
 			printf("p.junk : %s\n", p.junk);
 
 
 			// puis on ecrit tout dans l'ordre et la taille indiqué dans le posix_header en completant avec des '\0'
-			printf("%s\n");
+			printf("\n");
 			//n = write(fd, p, BLOCK_SIZE);
-
 
 			close(fd);
 
