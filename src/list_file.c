@@ -20,12 +20,10 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 	int total = 0;
 	int n, i, shift;
 
-	int size_psize = sizeof(p.size);
 	int size_dec;
-	char size_str[size_psize];
+	char size_str[sizeof(p.size)];
 
-	int size_pname = sizeof(p.name);
-	char name[size_pname];
+	char name[sizeof(p.name)];
 
 	char type[1];
 
@@ -75,13 +73,13 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 		}
 
 		/* Récupère le nom complet du fichier */
-		for (i = 0; i < size_pname; i++)
+		for (i = 0; i < sizeof(p.name); i++)
 		{
 			p.name[i] = buf[i];
 		}
 
 		/* Récupère la taille du fichier + conversion */
-		for (i = 0; i < size_psize; i++)
+		for (i = 0; i < sizeof(p.size); i++)
 		{
 			p.size[i] = buf[124+i];
 		}

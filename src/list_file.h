@@ -166,8 +166,8 @@ void get_time(char * time_oct, char * time)
 		time[i+11] = hour[i];
 		time[i+14] = min[i];
 	}
-	time[4] = ' ';
-	time[7] = ' ';
+	time[4] = '-';
+	time[7] = '-';
 	time[10] = ' ';
 	time[13] = ':';
 	time[16] = '\0';
