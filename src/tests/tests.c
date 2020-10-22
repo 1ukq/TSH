@@ -66,6 +66,7 @@ void ls_test(const char *path_tar, const char *path_file_source, int expected_nb
 void buffarize_test(const char *path_file_source, char *expected_buf, off_t nb_bytes){
 
     struct stat buf;
+    stat(path_file_source, &buf);
     char *file_source_buf = buffarize(path_file_source, &buf);
     munit_assert_memory_equal(nb_bytes, expected_buf, file_source_buf);
 
@@ -91,10 +92,9 @@ int main(void){
 
 
     ls_test("targets/test.tar", "test_dir/", 2);
+    printf("\n");
     ls_test("targets/test.tar", "", 2);
     printf("\n");
-
-
 
 
 
@@ -105,7 +105,34 @@ int main(void){
     free(expected_buf);
     close(fd);
 
-    //insert_file_in_tar("a.tar", "tests.c", "tests.c");
+
+
+
+
+    struct stat buf;
+    //stat("targets/bar", &buf);
+    struct posix_header header;
+    //memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
+/*
+    int ret = create_file_header("bar", &buf, &header);
+    printf("ret : %d\n", ret);
+    printf("name : %s\n", header.name);
+    printf("size : %s\n", header.size);
+    printf("type : %c\n", header.typeflag);
+    printf("version : %s\n", header.version);
+    printf("magic : %s\n", header.magic);
+    printf("mode : %s\n", header.mode);
+    printf("chcksum : %s\n", header.chksum);
+
+    char *p = (char *)&header;
+    for(int i = 0; i < BLOCK_SIZE; i++) printf("%c", p[i]);
+    */
+
+
+    //int f = open("test", O_WRONLY);
+    //write(f, &header, 512);
+
+    insert_file_in_tar("a.tar", "targets/test_dir/foo", "foo");
 
    return 0;
 }

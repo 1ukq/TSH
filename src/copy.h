@@ -19,11 +19,11 @@ void cat(const char *path_tar, const char *path_file_source);
 
 char *buffarize(const char *path_file_source, struct stat *restrict buf);
 
-char file_type(struct stat *restrict buf);
+void init_type_file(struct stat *restrict buf, struct posix_header *header);
 
-int file_mode(struct stat *restrict buf);
+void init_mode_file(struct stat *restrict buf, struct posix_header *header);
 
-void create_file_header(const char *restrict path_file_source, const char *file_name, struct stat *restrict buf, struct posix_header *header);
+int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header);
 
 void insert_file_in_tar(const char *path_tar, const char *path_file_source, const char *file_name);
 

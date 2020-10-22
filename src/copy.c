@@ -12,7 +12,9 @@
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest){
 
-    if(fd_dest == -1) perror("open");
+    if(fd_dest == -1){
+        return -1;
+    };
 
     ssize_t size_read;
     ssize_t size_write;
@@ -21,7 +23,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
     int fd_source = open(path_tar, O_RDONLY);
     if(fd_source == -1){
-        perror("open");
+        perror("open in copy_from_tar");
         return -1;
     }
 
@@ -31,7 +33,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
         size_read = read(fd_source, &p, BLOCK_SIZE);
         if(size_read == -1){
-            perror("read");
+            perror("read in copy_from_tar");
             return -1;
         }
 
@@ -43,13 +45,13 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
     char *buf = malloc(sizeof(char) * shift * BLOCK_SIZE);
     if(buf == NULL){
-        perror("malloc");
+        perror("malloc in copy_from_tar");
         return -1;
     }
 
     size_read = read(fd_source, buf, shift * BLOCK_SIZE);
     if(size_read == -1){
-        perror("read");
+        perror("read in copy_from_tar");
         return -1;
     }
 
@@ -63,7 +65,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
     size_write = write(fd_dest, buf, nb_char_in_buf);
     if(size_write == -1){
-        perror("write");
+        perror("write in copy_from_tar");
         return -1;
     }
 
@@ -82,12 +84,6 @@ void cat(const char *path_tar, const char *path_file_source){
 }
 
 char *buffarize(const char *restrict path_file_source, struct stat *restrict buf){
-
-    int check_ret = stat(path_file_source, buf);
-    if(check_ret == -1){
-        perror("stat in buffarize");
-        return NULL;
-    }
 
     int fd_source = open(path_file_source, O_RDONLY);
     if(fd_source == -1){
@@ -132,53 +128,66 @@ int check_checksum(struct posix_header *hd) {
     return (checksum == sum);
 }
 
-char file_type(struct stat *restrict buf){
+void init_type_file(struct stat *restrict buf, struct posix_header *header){
+    if(S_ISREG(buf -> st_mode)) (*header).typeflag = REGTYPE;
+    else if(S_ISDIR(buf -> st_mode)) (*header).typeflag = DIRTYPE;
+    else if(S_ISFIFO(buf -> st_mode)) (*header).typeflag = FIFOTYPE;
+    else if(S_ISLNK(buf -> st_mode)) (*header).typeflag = LNKTYPE;
+    else if(S_ISCHR(buf -> st_mode)) (*header).typeflag = CHRTYPE;
+    else if(S_ISBLK(buf -> st_mode)) (*header).typeflag = BLKTYPE;
+    else if(S_ISSOCK(buf -> st_mode)) (*header).typeflag = SOCKTYPE;
+}
 
-    if(S_ISREG(buf -> st_mode)) return REGTYPE;
-    else if(S_ISDIR(buf -> st_mode)) return DIRTYPE;
-    else if(S_ISFIFO(buf -> st_mode)) return FIFOTYPE;
-    else if(S_ISLNK(buf -> st_mode)) return LNKTYPE;
-    else if(S_ISCHR(buf -> st_mode)) return CHRTYPE;
-    else if(S_ISBLK(buf -> st_mode)) return BLKTYPE;
-    else if(S_ISSOCK(buf -> st_mode)) return SOCKTYPE;
-    else return 'R';
+void init_mode_file(struct stat *restrict buf, struct posix_header *header){
+
+    sprintf(header -> mode, "%s", "0000000\0");
+    int usr = 0;
+    int grp = 0;
+    int oth = 0;
+    if(buf -> st_mode & S_IRUSR) usr += 4;
+    if(buf -> st_mode & S_IWUSR) usr += 2;
+    if(buf -> st_mode & S_IXUSR) usr += 1;
+    if(buf -> st_mode & S_IRGRP) grp += 4;
+    if(buf -> st_mode & S_IWGRP) grp += 2;
+    if(buf -> st_mode & S_IXGRP) grp += 1;
+    if(buf -> st_mode & S_IROTH) oth += 4;
+    if(buf -> st_mode & S_IWOTH) oth += 2;
+    if(buf -> st_mode & S_IXOTH) oth += 1;
+    (*header).mode[6] += oth;
+    (*header).mode[5] += grp;
+    (*header).mode[4] += usr;
 
 }
 
-int file_mode(struct stat *restrict buf){
+int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header){
 
-    int mode = 0000000;
-    if(buf -> st_mode & S_IRUSR) mode += S_IRUSR;
-    if(buf -> st_mode & S_IWUSR) mode += S_IWUSR;
-    if(buf -> st_mode & S_IXUSR) mode += S_IXUSR;
-    if(buf -> st_mode & S_IRGRP) mode += S_IRGRP;
-    if(buf -> st_mode & S_IWGRP) mode += S_IWGRP;
-    if(buf -> st_mode & S_IXGRP) mode += S_IXGRP;
-    if(buf -> st_mode & S_IROTH) mode += S_IROTH;
-    if(buf -> st_mode & S_IWOTH) mode += S_IWOTH;
-    if(buf -> st_mode & S_IXOTH) mode += S_IXOTH;
-    return mode;
-    
-}
-
-void create_file_header(const char *restrict path_file_source, const char *file_name, struct stat *restrict buf, struct posix_header *header){
-
-    int check_ret = stat(path_file_source, buf);
-    if(check_ret == -1){
-        perror("stat");
-    }
+    //set_checksum(header);
+    //int n = check_checksum(header);
+    //if(!n){
+    //    return -1;
+    //}
 
     sprintf(header -> name, "%s", file_name);
+
+    init_mode_file(buf, header);
+
     off_t file_size = buf -> st_size;
     sprintf(header -> size, "%011llo", file_size);
-    char type = file_type(buf);
-    header -> typeflag = type;
-    set_checksum(header);
-    (*header).version[0] = '0';
-    (*header).version[1] = '0';
+
+    init_type_file(buf, header);
+
     sprintf(header -> magic, "%s", TMAGIC);
-    int mode = file_mode(buf);
-    sprintf(header -> mode, "%o", mode);
+
+    (*header).version[0] = ' ';
+    (*header).version[1] = ' ';
+
+    sprintf(header -> uid, "%s", "0000765");
+    sprintf(header -> gid, "%s", "0000024");
+    sprintf(header -> mtime, "%s", "13740107126");
+    sprintf(header -> uname, "%s", "LucasKetelsstaff");
+    sprintf(header -> chksum,"%s", "000400");
+
+    return 0;
 
 }
 
@@ -186,21 +195,25 @@ void insert_file_in_tar(const char *path_tar, const char *path_file_source, cons
 
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
-        perror("open");
+        perror("open in insert_file_in_tar");
     }
 
-    int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END);
+    //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END);
+    int lseek_ret = lseek(fd_tar, 1024, SEEK_SET);
     if(lseek_ret == -1){
-        perror("lseek");
+        perror("lseek in insert_file_in_tar");
     }
-    printf("LSEEK %d\n", lseek_ret);
 
     struct stat stat_buf_source;
-    char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
-
+    int check_stat = stat(path_file_source, &stat_buf_source);
+    if(check_stat == -1){
+        perror("stat in insert_file_in_tar");
+    }
     struct posix_header header;
-    struct stat buf;
-    create_file_header(path_file_source, file_name, &buf, &header);
+    memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
+
+    create_file_header(file_name, &stat_buf_source, &header);
+    char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
 
     int wr = write(fd_tar, &header, BLOCK_SIZE);
 
