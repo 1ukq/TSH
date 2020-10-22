@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
+#include <sys/utsname.h>
 
 void copy_from_tar_test(const char *path_tar, const char *path_file_source, const char *path_file_dest, int file_source_size){
 
@@ -106,36 +107,11 @@ int main(void){
     close(fd);
 
 
-
-
-
     struct stat buf;
-    //stat("Makefile", &buf);
+
     struct posix_header header;
-    //memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
 
-
-    /*
-    int ret = create_file_header("bar", &buf, &header);
-    printf("ret : %d\n", ret);
-    printf("name : %s\n", header.name);
-    printf("size : %s\n", header.size);
-    printf("type : %c\n", header.typeflag);
-    printf("version : %s\n", header.version);
-    printf("magic : %s\n", header.magic);
-    printf("mode : %s\n", header.mode);
-    printf("chcksum : %s\n", header.chksum);
-    */
-    //printf("uname : %s\n", header.uname);
-
-    //char *p = (char *)&header;
-    //for(int i = 0; i < BLOCK_SIZE; i++) printf("%c", p[i]);
-
-
-    //int f = open("test", O_WRONLY);
-    //write(f, &header, 512);
-
-    insert_file_in_tar("a.tar", "targets/test_dir/foo", "foo");
+    insert_file_in_tar("a.tar", "targets/test_dir/foo");
 
    return 0;
 }

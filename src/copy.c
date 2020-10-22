@@ -1,19 +1,4 @@
 #include "copy.h"
-#include "types/posix_header.h"
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/uio.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <pwd.h>
-#include <grp.h>
-#include <uuid/uuid.h>
-#include <time.h>
-
-
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest){
 
@@ -84,7 +69,6 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 void cat(const char *path_tar, const char *path_file_source){
 
     int n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
-    if(n == -1) perror("");
 
 }
 
@@ -164,6 +148,12 @@ void init_mode_file(struct stat *restrict buf, struct posix_header *header){
 
 }
 
+void init_size_file(struct stat *restrict buf, struct posix_header *header){
+
+    sprintf(header -> size, "%011llo", buf -> st_size);
+
+}
+
 void init_uid_file(struct stat *restrict buf, struct posix_header *header){
 
     sprintf(header -> uid, "%7o", buf -> st_uid);
@@ -180,53 +170,57 @@ void init_gid_file(struct stat *restrict buf, struct posix_header *header){
 
 void init_mtime_file(struct stat *restrict buf, struct posix_header *header){
 
-    sprintf(header -> mtime, "%li", time(NULL));
-    printf("TIME : %ld\n", time(NULL));
+    sprintf(header -> mtime, "%lo", buf -> st_mtimespec.tv_sec);
 
 }
 
-int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header){
-/*
+void init_name_file(struct posix_header *header, const char *path_file_source){
+
+    sprintf(header -> name, "%s", path_file_source);
+
+}
+
+void init_magic_file(struct posix_header *header){
+
+    sprintf(header -> magic, "%s", TMAGIC);
+
+}
+
+void init_version_file(struct posix_header *header){
+
+    (*header).version[0] = ' ';
+    (*header).version[1] = ' '; 
+
+}
+
+int create_file_header(const char *path_file_source, struct stat *restrict buf, struct posix_header *header){
+
+    init_name_file(header, path_file_source);
+    init_mode_file(buf, header);
+    init_size_file(buf, header);
+    init_type_file(buf, header);
+    init_magic_file(header);
+    init_version_file(header);
+    init_uid_file(buf, header);
+    init_gid_file(buf, header);
+    init_mtime_file(buf, header);
     set_checksum(header);
     int n = check_checksum(header);
     if(!n){
         return -1;
     }
-*/
-    sprintf(header -> name, "%s", file_name);
-
-    init_mode_file(buf, header);
-
-    off_t file_size = buf -> st_size;
-    sprintf(header -> size, "%011llo", file_size);
-
-    init_type_file(buf, header);
-
-    sprintf(header -> magic, "%s", TMAGIC);
-
-    (*header).version[0] = ' ';
-    (*header).version[1] = ' ';
-
-    init_uid_file(buf, header);
-    init_gid_file(buf, header);
-
-    //sprintf(header -> mtime, "%s", "13740107126");
-    init_mtime_file(buf, header);
-    sprintf(header -> uname, "%s", "LucasKetelsstaff");
-    sprintf(header -> chksum,"%s", "011662");
-
     return 0;
 
 }
 
-void insert_file_in_tar(const char *path_tar, const char *path_file_source, const char *file_name){
+void insert_file_in_tar(const char *path_tar, const char *path_file_source){
 
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
         perror("open in insert_file_in_tar");
     }
 
-    //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END);
+    //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar
     int lseek_ret = lseek(fd_tar, 1024, SEEK_SET);
     if(lseek_ret == -1){
         perror("lseek in insert_file_in_tar");
@@ -240,7 +234,7 @@ void insert_file_in_tar(const char *path_tar, const char *path_file_source, cons
     struct posix_header header;
     memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
 
-    create_file_header(file_name, &stat_buf_source, &header);
+    create_file_header(path_file_source, &stat_buf_source, &header);
     char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
 
     int wr = write(fd_tar, &header, BLOCK_SIZE);

@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pwd.h>
+#include <grp.h>
+#include <uuid/uuid.h>
+#include <time.h>
 
 char buffer_block[BLOCK_SIZE];
 
@@ -29,6 +33,6 @@ void init_uid_file(struct stat *restrict buf, struct posix_header *header);
 
 void init_gid_file(struct stat *restrict buf, struct posix_header *header);
 
-void insert_file_in_tar(const char *path_tar, const char *path_file_source, const char *file_name);
+void insert_file_in_tar(const char *path_tar, const char *path_file_source);
 
 #endif
