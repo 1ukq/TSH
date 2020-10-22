@@ -110,10 +110,12 @@ int main(void){
 
 
     struct stat buf;
-    //stat("targets/bar", &buf);
+    //stat("Makefile", &buf);
     struct posix_header header;
     //memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
-/*
+
+
+    /*
     int ret = create_file_header("bar", &buf, &header);
     printf("ret : %d\n", ret);
     printf("name : %s\n", header.name);
@@ -123,10 +125,11 @@ int main(void){
     printf("magic : %s\n", header.magic);
     printf("mode : %s\n", header.mode);
     printf("chcksum : %s\n", header.chksum);
-
-    char *p = (char *)&header;
-    for(int i = 0; i < BLOCK_SIZE; i++) printf("%c", p[i]);
     */
+    //printf("uname : %s\n", header.uname);
+
+    //char *p = (char *)&header;
+    //for(int i = 0; i < BLOCK_SIZE; i++) printf("%c", p[i]);
 
 
     //int f = open("test", O_WRONLY);

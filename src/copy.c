@@ -8,6 +8,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <pwd.h>
+#include <grp.h>
+#include <uuid/uuid.h>
+#include <time.h>
+
 
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest){
@@ -159,14 +164,35 @@ void init_mode_file(struct stat *restrict buf, struct posix_header *header){
 
 }
 
+void init_uid_file(struct stat *restrict buf, struct posix_header *header){
+
+    sprintf(header -> uid, "%7o", buf -> st_uid);
+    for(int i = 0; i < 8; i++) if((*header).uid[i] == ' ') (*header).uid[i] = '0';
+
+}
+
+void init_gid_file(struct stat *restrict buf, struct posix_header *header){
+
+    sprintf(header -> gid, "%7o", buf -> st_gid);
+    for(int i = 0; i < 8; i++) if((*header).gid[i] == ' ') (*header).gid[i] = '0';
+
+}
+
+void init_mtime_file(struct stat *restrict buf, struct posix_header *header){
+
+    sprintf(header -> mtime, "%li", time(NULL));
+    printf("TIME : %ld\n", time(NULL));
+
+}
+
 int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header){
-
-    //set_checksum(header);
-    //int n = check_checksum(header);
-    //if(!n){
-    //    return -1;
-    //}
-
+/*
+    set_checksum(header);
+    int n = check_checksum(header);
+    if(!n){
+        return -1;
+    }
+*/
     sprintf(header -> name, "%s", file_name);
 
     init_mode_file(buf, header);
@@ -181,11 +207,13 @@ int create_file_header(const char *file_name, struct stat *restrict buf, struct 
     (*header).version[0] = ' ';
     (*header).version[1] = ' ';
 
-    sprintf(header -> uid, "%s", "0000765");
-    sprintf(header -> gid, "%s", "0000024");
-    sprintf(header -> mtime, "%s", "13740107126");
+    init_uid_file(buf, header);
+    init_gid_file(buf, header);
+
+    //sprintf(header -> mtime, "%s", "13740107126");
+    init_mtime_file(buf, header);
     sprintf(header -> uname, "%s", "LucasKetelsstaff");
-    sprintf(header -> chksum,"%s", "000400");
+    sprintf(header -> chksum,"%s", "011662");
 
     return 0;
 

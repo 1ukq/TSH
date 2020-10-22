@@ -25,6 +25,10 @@ void init_mode_file(struct stat *restrict buf, struct posix_header *header);
 
 int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header);
 
+void init_uid_file(struct stat *restrict buf, struct posix_header *header);
+
+void init_gid_file(struct stat *restrict buf, struct posix_header *header);
+
 void insert_file_in_tar(const char *path_tar, const char *path_file_source, const char *file_name);
 
 #endif
