@@ -72,6 +72,35 @@ void cat(const char *path_tar, const char *path_file_source){
 
 }
 
+int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes){
+
+    for(int i = 0; i < nbytes; i++) if(buf1[i] != buf2[i]) return 0;
+    return 1;
+
+}
+
+int find_next_block(int fd_tar){
+
+    int nb_blocks = 0;
+
+    char *buf1 = malloc(sizeof(char) * BLOCK_SIZE);
+    char *buf2 = malloc(sizeof(char) * BLOCK_SIZE);
+    memset(buf2, '\0', BLOCK_SIZE);
+
+    int n = read(fd_tar, buf1, BLOCK_SIZE);
+    if(n == -1){
+        perror("read in find_next_block");
+        return -1;
+    }
+
+    while(!compare_buffers_of_same_size(buf1, buf2, BLOCK_SIZE)){
+        read(fd_tar, buf1, BLOCK_SIZE);
+        nb_blocks++;
+    }
+
+    return nb_blocks;
+}
+
 char *buffarize(const char *restrict path_file_source, struct stat *restrict buf){
 
     int fd_source = open(path_file_source, O_RDONLY);
@@ -213,23 +242,27 @@ int create_file_header(const char *path_file_source, struct stat *restrict buf, 
 
 }
 
-void insert_file_in_tar(const char *path_tar, const char *path_file_source){
+int insert_file_in_tar(const char *path_tar, const char *path_file_source){
 
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
         perror("open in insert_file_in_tar");
+        return -1;
     }
 
-    //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar
-    int lseek_ret = lseek(fd_tar, 1024, SEEK_SET);
+    //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar (bsdtar is the default tar utility on MacOS)
+    int b = find_next_block(fd_tar);
+    int lseek_ret = lseek(fd_tar, b * BLOCK_SIZE, SEEK_SET);
     if(lseek_ret == -1){
         perror("lseek in insert_file_in_tar");
+        return -1;
     }
 
     struct stat stat_buf_source;
     int check_stat = stat(path_file_source, &stat_buf_source);
     if(check_stat == -1){
         perror("stat in insert_file_in_tar");
+        return -1;
     }
     struct posix_header header;
     memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
@@ -238,9 +271,22 @@ void insert_file_in_tar(const char *path_tar, const char *path_file_source){
     char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
 
     int wr = write(fd_tar, &header, BLOCK_SIZE);
+    if(wr == -1){
+        perror("write in insert_file_in_tar");
+        return -1;
+    }
 
     int size = stat_buf_source.st_size;
     int nb_blocks = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
     wr = write(fd_tar, file_source_buf, nb_blocks * BLOCK_SIZE);
+    if(wr == -1){
+        perror("write in insert_file_in_tar");
+        return -1;
+    }
+
+    free(file_source_buf);
+    close(fd_tar);
+
+    return 0;
 
 }

@@ -107,11 +107,13 @@ int main(void){
     close(fd);
 
 
-    struct stat buf;
+    //struct stat buf;
+    //struct posix_header header;
+    //insert_file_in_tar("a.tar", "targets/test_dir/foo");
 
-    struct posix_header header;
-
-    insert_file_in_tar("a.tar", "targets/test_dir/foo");
+    //int fd_tar = open("a.tar", O_RDONLY);
+    //int ret = find_next_block(fd_tar);
+    //printf("RET : %d\n", ret);
 
    return 0;
 }

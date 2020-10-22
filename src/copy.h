@@ -15,11 +15,13 @@
 #include <uuid/uuid.h>
 #include <time.h>
 
-char buffer_block[BLOCK_SIZE];
-
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest);
 
 void cat(const char *path_tar, const char *path_file_source);
+
+int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
+
+int find_next_block(int fd_tar);
 
 char *buffarize(const char *path_file_source, struct stat *restrict buf);
 
@@ -33,6 +35,6 @@ void init_uid_file(struct stat *restrict buf, struct posix_header *header);
 
 void init_gid_file(struct stat *restrict buf, struct posix_header *header);
 
-void insert_file_in_tar(const char *path_tar, const char *path_file_source);
+int insert_file_in_tar(const char *path_tar, const char *path_file_source);
 
 #endif
