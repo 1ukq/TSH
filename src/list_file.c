@@ -15,23 +15,24 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 	struct posix_header p;
 
 	char buf[BLOCK_SIZE];
-	char affichage[BLOCK_SIZE] = "";
+	//char affichage[BLOCK_SIZE] = "";
 
 	int total = 0;
 	int n, i, shift;
 
+	int size_psize = sizeof(p.size);
 	int size_dec;
-	char size_str[sizeof(p.size)];
+	char size_str[size_psize];
 
-	char name[sizeof(p.name)];
+	int size_pname = sizeof(p.name);
+	char name[size_pname];
+
 
 	char type[1];
 
 	char time_str[16];
 
 	char perm_str[sizeof(p.mode)];
-
-
 
 
 	if(option != 'l' && option != ' ')
@@ -54,17 +55,12 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 			/* Fin du tar */
 			close(fd);
 
-			if (strlen(affichage) > 0)
+			if(total > 0 && option != 'l')
 			{
-				if(option != 'l')
-				{
-					strcat(affichage, "\n");
-				}
-
-				n = write(fd_out, affichage, sizeof(affichage));
+				n = write(fd_out, "\n", 1);
 				if(n < 0)
 				{
-					perror("write");
+					perror("write 2");
 					return -1;
 				}
 			}
@@ -73,13 +69,13 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 		}
 
 		/* Récupère le nom complet du fichier */
-		for (i = 0; i < sizeof(p.name); i++)
+		for (i = 0; i < size_pname; i++)
 		{
 			p.name[i] = buf[i];
 		}
 
 		/* Récupère la taille du fichier + conversion */
-		for (i = 0; i < sizeof(p.size); i++)
+		for (i = 0; i < size_psize; i++)
 		{
 			p.size[i] = buf[124+i];
 		}
@@ -90,6 +86,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 		if(verif_convert_name(name, p.name, path_cwd) != 0)
 		{
 			/* Ici name a son nom exact */
+			char affichage[BLOCK_SIZE] = ""; //permet d'afficher fichier par fichier (on ne se pose plus la question du nombre de fichiers à afficher)
 			if(option == 'l')
 			{
 				/* récupère le type */
@@ -145,6 +142,13 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 				/* ajoute le nom exact du fichier+"\t" au message à renvoyer */
 				strcat(affichage, name);
 				strcat(affichage, "\t");
+			}
+
+			n = write(fd_out, affichage, sizeof(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
+			if(n < 0)
+			{
+				perror("write 1");
+				return -1;
 			}
 
 			total++;
