@@ -1,12 +1,9 @@
 #include "munit/munit.h"
 #include "../copy.h"
 #include "../list_file.h"
-<<<<<<< HEAD
 #include "../mkdir.h"
-=======
 #include "../types/posix_header.h"
 #include <sys/stat.h>
->>>>>>> issue_13
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>

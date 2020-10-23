@@ -1,6 +1,6 @@
 #include "mkdir.h"
 
-void set_checksum(struct posix_header *hd)
+void set_checksum_mkdir(struct posix_header *hd)
 {
   	memset(hd -> chksum, ' ', 8);
   	unsigned int sum = 0;
@@ -104,7 +104,7 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 			/* junk */
 
 			/* chksum */
-			set_checksum(&p);
+			set_checksum_mkdir(&p);
 
 			/* Place le curseur en dessous du contenu du dernier fichier */
 			n = lseek(fd, (-1)*BLOCK_SIZE, SEEK_CUR);
