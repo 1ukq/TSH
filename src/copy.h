@@ -21,7 +21,7 @@ void cat(const char *path_tar, const char *path_file_source);
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 
-int find_next_block(int fd_tar);
+int find_next_block(int fd_tar, struct stat *restrict buf_stat);
 
 char *buffarize(const char *path_file_source, struct stat *restrict buf);
 

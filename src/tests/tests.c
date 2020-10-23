@@ -79,17 +79,12 @@ int main(void){
     copy_from_tar_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
     copy_from_tar_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
 
-
-
-    
     cat_test("targets/test.tar", "bar");
     printf("\n");
     cat_test("targets/test.tar", "test_dir/helloworld");
     printf("\n");
     cat_test("targets/test.tar", "test_dir/foo");
     printf("\n");
-
-
 
 
     ls_test("targets/test.tar", "test_dir/", 2);
@@ -106,14 +101,14 @@ int main(void){
     free(expected_buf);
     close(fd);
 
-
     //struct stat buf;
+    //stat("a.tar", &buf);
     //struct posix_header header;
-    //insert_file_in_tar("a.tar", "targets/test_dir/foo");
-
     //int fd_tar = open("a.tar", O_RDONLY);
-    //int ret = find_next_block(fd_tar);
+    //int ret = find_next_block(fd_tar, &buf);
     //printf("RET : %d\n", ret);
+
+    //insert_file_in_tar("a.tar", "targets/test_dir/foo");
 
    return 0;
 }

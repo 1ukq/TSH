@@ -19,7 +19,17 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
     int shift = 0;
 
+    size_read = read(fd_source, &p, BLOCK_SIZE);
+
     while(strcmp(p.name, path_file_source)){
+
+        sscanf(p.size, "%o", &size);
+        shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+        int ret_lseek = lseek(fd_source, shift * BLOCK_SIZE, SEEK_CUR);
+        if(ret_lseek == -1){
+            perror("lseek in copy_from_tar");
+            return -1;
+        }
 
         size_read = read(fd_source, &p, BLOCK_SIZE);
         if(size_read == -1){
@@ -27,11 +37,10 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
             return -1;
         }
 
-        sscanf(p.size, "%x", &size);
-
-        shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
-
     }
+
+    sscanf(p.size, "%o", &size);
+    shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
 
     char *buf = malloc(sizeof(char) * shift * BLOCK_SIZE);
     if(buf == NULL){
@@ -79,26 +88,43 @@ int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes){
 
 }
 
-int find_next_block(int fd_tar){
+void copy_string(char *str1, char *str2, int length){
+
+    for(int i = 0; i < length; i++){
+        str1[i] = str2[i];
+    }
+
+}
+
+int find_next_block(int fd_tar, struct stat *restrict buf_stat){
 
     int nb_blocks = 0;
+    int size_tar = buf_stat -> st_size;
+    int pos = 0;
 
+    char *content = malloc(sizeof(char) * size_tar);
     char *buf1 = malloc(sizeof(char) * BLOCK_SIZE);
     char *buf2 = malloc(sizeof(char) * BLOCK_SIZE);
     memset(buf2, '\0', BLOCK_SIZE);
 
-    int n = read(fd_tar, buf1, BLOCK_SIZE);
+    int n = read(fd_tar, content, size_tar);
     if(n == -1){
         perror("read in find_next_block");
         return -1;
     }
 
+    copy_string(buf1, content, BLOCK_SIZE);
+
     while(!compare_buffers_of_same_size(buf1, buf2, BLOCK_SIZE)){
-        read(fd_tar, buf1, BLOCK_SIZE);
+
+        pos += BLOCK_SIZE;
+        copy_string(buf1, content + pos, BLOCK_SIZE);
         nb_blocks++;
+
     }
 
     return nb_blocks;
+
 }
 
 char *buffarize(const char *restrict path_file_source, struct stat *restrict buf){
@@ -251,7 +277,9 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source){
     }
 
     //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar (bsdtar is the default tar utility on MacOS)
-    int b = find_next_block(fd_tar);
+    struct stat stat_tar;
+    stat(path_tar, &stat_tar);
+    int b = find_next_block(fd_tar, &stat_tar);
     int lseek_ret = lseek(fd_tar, b * BLOCK_SIZE, SEEK_SET);
     if(lseek_ret == -1){
         perror("lseek in insert_file_in_tar");
