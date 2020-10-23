@@ -1,8 +1,10 @@
 #include "mkdir.h"
 
 
-int makedir(char * path_tar, char * path_cwd, char * dir_name)
+int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 {
+	//faire attention au cas où dir_name est de la forme "dossier1/dossier2/nom_du_dir"
+
 	struct posix_header p;
 	memset(&p, '\0', BLOCK_SIZE);
 
@@ -18,7 +20,7 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 	int size_dec;
 	int size_pname = sizeof(p.name);
 
-	//initialisation du nom complet (pour vérifier que le directory n'est pas déja existant)
+	/* initialisation du nom complet (pour vérifier que le directory n'est pas déja existant) */
 	char fullname[size_pname];
 	memset(fullname, '\0', size_pname);
 
@@ -126,7 +128,15 @@ int makedir(char * path_tar, char * path_cwd, char * dir_name)
 		if(strcmp(fullname, p.name) == 0)
 		{
 			// le directory existe deja
-			return -1;
+			close(fd);
+			n = write(fd_out, "mkdir: cannot create directory : File already exists\n", 53);
+			if(n < 0)
+			{
+				perror("write 3");
+				return -1;
+			}
+			
+			return 0;
 		}
 
 		for (i = 0; i < size_psize; i++)
