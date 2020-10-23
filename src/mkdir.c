@@ -3,7 +3,7 @@
 
 int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 {
-	//faire attention au cas où dir_name est de la forme "dossier1/dossier2/nom_du_dir"
+	//faire attention au cas où dir_name est de la forme ".../nom_du_dir"
 
 	struct posix_header p;
 	memset(&p, '\0', BLOCK_SIZE);
@@ -20,7 +20,7 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 	int size_dec;
 	int size_pname = sizeof(p.name);
 
-	/* initialisation du nom complet (pour vérifier que le directory n'est pas déja existant) */
+	/* initialisation du nom complet (pour vérifier que le répertoire n'est pas déja existant) */
 	char fullname[size_pname];
 	memset(fullname, '\0', size_pname);
 
@@ -94,20 +94,21 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 			/* chksum */
 			set_checksum(&p);
 
-
+			/* Place le curseur en dessous du contenu du dernier fichier */
 			n = lseek(fd, (-1)*BLOCK_SIZE, SEEK_CUR);
 			if(n < 0)
 			{
 				perror("lseek 2");
 				return -1;
 			}
+			/* Écrit l'entête du nouveau répertoire */
 			n = write(fd, &p, BLOCK_SIZE);
 			if(n < 0)
 			{
 				perror("write 1");
 				return -1;
 			}
-
+			/* Écrit les 2 blocs de fin du tar */
 			n = write(fd, end_blocks, 2*BLOCK_SIZE);
 			if(n < 0)
 			{
@@ -120,14 +121,10 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 			return 0;
 		}
 
-		/* Récupère la taille du fichier + conversion */
-		for (i = 0; i < size_pname; i++)
-		{
-			p.name[i] = buf[i];
-		}
+		/* Regarde si le répertoire n'est pas déjà existant */
 		if(strcmp(fullname, p.name) == 0)
 		{
-			// le directory existe deja
+			// le répertoire existe deja
 			close(fd);
 			n = write(fd_out, "mkdir: cannot create directory : File already exists\n", 53);
 			if(n < 0)
@@ -135,8 +132,13 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 				perror("write 3");
 				return -1;
 			}
-			
+
 			return 0;
+		}
+		/* Récupère la taille du fichier + conversion */
+		for (i = 0; i < size_pname; i++)
+		{
+			p.name[i] = buf[i];
 		}
 
 		for (i = 0; i < size_psize; i++)
