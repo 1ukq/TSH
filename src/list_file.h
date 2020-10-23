@@ -1,3 +1,6 @@
+#ifndef LIST_FILE
+#define LIST_FILE
+
 #include <sys/types.h> //open
 #include <sys/stat.h> //open
 #include <fcntl.h> //open
@@ -7,10 +10,6 @@
 #include <stdlib.h> //atoi
 #include <time.h> //gmtime
 
-
-
-#ifndef LIST_FILE
-#define LIST_FILE
 #define BLOCK_SIZE 512
 #define LTYPE "-7lcbdps"
 #define LPERM "rwxrwxrwx"

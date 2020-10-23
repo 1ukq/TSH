@@ -57,7 +57,7 @@ void cat_test(const char *path_tar, const char *path_file_source){
 
 void ls_test(const char *path_tar, const char *path_file_source, int expected_nb_files){
 
-    int ret = ls(path_tar, path_file_source);
+    int ret = ls(STDOUT_FILENO, ' ',path_tar, path_file_source);
     munit_assert_int(expected_nb_files, ==, ret);
 }
 
