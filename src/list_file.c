@@ -70,7 +70,7 @@ void dec_to_bin(char * dec, char * bin)
 
 void oct_to_bin(char * oct, char * bin)
 {
-	char * dec_str;
+	char * dec_str = NULL;
 
 	oct_to_dec(oct, dec_str);
 	dec_to_bin(dec_str, bin);
