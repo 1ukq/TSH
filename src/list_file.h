@@ -23,6 +23,7 @@ int verif_convert_name(char * name, char * fullname, const char * path_cwd)
 	- fullname : p.name (nom à vérifier puis convertir)
 	- path_cwd : path_cwd
 	*/
+	
 	int i, j, size_name;
 	int size_fullname = 100;
 	int len_path_cwd = strlen(path_cwd);

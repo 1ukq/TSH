@@ -4,7 +4,7 @@
 int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 {
 	/*
-	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent
+	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par la fonction cd qui vérifiera à chaque changement de cwd que le nouveau chemin existe)
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
 	- fd_out : sortie pour affichage (STDOUT_FILENO pour les tests) ce sera le fd du tshell
 	- option : ' ' pour un ls et 'l' pour un ls -l
@@ -12,10 +12,11 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 	- path_cwd : chemin de la localisation de l'utilisateur (cwd) à partir du tar avec un '/' à la fin (exemple "dos1/dos2/dos3/") ou "" si il est à la racine du tar
 	*/
 
+	//Note : la fonction ne prend pas encore en compte le nombre de liens pour chaque fichiers
+
 	struct posix_header p;
 
 	char buf[BLOCK_SIZE];
-	//char affichage[BLOCK_SIZE] = "";
 
 	int total = 0;
 	int n, i, shift;
@@ -102,6 +103,8 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 				get_permissions(p.mode, perm_str);
 				strcat(affichage, perm_str);
 				strcat(affichage, "  ");
+
+				/* devrait récupérer le nombre de liens + ajout */
 
 				/* récupère le uname + ajout */
 				for (i = 0; i < sizeof(p.uname); i++)
