@@ -132,6 +132,11 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 
 			return 0;
 		}
+		/* Récupère le nom du fichier */
+		for (i = 0; i < size_pname; i++)
+		{
+			p.name[i] = buf[i];
+		}
 
 		/* Regarde si le répertoire n'est pas déjà existant */
 		if(strcmp(fullname, p.name) == 0)
@@ -147,12 +152,8 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 
 			return 0;
 		}
-		/* Récupère la taille du fichier + conversion */
-		for (i = 0; i < size_pname; i++)
-		{
-			p.name[i] = buf[i];
-		}
 
+		/* Récupère la taille du fichier + conversion */
 		for (i = 0; i < size_psize; i++)
 		{
 			p.size[i] = buf[124+i];
