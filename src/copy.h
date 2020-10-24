@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <pwd.h>
 #include <grp.h>
-#include <uuid/uuid.h>
+//#include <uuid/uuid.h>
 #include <time.h>
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest);
