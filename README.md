@@ -4,7 +4,7 @@
 # Introduction
 Ce fichier permet de faciliter la compréhension du projet dans son ensemble. Chaque fonction codée pour ce premier rendu y est décrite pour fournir au lecteur une approche complémentaire au code brut.
 
-Nous nous sommes principalement penchés sur les fonctions directement liées au `tar` à savoir (jusqu'ici), `ls`, `ls -l`, `mkdir`, `rm`, `cp`, `cat`, `mv`. Ces fonctions faciliteront la poursuite du projet.
+Nous nous sommes principalement penchés sur les fonctions directement liées au `tar`. Ces fonctions faciliteront la poursuite du projet.
 
 Une fois toutes les fonctions impliquant directement un `tar` codées, nous nous pencherons sur le shell en lui-même. L'utilisation de la fonction `exec()` paraît primordiale pour le comportement du shell hors tarball, et nous nous aiderons des fonctions ci-dessus lorsque les manipulations seront liées à un `tar`.
 
@@ -20,7 +20,7 @@ Une fois toutes les fonctions impliquant directement un `tar` codées, nous nous
 int ls(int fd_out, char option, const char * path_tar, const char * path_cwd);
 ```
 
-### Renvoie et arguments :
+### Retour et arguments :
 - `ls(...)` : renvoie le nombre de fichiers en path_cwd si tout s'est bien passé et `-1` sinon
 - `fd_out` : sortie pour affichage (`STDOUT_FILENO` pour les tests) ce sera le *file descriptor* du *tshell* plus tard
 - `option` : `' '` pour un `ls` et `'l'` pour un `ls -l`
@@ -28,7 +28,8 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd);
 - `path_cwd` : chemin de la localisation de l'utilisateur (`cwd`) à partir du `tar` avec un `'/'` à la fin (exemple `"dos1/dos2/dos3/"`) ou `""` si il est à la racine du `tar`
 
 
-### Description :
+### Description et comportement:
+La fonction `ls()` avec l'option `' '` liste les fichiers présent à un endroit donné dans un tar donné. Avec l'option `'l'`, la liste affichée est plus détaillée.
 - Ouvre le fichier `tar` en mode lecture puis lit l'en-tête du premier fichier du `tar` si il en contient, se termine : ferme le *file descriptor* du `tar` et renvoie `0`.
 - Vérifie que le fichier est à afficher en regardant d'abord si `path_cwd` est en préfixe du nom complet du fichier puis si il n'est pas plus "profond" que la profondeur de `path_tar` + 1.
 - Récupère le nom complet et la taille du fichier. Puis convertit le nom complet (de la forme `".../dos/nom_fichier"` ou `".../dos/nom_fichier/..."` par exemple) en nom exact du fichier (`"nom_fichier"`).
@@ -70,15 +71,15 @@ int main(void)
 
 
 
-## `mkdir`
+## `makedir`
 
 ```C
-#include "mkdir.c"
+#include "makedir.c"
 
 int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name);
 ```
 
-### Renvoie et arguments :
+### Retour et arguments :
 - `makedir(...)` : renvoie `0` si tout s'est bien passé et `-1` sinon
 - `fd_out` : sortie pour affichage (`STDOUT_FILENO` pour les tests) ce sera le *file descriptor* du *tshell* plus tard
 - `path_tar` : chemin du `tar` (exemple `"chemin/.../test.tar"`)
@@ -86,7 +87,8 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name);
 - `dir_name` : nom du nouveau répertoire (avec ou sans `'/'` à la fin; ne doit pas contenir de `'/'` avant la fin)
 
 
-### Description :
+### Description et comportement :
+La fonction `makedir()` crée un répertoire vide de nom donné à un endroit donné dans un tar donné.
 - Crée la variable `fullname` = `path_cwd` + `dir_name` (+ `'/'` si il n'y est pas déjà).
 - Ouvre le fichier `tar` en mode lecture/écriture puis lit l'en-tête du premier fichier du `tar` si il en contient, sinon voir point 6.
 - Récupère le nom du fichier et le compare avec `fullname`. Si ils sont égaux, le répertoire existe déjà, la fonction se termine : ferme le *file descriptor* du `tar`, écrit un message sur `fd_out` (le *file descriptor* du (futur) shell) et renvoie `0`.
@@ -106,7 +108,7 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name);
 ### Exemple de test :
 Après avoir créé un fichier `test.tar`
 ```C
-#include "mkdir.c"
+#include "makedir.c"
 
 int main(void)
 {
@@ -134,7 +136,7 @@ La fonction `copy_from_tar` copie le contenu d'un fichier se situant dans un arc
 ### Retour et arguments :
 
 - `path_tar` est le chemin (relatif ou absolu) de l'archive depuis laquelle on copie le fichier `path_file_source`.
-- `path_file_source` correspond au chemin au sein de l'archive dans laquelle se situe le fichier dont on veut copier le contenu. 
+- `path_file_source` correspond au chemin au sein de l'archive dans laquelle se situe le fichier dont on veut copier le contenu.
 - `fd_dest` est le descripteur du fichier dans lequel on veut copier le contenu du fichier pointé par `path_file_source`.
 - La fonction renvoie le nombre de caractères copiés si tout s'est bien passé, et `-1` sinon.
 
@@ -222,4 +224,4 @@ Précisons que le Makefile à la racine dispose d'une cible `tests` (faire `make
 
 # `Dockerfile`
 
-Vous trouverez à la racine un Dockerfile, pour tester le projet. 
+Vous trouverez à la racine un Dockerfile, pour tester le projet.
