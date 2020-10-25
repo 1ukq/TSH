@@ -20,6 +20,10 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
     int shift = 0;
 
     size_read = read(fd_source, &p, BLOCK_SIZE);
+    if(size_read == -1){
+        perror("read in copy_from_tar");
+        return -1;
+    }
 
     while(strcmp(p.name, path_file_source)){
 
