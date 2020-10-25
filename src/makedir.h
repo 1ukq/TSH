@@ -1,3 +1,6 @@
+#ifndef MAKEDIR
+#define MAKEDIR
+
 #include <string.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -15,3 +18,6 @@
 void set_checksum(struct posix_header *hd);
 
 int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name);
+
+
+#endif
