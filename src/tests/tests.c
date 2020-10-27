@@ -114,7 +114,8 @@ int main(void){
 
     //insert_file_in_tar("a.tar", "targets/test_dir/foo");
 
-    remove_file_from_tar("a.tar", "targets/test_dir/foo");
+    //remove_file_from_tar("a.tar", "targets/bar");
+    //remove_file_from_tar("a.tar", "targets/test_dir/foo");
 
    return 0;
 }
