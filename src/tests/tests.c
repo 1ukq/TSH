@@ -3,6 +3,7 @@
 #include "../list_file.h"
 #include "../makedir.h"
 #include "../types/posix_header.h"
+#include "../remove.h"
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -109,9 +110,12 @@ int main(void){
     //int ret = find_next_block(fd_tar, &buf);
     //printf("RET : %d\n", ret);
 
-    makedir(STDOUT_FILENO, "a.tar", "", "tests_dir");
+    //makedir(STDOUT_FILENO, "a.tar", "", "tests_dir");
 
-    insert_file_in_tar("a.tar", "targets/test_dir/foo");
+    //insert_file_in_tar("a.tar", "targets/test_dir/foo");
+
+    //remove_file_from_tar("a.tar", "targets/bar");
+    //remove_file_from_tar("a.tar", "targets/test_dir/foo");
 
    return 0;
 }
