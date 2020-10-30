@@ -1,5 +1,60 @@
 #include "cd.h"
 
+void get_wd(struct work_directory wd, char * path_wd)
+{
+	sprintf(path_wd, "%s", wd.c_htar);
+	if(strlen(wd.tar_name) > 0)
+	{
+		strcat(path_wd, "/");
+		strcat(path_wd, wd.tar_name);
+
+		if(strlen(wd.c_tar)>0)
+		{
+			strcat(path_wd, "/");
+			strncat(path_wd, wd.c_tar, strlen(wd.c_tar)-1);
+		}
+	}
+}
+
+void fill_wd(char * path_wd, struct work_directory * ad_wd)
+{
+	char * path_wd_copy = strdup(path_wd);
+	char * token = strtok(path_wd_copy, "/");
+
+	sprintf((*ad_wd).c_htar, "%s", "");
+	sprintf((*ad_wd).tar_name, "%s", "");
+	sprintf((*ad_wd).c_tar, "%s", "");
+
+	while(strstr(token, ".tar") == NULL)
+	{
+		strcat((*ad_wd).c_htar, "/");
+		strcat((*ad_wd).c_htar, token);
+
+		token = strtok(NULL, "/");
+
+		if(token == NULL)
+		{
+			break;
+		}
+	}
+
+	if(token != NULL)
+	{
+		strcat((*ad_wd).tar_name, token);
+
+		token = strtok(NULL, "/");
+
+		while(token != NULL)
+		{
+			strcat((*ad_wd).c_tar, token);
+			strcat((*ad_wd).c_tar, "/");
+
+			token = strtok(NULL, "/");
+		}
+	}
+}
+
+
 int cd(struct work_directory * ad_cwd, struct work_directory * ad_nwd)
 {
 	struct posix_header p;

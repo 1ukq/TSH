@@ -12,6 +12,9 @@
 
 #define BLOCK_SIZE 512
 
+void get_wd(struct work_directory wd, char * path_wd);
+
+void fill_wd(char * path_wd, struct work_directory * ad_wd);
 
 int cd(struct work_directory * ad_cwd, struct work_directory * ad_nwd);
 
