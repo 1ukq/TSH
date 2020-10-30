@@ -12,29 +12,10 @@
 #include <stdlib.h>
 #include <pwd.h>
 #include <grp.h>
-//#include <uuid/uuid.h>
 #include <time.h>
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest);
 
 void cat(const char *path_tar, const char *path_file_source);
-
-int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
-
-int find_next_block(int fd_tar, struct stat *restrict buf_stat);
-
-char *buffarize(const char *path_file_source, struct stat *restrict buf);
-
-void init_type_file(struct stat *restrict buf, struct posix_header *header);
-
-void init_mode_file(struct stat *restrict buf, struct posix_header *header);
-
-int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header);
-
-void init_uid_file(struct stat *restrict buf, struct posix_header *header);
-
-void init_gid_file(struct stat *restrict buf, struct posix_header *header);
-
-int insert_file_in_tar(const char *path_tar, const char *path_file_source);
 
 #endif
