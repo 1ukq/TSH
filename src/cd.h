@@ -12,6 +12,7 @@
 
 #define BLOCK_SIZE 512
 
+
 int cd(struct work_directory * ad_cwd, struct work_directory * ad_nwd);
 
 #endif
