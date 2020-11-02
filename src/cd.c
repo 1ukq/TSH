@@ -9,31 +9,39 @@ void fill_wd(char * path_wd, struct work_directory * ad_wd)
 	sprintf((*ad_wd).tar_name, "%s", "");
 	sprintf((*ad_wd).c_tar, "%s", "");
 
-	while(strstr(token, ".tar") == NULL)
+	if(token == NULL)
 	{
+		/* alors path_wd = "/" */
 		strcat((*ad_wd).c_htar, "/");
-		strcat((*ad_wd).c_htar, token);
-
-		token = strtok(NULL, "/");
-
-		if(token == NULL)
-		{
-			break;
-		}
 	}
-
-	if(token != NULL)
+	else
 	{
-		strcat((*ad_wd).tar_name, token);
-
-		token = strtok(NULL, "/");
-
-		while(token != NULL)
+		while(strstr(token, ".tar") == NULL)
 		{
-			strcat((*ad_wd).c_tar, token);
-			strcat((*ad_wd).c_tar, "/");
+			strcat((*ad_wd).c_htar, "/");
+			strcat((*ad_wd).c_htar, token);
 
 			token = strtok(NULL, "/");
+
+			if(token == NULL)
+			{
+				break;
+			}
+		}
+
+		if(token != NULL)
+		{
+			strcat((*ad_wd).tar_name, token);
+
+			token = strtok(NULL, "/");
+
+			while(token != NULL)
+			{
+				strcat((*ad_wd).c_tar, token);
+				strcat((*ad_wd).c_tar, "/");
+
+				token = strtok(NULL, "/");
+			}
 		}
 	}
 }
@@ -46,7 +54,7 @@ void get_wd(struct work_directory wd, char * path_wd)
 		strcat(path_wd, "/");
 		strcat(path_wd, wd.tar_name);
 
-		if(strlen(wd.c_tar)>0)
+		if(strlen(wd.c_tar) > 0)
 		{
 			strcat(path_wd, "/");
 			strncat(path_wd, wd.c_tar, strlen(wd.c_tar)-1);
@@ -79,37 +87,42 @@ int cd(char * path_cwd, char * path_nwd)
 	}
 
 	/* si le nouveau "chemin" est ".." */
-	/*
 	if(strcmp(path_nwd, "..") == 0)
 	{
-		if(strlen(nwd.c_tar) == 0)
+		if(strlen(cwd.c_tar) == 0)
 		{
-			if(strlen(nwd.tar_name) == 0)
+			if(strlen(cwd.tar_name) == 0)
 			{
-				if(strlen(nwd.c_htar) == 0)
-				{
-
-				}
-				else
-				{
-
-				}
+				chdir("..");
+				getcwd(cwd.c_htar, sizeof(cwd.c_htar));
+				get_wd(cwd, path_cwd);
 			}
 			else
 			{
-				sprintf(nwd.tar_name, "");
-				cwd = nwd;
-				fill_wd(path_cwd, cwd);
+				sprintf(cwd.tar_name, "%s", "");
+				get_wd(cwd, path_cwd);
 			}
 		}
 		else
 		{
+			int ind_avdernier_slash = -1;
+			int ind_dernier_slash = -1;
 
+			for(i = 0; i < strlen(cwd.c_tar); i++)
+			{
+				if(cwd.c_tar[i] == '/')
+				{
+					ind_avdernier_slash = ind_dernier_slash;
+					ind_dernier_slash = i;
+				}
+			}
+
+			cwd.c_tar[ind_avdernier_slash + 1] = '\0';
+			get_wd(cwd, path_cwd);
 		}
 
 		return 0;
 	}
-	*/
 
 
 
