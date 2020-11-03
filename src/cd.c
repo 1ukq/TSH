@@ -1,5 +1,6 @@
 #include "cd.h"
 
+/* cette fonction permet de remplir une structure work_directory à partir d'une chaine représentant un chemin */
 void fill_wd(char * path_wd, struct work_directory * ad_wd)
 {
 	char * path_wd_copy = strdup(path_wd);
@@ -16,6 +17,7 @@ void fill_wd(char * path_wd, struct work_directory * ad_wd)
 	}
 	else
 	{
+		/* regarde si le chemin implique un tar et ajoute le chemin hors tar dans c_htar */
 		while(strstr(token, ".tar") == NULL)
 		{
 			strcat((*ad_wd).c_htar, "/");
@@ -29,14 +31,18 @@ void fill_wd(char * path_wd, struct work_directory * ad_wd)
 			}
 		}
 
+		/* si le chemin implique un tar */
 		if(token != NULL)
 		{
+			/* ajout du nom du tar dans tar_name */
 			strcat((*ad_wd).tar_name, token);
 
 			token = strtok(NULL, "/");
 
+			/* si le chemin dans le tar n'est pas nul */
 			while(token != NULL)
 			{
+				/* ajoute le chemin dans le tar dans c_tar */
 				strcat((*ad_wd).c_tar, token);
 				strcat((*ad_wd).c_tar, "/");
 
@@ -46,16 +52,20 @@ void fill_wd(char * path_wd, struct work_directory * ad_wd)
 	}
 }
 
+/* cette fonction permet de récupérer un chemin dans une chaîne de caractères à partir d'un chemin dans la structure work_directory */
 void get_wd(struct work_directory wd, char * path_wd)
 {
+	/* ajoute le chemin hors tar à la chaine de caractères */
 	sprintf(path_wd, "%s", wd.c_htar);
 	if(strlen(wd.tar_name) > 0)
 	{
+		/* ajoute le nom du tar à la chaine de caractères si il y en a un */
 		strcat(path_wd, "/");
 		strcat(path_wd, wd.tar_name);
 
 		if(strlen(wd.c_tar) > 0)
 		{
+			/* ajoute le chemin dans le tar à la chaine de caractères si il existe */
 			strcat(path_wd, "/");
 			strncat(path_wd, wd.c_tar, strlen(wd.c_tar)-1);
 		}
@@ -64,7 +74,7 @@ void get_wd(struct work_directory wd, char * path_wd)
 
 
 
-
+/* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu */
 int cd(char * path_cwd, char * path_nwd)
 {
 	struct posix_header p;
@@ -89,22 +99,27 @@ int cd(char * path_cwd, char * path_nwd)
 	/* si le nouveau "chemin" est ".." */
 	if(strcmp(path_nwd, "..") == 0)
 	{
+		/* si le chemin dans le tar est nul */
 		if(strlen(cwd.c_tar) == 0)
 		{
+			/* si le chemin est hors tar */
 			if(strlen(cwd.tar_name) == 0)
 			{
+				/* on change classiquement le cwd avec chdir et on change la variable path_cwd */
 				chdir("..");
 				getcwd(cwd.c_htar, sizeof(cwd.c_htar));
 				get_wd(cwd, path_cwd);
 			}
 			else
 			{
+				/* on retire simplement le nom du tar au chemin dans path_cwd */
 				sprintf(cwd.tar_name, "%s", "");
 				get_wd(cwd, path_cwd);
 			}
 		}
 		else
 		{
+			/* on repère l'avant-dernier slash et on le remplace par '\0' pour réduire le chemin d'un cran */
 			int ind_avdernier_slash = -1;
 			int ind_dernier_slash = -1;
 
@@ -117,6 +132,7 @@ int cd(char * path_cwd, char * path_nwd)
 				}
 			}
 
+			/* on change path_cwd avec les modifications ci-dessus */
 			cwd.c_tar[ind_avdernier_slash + 1] = '\0';
 			get_wd(cwd, path_cwd);
 		}
