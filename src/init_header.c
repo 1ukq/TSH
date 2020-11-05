@@ -51,8 +51,8 @@ void init_mode_file(struct stat *restrict buf, struct posix_header *header){
 
 void init_size_file(struct stat *restrict buf, struct posix_header *header){
 
-    //sprintf(header -> size, "%011llo", buf -> st_size); //Line for MacOs
-    sprintf(header -> size, "%011lo", buf -> st_size);
+    sprintf(header -> size, "%011llo", buf -> st_size); //Line for MacOs
+    //sprintf(header -> size, "%011lo", buf -> st_size);
 
 }
 
@@ -72,14 +72,18 @@ void init_gid_file(struct stat *restrict buf, struct posix_header *header){
 
 void init_mtime_file(struct stat *restrict buf, struct posix_header *header){
 
-    //sprintf(header -> mtime, "%lo", buf -> st_mtimespec.tv_sec); //Line for MacOS
-    sprintf(header -> mtime, "%lo", buf -> st_mtim.tv_sec);
+    sprintf(header -> mtime, "%lo", buf -> st_mtimespec.tv_sec); //Line for MacOS
+    //sprintf(header -> mtime, "%lo", buf -> st_mtim.tv_sec);
 
 }
 
-void init_name_file(struct posix_header *header, const char *path_file_source){
+void init_name_file(struct posix_header *header, const char *path_file_source/*, const char *dest*/){
 
+    //int length = name_length(path_file_source);
+    //char *name = malloc(sizeof(char) * (length + strlen(dest)));
+    //get_name_from_path(path_file_source, name);
     sprintf(header -> name, "%s", path_file_source);
+    //free(name);
 
 }
 
