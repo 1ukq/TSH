@@ -72,11 +72,82 @@ void get_wd(struct work_directory wd, char * path_wd)
 	}
 }
 
+void chemin_propre(char * cwd)
+{
+	int i, j;
 
+	int nb_slash = 0;
+	for(i = 0; i < strlen(cwd); i++)
+	{
+		nb_slash += (cwd[i] == '/') ? 1 : 0;
+	}
+
+	char liste_rep[nb_slash][50];
+	int ind_rep[nb_slash];
+
+	char * cwd_copy = strdup(cwd);
+	char * token = strtok(cwd_copy, "/");
+	i = 0;
+	while(token != NULL && i < nb_slash)
+	{
+		sprintf(liste_rep[i], "%s", token);
+		token = strtok(NULL, "/");
+		i++;
+	}
+
+	for(i = 0; i < nb_slash; i++)
+	{
+		if(strcmp(liste_rep[i], ".") == 0)
+		{
+			ind_rep[i] = 0;
+		}
+		else if(strcmp(liste_rep[i], "..") == 0)
+		{
+			ind_rep[i] = 0;
+			j = i - 1;
+			while(ind_rep[j] != 1)
+			{
+				j--;
+			}
+			ind_rep[j] = 0;
+		}
+		else
+		{
+			ind_rep[i] = 1;
+		}
+	}
+
+	sprintf(cwd, "%s", "");
+	for(i = 0; i < nb_slash; i++)
+	{
+		if(ind_rep[i])
+		{
+			strcat(cwd, "/");
+			strcat(cwd, liste_rep[i]);
+		}
+	}
+}
 
 /* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu */
 int cd(char * path_cwd, char * path_nwd)
 {
+	/* si el nouveau chemin est vide */
+	if(strlen(path_nwd) == 0)
+	{
+		return 0;
+	}
+
+	/* si le nouveau chemin n'est pas absolu : on le rend absolu */
+	if(path_nwd[0] != '/')
+	{
+		char * end_nwd = strdup(path_nwd);
+		sprintf(path_nwd, "%s/", path_cwd);
+		strcat(path_nwd, end_nwd);
+	}
+
+	/* permet de rendre le nouveau chemin "propre" à savoir remplace les . et .. en gardant l'intégrité du chemin */
+	chemin_propre(path_nwd);
+
 	struct posix_header p;
 
 	char buf[BLOCK_SIZE];
@@ -87,59 +158,6 @@ int cd(char * path_cwd, char * path_nwd)
 
 	struct work_directory nwd;
 	fill_wd(path_nwd, &nwd);
-
-
-	/* si le nouveau "chemin" est "." */
-	if(strcmp(path_nwd, ".") == 0)
-	{
-		/* on ne fait rien */
-		return 0;
-	}
-
-	/* si le nouveau "chemin" est ".." */
-	if(strcmp(path_nwd, "..") == 0)
-	{
-		/* si le chemin dans le tar est nul */
-		if(strlen(cwd.c_tar) == 0)
-		{
-			/* si le chemin est hors tar */
-			if(strlen(cwd.tar_name) == 0)
-			{
-				/* on change classiquement le cwd avec chdir et on change la variable path_cwd */
-				chdir("..");
-				getcwd(cwd.c_htar, sizeof(cwd.c_htar));
-				get_wd(cwd, path_cwd);
-			}
-			else
-			{
-				/* on retire simplement le nom du tar au chemin dans path_cwd */
-				sprintf(cwd.tar_name, "%s", "");
-				get_wd(cwd, path_cwd);
-			}
-		}
-		else
-		{
-			/* on repère l'avant-dernier slash et on le remplace par '\0' pour réduire le chemin d'un cran */
-			int ind_avdernier_slash = -1;
-			int ind_dernier_slash = -1;
-
-			for(i = 0; i < strlen(cwd.c_tar); i++)
-			{
-				if(cwd.c_tar[i] == '/')
-				{
-					ind_avdernier_slash = ind_dernier_slash;
-					ind_dernier_slash = i;
-				}
-			}
-
-			/* on change path_cwd avec les modifications ci-dessus */
-			cwd.c_tar[ind_avdernier_slash + 1] = '\0';
-			get_wd(cwd, path_cwd);
-		}
-
-		return 0;
-	}
-
 
 
 	/* vérfie que le nouveau chemin hors-tar existe et change "vraiment" de directory */
