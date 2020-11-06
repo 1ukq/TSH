@@ -3,7 +3,7 @@ EXEC = tests
 FLAGS = -g -Wall
 
 MUNIT_C_FILE = munit/munit.c
-SRC = ../copy.c ../list_file.c ../makedir.c ../remove.c ../insert.c ../init_header.c ../utils.c ../move.c
+SRC = ../copy.c ../list_file.c ../makedir.c ../remove.c ../init_header.c ../utils.c ../move.c
 
 $(EXEC) : tests.c $(MUNIT_C_FILE) $(SRC)
 	$(CC) $^ -o $(EXEC)

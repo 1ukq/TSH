@@ -1,6 +1,5 @@
 #include "munit/munit.h"
 #include "../copy.h"
-#include "../insert.h"
 #include "../list_file.h"
 #include "../makedir.h"
 #include "../types/posix_header.h"
@@ -121,7 +120,7 @@ int main(void){
     //remove_file_from_tar("a.tar", "targets/bar");
     //remove_file_from_tar("a.tar", "targets/test_dir/foo");
 
-    mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "");
+    //mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "");
 
    return 0;
 }
