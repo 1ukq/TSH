@@ -276,7 +276,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 
 }
 
-int mv_from_ext_to_tar(const char *path_tar, const char *path_file_source, const char *path_in_tar){
+int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, const char *path_in_tar){
 
     int ret = fork();
     if(ret == 0) execlp("rm", "rm", path_file_source, NULL);
@@ -286,7 +286,87 @@ int mv_from_ext_to_tar(const char *path_tar, const char *path_file_source, const
 
 }
 
-int mv_from_tar_to_ext(){
+int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, const char *path_dest){
+
+    int fd_tar = open(path_tar, O_RDWR);
+    if(fd_tar == -1){
+        perror("open in mv_from_tar_to_dir");
+        return -1;
+    }
+
+    int size = 0;
+    int shift = 0;
+    int ret_lseek = 0;
+
+    struct posix_header header;
+    int size_read = read(fd_tar, &header, BLOCK_SIZE);
+    if(size_read == -1){
+        perror("read in mv_from_tar_to_dir");
+        return -1;
+    }
+
+    while(strcmp(header.name, path_file_source)){
+
+        sscanf(header.size, "%o", &size);
+        shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+
+        ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);
+        if(ret_lseek == -1){
+            perror("lseek in mv_from_tar_to_tar");
+            return -1;
+        }
+
+        size_read = read(fd_tar, &header, BLOCK_SIZE);
+        if(size_read == -1){
+            perror("read in mv_from_tar_to_tar");
+            return -1;
+        }
+
+    }
+
+    sscanf(header.size, "%o", &size);
+    shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+
+    char *buf = malloc(sizeof(char) * shift * BLOCK_SIZE);
+    if(buf == NULL){
+        perror("malloc in mv_from_tar_to_dir");
+    }
+    size_read = read(fd_tar, buf, sizeof(char) * shift * BLOCK_SIZE);
+    if(size_read == -1){
+        perror("read in mv_from_tar_to_dir");
+        return -1;
+    }
+
+    ret_lseek = lseek(fd_tar, -BLOCK_SIZE * (shift + 1), SEEK_CUR);
+    if(ret_lseek == -1){
+        perror("lseek in mv_from_tar_to_dir");
+        return -1;
+    }
+
+    int pos_from = ret_lseek;
+    int pos_to = pos_from + (shift + 1) * BLOCK_SIZE;
+    int size_tar = lseek(fd_tar, 0, SEEK_END);
+    if(size_tar == -1){
+        perror()
+    }
+    int sup = suppress_file(fd_tar, pos_from, pos_to, size_tar);
+    if(sup == -1) return -1;
+
+    int f = fork();
+    if(f == 0) execlp("touch", "touch", path_dest, NULL);
+    if(f == -1){
+        perror("execlp in mv_from_tar_to_dir");
+        return -1;
+    }
+    else{
+        wait(NULL);
+        int fd_dest = open(path_dest, O_WRONLY);
+        if(fd_dest == -1){
+            perror("open dest in mv_from_tar_to_dir");
+            return -1;
+        }
+        write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
+    }
 
     return 0;
 

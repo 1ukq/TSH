@@ -26,6 +26,8 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source);
 
 int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, const char *path_in_tar);
 
-int mv_from_ext_to_tar(const char *path_tar, const char *path_file_source, const char *path_in_tar);
+int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, const char *path_in_tar);
+
+int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, const char *path_dest);
 
 #endif
