@@ -2,9 +2,12 @@
 #define UTILS
 
 #include <string.h>
+#include <stdlib.h>
 
 int name_length(const char* path_file_source);
 
-void get_name_from_path(const char *path_file_source, char *file_name);
+char *name(const char *path);
+
+char *concatenate(char *str1, char *str2);
 
 #endif

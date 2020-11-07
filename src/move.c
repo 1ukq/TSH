@@ -286,7 +286,7 @@ int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, const
 
 }
 
-int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, const char *path_dest){
+int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char *path_dest){
 
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
@@ -347,26 +347,36 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, const
     int pos_to = pos_from + (shift + 1) * BLOCK_SIZE;
     int size_tar = lseek(fd_tar, 0, SEEK_END);
     if(size_tar == -1){
-        perror()
+        perror("lseek size_tar in mv_from_tar_to_dir");
+        return -1;
     }
     int sup = suppress_file(fd_tar, pos_from, pos_to, size_tar);
     if(sup == -1) return -1;
 
+    char *str = name(header.name);
+    char *path = concatenate(path_dest, str);
+
     int f = fork();
-    if(f == 0) execlp("touch", "touch", path_dest, NULL);
+    if(f == 0){
+        execlp("touch", "touch", path, NULL);
+    }
     if(f == -1){
         perror("execlp in mv_from_tar_to_dir");
         return -1;
     }
     else{
         wait(NULL);
-        int fd_dest = open(path_dest, O_WRONLY);
+        int fd_dest = open(path, O_WRONLY);
         if(fd_dest == -1){
             perror("open dest in mv_from_tar_to_dir");
             return -1;
         }
         write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
     }
+
+    free(str);
+    free(path);
+    close(fd_tar);
 
     return 0;
 

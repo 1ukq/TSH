@@ -4,6 +4,7 @@ int name_length(const char* path_file_source){
 
     int name_length = 0;
     for(int i = strlen(path_file_source) - 1; i > -1; i--){
+        if(path_file_source[i] == '\0') continue;
         if(path_file_source[i] != '/') name_length++;
         else break;
     }
@@ -11,16 +12,27 @@ int name_length(const char* path_file_source){
 
 }
 
-void get_name_from_path(const char *path_file_source, char *file_name){
+char *name(const char *path){
 
-    int length = name_length(path_file_source);
-    strncpy(file_name, path_file_source + (strlen(path_file_source) - length), length);
+    int length = name_length(path);
+    int len_path = strlen(path);
+    char *ret = malloc(sizeof(char) * length);
+    if(ret == NULL) return NULL;
+    for(int i = 0; i < length; i++) ret[i] = path[len_path - length + i];
+    return ret;
+
+}
+
+char *concatenate(char *str1, char *str2){
+
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+    char *ret = malloc(sizeof(char) * (len1 + len2 + 1));
+    if(ret == NULL) return NULL;
+    for(int i = 0; i < len1; i++) ret[i] = str1[i];
+    for(int i = 0; i < len2; i++) ret[i + len1] = str2[i];
+    ret[len1 + len2] = '\0';
+    return ret;
 
 }
 
-void concatenate_name_path(const char* path_file_source, const char *path_in_tar, char *file_name, char *buf){
-
-    strncpy(buf, path_in_tar, strlen(path_in_tar));
-    strcat(buf, file_name);
-
-}

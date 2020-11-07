@@ -15,6 +15,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <sys/wait.h>
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 
@@ -28,6 +29,6 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 
 int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, const char *path_in_tar);
 
-int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, const char *path_dest);
+int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char *path_dest);
 
 #endif

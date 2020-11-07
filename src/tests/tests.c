@@ -121,7 +121,7 @@ int main(void){
     //remove_file_from_tar("a.tar", "targets/test_dir/foo");
 
     //mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "");
-    mv_from_tar_to_dir("a.tar", "targets/bar", "toto");
+    mv_from_tar_to_dir("a.tar", "targets/bar", "./");
 
    return 0;
 }
