@@ -1,7 +1,7 @@
 #ifndef WORK_DIRECTORY
 #define WORK_DIRECTORY
 
-#include <linux/limits.h>
+#define PATH_MAX 4096
 
 struct work_directory
 {

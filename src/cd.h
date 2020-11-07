@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include "types/posix_header.h"
 #include "types/work_directory.h"
+#include "annexe/fonctions_utiles.c"
 
 #define BLOCK_SIZE 512
 

@@ -1,133 +1,5 @@
 #include "cd.h"
 
-/* cette fonction permet de remplir une structure work_directory à partir d'une chaine représentant un chemin */
-void fill_wd(char * path_wd, struct work_directory * ad_wd)
-{
-	char * path_wd_copy = strdup(path_wd);
-	char * token = strtok(path_wd_copy, "/");
-
-	sprintf((*ad_wd).c_htar, "%s", "");
-	sprintf((*ad_wd).tar_name, "%s", "");
-	sprintf((*ad_wd).c_tar, "%s", "");
-
-	if(token == NULL)
-	{
-		/* alors path_wd = "/" */
-		strcat((*ad_wd).c_htar, "/");
-	}
-	else
-	{
-		/* regarde si le chemin implique un tar et ajoute le chemin hors tar dans c_htar */
-		while(strstr(token, ".tar") == NULL)
-		{
-			strcat((*ad_wd).c_htar, "/");
-			strcat((*ad_wd).c_htar, token);
-
-			token = strtok(NULL, "/");
-
-			if(token == NULL)
-			{
-				break;
-			}
-		}
-
-		/* si le chemin implique un tar */
-		if(token != NULL)
-		{
-			/* ajout du nom du tar dans tar_name */
-			strcat((*ad_wd).tar_name, token);
-
-			token = strtok(NULL, "/");
-
-			/* si le chemin dans le tar n'est pas nul */
-			while(token != NULL)
-			{
-				/* ajoute le chemin dans le tar dans c_tar */
-				strcat((*ad_wd).c_tar, token);
-				strcat((*ad_wd).c_tar, "/");
-
-				token = strtok(NULL, "/");
-			}
-		}
-	}
-}
-
-/* cette fonction permet de récupérer un chemin dans une chaîne de caractères à partir d'un chemin dans la structure work_directory */
-void get_wd(struct work_directory wd, char * path_wd)
-{
-	/* ajoute le chemin hors tar à la chaine de caractères */
-	sprintf(path_wd, "%s", wd.c_htar);
-	if(strlen(wd.tar_name) > 0)
-	{
-		/* ajoute le nom du tar à la chaine de caractères si il y en a un */
-		strcat(path_wd, "/");
-		strcat(path_wd, wd.tar_name);
-
-		if(strlen(wd.c_tar) > 0)
-		{
-			/* ajoute le chemin dans le tar à la chaine de caractères si il existe */
-			strcat(path_wd, "/");
-			strncat(path_wd, wd.c_tar, strlen(wd.c_tar)-1);
-		}
-	}
-}
-
-void chemin_propre(char * cwd)
-{
-	int i, j;
-
-	int nb_slash = 0;
-	for(i = 0; i < strlen(cwd); i++)
-	{
-		nb_slash += (cwd[i] == '/') ? 1 : 0;
-	}
-
-	char liste_rep[nb_slash][50];
-	int ind_rep[nb_slash];
-
-	char * cwd_copy = strdup(cwd);
-	char * token = strtok(cwd_copy, "/");
-	i = 0;
-	while(token != NULL && i < nb_slash)
-	{
-		sprintf(liste_rep[i], "%s", token);
-		token = strtok(NULL, "/");
-		i++;
-	}
-
-	for(i = 0; i < nb_slash; i++)
-	{
-		if(strcmp(liste_rep[i], ".") == 0)
-		{
-			ind_rep[i] = 0;
-		}
-		else if(strcmp(liste_rep[i], "..") == 0)
-		{
-			ind_rep[i] = 0;
-			j = i - 1;
-			while(ind_rep[j] != 1)
-			{
-				j--;
-			}
-			ind_rep[j] = 0;
-		}
-		else
-		{
-			ind_rep[i] = 1;
-		}
-	}
-
-	sprintf(cwd, "%s", "");
-	for(i = 0; i < nb_slash; i++)
-	{
-		if(ind_rep[i])
-		{
-			strcat(cwd, "/");
-			strcat(cwd, liste_rep[i]);
-		}
-	}
-}
-
 /* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu */
 int cd(char * path_cwd, char * path_nwd)
 {
@@ -137,16 +9,9 @@ int cd(char * path_cwd, char * path_nwd)
 		return 0;
 	}
 
-	/* si le nouveau chemin n'est pas absolu : on le rend absolu */
-	if(path_nwd[0] != '/')
-	{
-		char * end_nwd = strdup(path_nwd);
-		sprintf(path_nwd, "%s/", path_cwd);
-		strcat(path_nwd, end_nwd);
-	}
-
-	/* permet de rendre le nouveau chemin "propre" à savoir remplace les . et .. en gardant l'intégrité du chemin */
-	chemin_propre(path_nwd);
+	/* rend le nwd chemin absolu */
+	char path_nwd_complet[strlen(path_cwd) + 1 + strlen(path_nwd)];
+	chemin_absolu(path_cwd, path_nwd, path_nwd_complet);
 
 	struct posix_header p;
 
@@ -157,7 +22,7 @@ int cd(char * path_cwd, char * path_nwd)
 	fill_wd(path_cwd, &cwd);
 
 	struct work_directory nwd;
-	fill_wd(path_nwd, &nwd);
+	fill_wd(path_nwd_complet, &nwd);
 
 
 	/* vérfie que le nouveau chemin hors-tar existe et change "vraiment" de directory */
