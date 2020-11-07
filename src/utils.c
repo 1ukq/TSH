@@ -16,9 +16,10 @@ char *name(const char *path){
 
     int length = name_length(path);
     int len_path = strlen(path);
-    char *ret = malloc(sizeof(char) * length);
+    char *ret = malloc(sizeof(char) * (length + 1));
     if(ret == NULL) return NULL;
     for(int i = 0; i < length; i++) ret[i] = path[len_path - length + i];
+    ret[length] = '\0';
     return ret;
 
 }
