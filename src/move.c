@@ -356,22 +356,19 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     char *str = name(header.name);
     char *path = concatenate(path_dest, str);
 
-    int f = fork();
-    if(f == 0){
-        execlp("touch", "touch", path, NULL);
-    }
-    if(f == -1){
-        perror("execlp in mv_from_tar_to_dir");
+    mode_t mode;
+    sscanf(header.mode, "%ho", &mode);
+
+    int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
+    if(fd_dest == -1){
+        perror("open dest in mv_from_tar_to_dir");
         return -1;
     }
-    else{
-        wait(NULL);
-        int fd_dest = open(path, O_WRONLY);
-        if(fd_dest == -1){
-            perror("open dest in mv_from_tar_to_dir");
-            return -1;
-        }
-        write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
+
+    int size_write = write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
+    if(size_write == -1){
+        perror("write in mv_from_tar_to_dir");
+        return -1;
     }
 
     free(str);
