@@ -1,5 +1,15 @@
 #include "utils.h"
 
+int str_length(char *str){
+    int i = str[0];
+    int ret = 0;
+    while(i != '\0'){
+        ret++;
+        i = str[ret];
+    }
+    return ret;
+}
+
 int name_length(const char* path_file_source){
 
     int name_length = 0;

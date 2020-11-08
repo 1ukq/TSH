@@ -73,7 +73,7 @@ char *buffarize(const char *restrict path_file_source, struct stat *restrict buf
 
 }
 
-int insert_file_in_tar(const char *path_tar, const char *path_file_source){
+int insert_file_in_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
 
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
@@ -100,7 +100,7 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source){
     struct posix_header header;
     memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
 
-    create_file_header(path_file_source, &stat_buf_source, &header);
+    create_file_header(path_file_source, &stat_buf_source, &header, path_in_tar);
     char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
 
     int wr = write(fd_tar, &header, BLOCK_SIZE);
@@ -163,7 +163,7 @@ int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
 
 }
 
-int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, const char *path_in_tar){
+int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, char *path_in_tar){
 
     int fd_source = open(path_tar_source, O_RDWR);
     if(fd_source == -1){
@@ -223,7 +223,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     sscanf(header.size, "%o", &size);
     shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
 
-    char *buf = malloc(sizeof(char) * (shift + 1) * BLOCK_SIZE);
+    char *buf = malloc(sizeof(char) * shift * BLOCK_SIZE);
     if(buf == NULL){
         perror("malloc in mv_from_tar_to_tar");
         return -1;
@@ -235,7 +235,21 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
         return -1;
     }
 
-    size_read = read(fd_source, buf, (shift + 1) * BLOCK_SIZE);
+    struct posix_header hd;
+
+    size_read = read(fd_source, &hd, BLOCK_SIZE);
+    if(size_read == -1){
+        perror("read in mv_from_tar_to_tar");
+        return -1;
+    }
+
+    char *str = name(path_file_source);
+    char *path = concatenate(path_in_tar, str);
+    memset(hd.name, '\0', 100);
+    sprintf(hd.name, "%s", path);
+    set_checksum(&hd);
+
+    size_read = read(fd_source, buf, shift * BLOCK_SIZE);
     if(size_read == -1){
         perror("read in mv_from_tar_to_tar");
         return -1;
@@ -255,14 +269,19 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
         return -1;
     }
     int b = find_next_block(fd_target, &stat_target);
-    printf("b : %d\n", b);
     ret_lseek = lseek(fd_target, b * BLOCK_SIZE, SEEK_SET);
     if(ret_lseek == -1){
         perror("lseek in mv_from_tar_to_tar");
         return -1;
     }
 
-    int size_write = write(fd_target, buf, (shift + 1) * BLOCK_SIZE);
+    int size_write = write(fd_target, &hd, BLOCK_SIZE);
+    if(size_write == -1){
+        perror("Write in move_from_tar_to_tar");
+        return -1;
+    }
+
+    size_write = write(fd_target, buf, shift * BLOCK_SIZE);
     if(size_write == -1){
         perror("Write in move_from_tar_to_tar");
         return -1;
@@ -276,12 +295,12 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 
 }
 
-int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, const char *path_in_tar){
+int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
 
     int ret = fork();
     if(ret == 0) execlp("rm", "rm", path_file_source, NULL);
     else if(ret == -1) perror("fork in mv_from_ext_to_tar");
-    else insert_file_in_tar(path_tar, path_file_source);
+    else insert_file_in_tar(path_tar, path_file_source, path_in_tar);
     return 0;
 
 }
@@ -357,6 +376,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     char *path = concatenate(path_dest, str);
 
     mode_t mode;
+    //sscanf(header.mode, "%ho", &mode); //Line for MacOS
     sscanf(header.mode, "%o", &mode);
 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);

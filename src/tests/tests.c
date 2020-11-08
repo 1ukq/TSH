@@ -120,8 +120,9 @@ int main(void){
     //remove_file_from_tar("a.tar", "targets/bar");
     //remove_file_from_tar("a.tar", "targets/test_dir/foo");
 
-    //mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "");
-    mv_from_tar_to_dir("a.tar", "targets/bar", "./");
+    //mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "dir/dir/");
+    //mv_from_tar_to_dir("c.tar", "targets/test_dir/foo", "./");
+    //mv_from_dir_to_tar("d.tar", "targets/test_dir/helloworld", "dir/");
 
    return 0;
 }
