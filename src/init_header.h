@@ -2,6 +2,7 @@
 #define INIT_HEADER
 
 #include "types/posix_header.h"
+#include "utils.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
@@ -30,12 +31,12 @@ void init_gid_file(struct stat *restrict buf, struct posix_header *header);
 
 void init_mtime_file(struct stat *restrict buf, struct posix_header *header);
 
-void init_name_file(struct posix_header *header, const char *path_file_source);
+void init_name_file(struct posix_header *header, const char *path_file_source, char *dest);
 
 void init_magic_file(struct posix_header *header);
 
 void init_version_file(struct posix_header *header);
 
-int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header);
+int create_file_header(const char *file_name, struct stat *restrict buf, struct posix_header *header, char *dest);
 
 #endif

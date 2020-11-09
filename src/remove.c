@@ -56,8 +56,8 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
         return -1;
     }
 
-    char *buf_write = malloc(sizeof(char) * (size_tar - pos) * BLOCK_SIZE);
-    memset(buf_write, '\0', sizeof(char) * (size_tar - pos) * BLOCK_SIZE);
+    char *buf_write = malloc(sizeof(char) * (size_tar - pos));
+    memset(buf_write, '\0', sizeof(char) * (size_tar - pos));
 
     int n = pos;
 

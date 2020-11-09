@@ -1,10 +1,11 @@
 #include "munit/munit.h"
 #include "../copy.h"
-#include "../insert.h"
 #include "../list_file.h"
 #include "../makedir.h"
 #include "../types/posix_header.h"
 #include "../remove.h"
+#include "../utils.h"
+#include "../move.h"
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -77,7 +78,7 @@ void buffarize_test(const char *path_file_source, char *expected_buf, off_t nb_b
 }
 
 int main(void){
-
+/*
     copy_from_tar_test("targets/test.tar", "bar", "targets/dest", 2105);
     copy_from_tar_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
     copy_from_tar_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
@@ -103,7 +104,7 @@ int main(void){
     buffarize_test("targets/bar", expected_buf, 2105);
     free(expected_buf);
     close(fd);
-
+*/
     //struct stat buf;
     //stat("a.tar", &buf);
     //struct posix_header header;
@@ -113,10 +114,15 @@ int main(void){
 
     //makedir(STDOUT_FILENO, "a.tar", "", "tests_dir");
 
-    insert_file_in_tar("a.tar", "targets/test_dir/foo");
+    //insert_file_in_tar("a.tar", "targets/test_dir/helloworld");
 
-    remove_file_from_tar("a.tar", "targets/bar");
-    remove_file_from_tar("a.tar", "targets/test_dir/foo");
+    //insert_file_in_tar("a.tar", "targets/bar");
+    //remove_file_from_tar("a.tar", "targets/bar");
+    //remove_file_from_tar("a.tar", "targets/test_dir/foo");
+
+    //mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "dir/dir/");
+    //mv_from_tar_to_dir("c.tar", "targets/test_dir/foo", "./");
+    //mv_from_dir_to_tar("d.tar", "targets/test_dir/helloworld", "dir/");
 
    return 0;
 }

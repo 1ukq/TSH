@@ -77,9 +77,11 @@ void init_mtime_file(struct stat *restrict buf, struct posix_header *header){
 
 }
 
-void init_name_file(struct posix_header *header, const char *path_file_source){
+void init_name_file(struct posix_header *header, const char *path_file_source, char *dest){
 
-    sprintf(header -> name, "%s", path_file_source);
+    char *str = name(path_file_source);
+    char *path = concatenate(dest, str);
+    sprintf(header -> name, "%s", path);
 
 }
 
@@ -96,9 +98,9 @@ void init_version_file(struct posix_header *header){
 
 }
 
-int create_file_header(const char *path_file_source, struct stat *restrict buf, struct posix_header *header){
+int create_file_header(const char *path_file_source, struct stat *restrict buf, struct posix_header *header, char *dest){
 
-    init_name_file(header, path_file_source);
+    init_name_file(header, path_file_source, dest);
     init_mode_file(buf, header);
     init_size_file(buf, header);
     init_type_file(buf, header);
