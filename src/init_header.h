@@ -2,7 +2,7 @@
 #define INIT_HEADER
 
 #include "types/posix_header.h"
-#include "utils.h"
+#include "utils/utils_string.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
