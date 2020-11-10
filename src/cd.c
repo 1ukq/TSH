@@ -116,6 +116,8 @@ int cd(char * path_cwd, char * path_nwd)
 
 	}
 
+	return 0;
+
 	close(fd);
 
 }

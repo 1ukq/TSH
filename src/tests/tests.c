@@ -4,7 +4,7 @@
 #include "../makedir.h"
 #include "../types/posix_header.h"
 #include "../remove.h"
-#include "../utils.h"
+#include "../utils/utils_string.h"
 #include "../move.h"
 #include <sys/stat.h>
 #include <stdlib.h>

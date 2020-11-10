@@ -2,12 +2,22 @@ CC = gcc
 EXEC = tests
 FLAGS = -g -Wall
 
-MUNIT_C_FILE = munit/munit.c
-SRC = ../copy.c ../list_file.c ../makedir.c ../remove.c ../init_header.c ../utils.c ../move.c
+SRC_DIR = ../
+UTILS_DIR = ../utils/
 
-$(EXEC) : tests.c $(MUNIT_C_FILE) $(SRC)
-	$(CC) $^ -o $(EXEC)
+MUNIT_C_FILE = munit/munit.c
+UTILS_FILES = $(foreach dir, $(UTILS_DIR), $(wildcard $(dir)*.c))
+SRC = ../copy.c ../list_file.c ../makedir.c ../remove.c ../init_header.c ../move.c ../cd.c ../pwd.c
+FILE_TEST = tests.c
+ALL_FILES = $(SRC) $(MUNIT_C_FILE) $(FILE_TEST) $(UTILS_FILES)
+OBJ = $(ALL_FILES:%.c=%.o)
+
+%.o : %.c
+	$(CC) -o $@ -c $< $(FLAGS)
+
+$(EXEC) : $(OBJ)
+	$(CC) -o $(EXEC) $(OBJ) $(FLAGS)
 
 .PHONY = clean
 clean :
-	rm *.o $(EXEC)
+	rm $(OBJ) $(EXEC)
