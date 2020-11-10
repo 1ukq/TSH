@@ -1,6 +1,10 @@
 #include "cd.h"
 
-/* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu */
+/* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu
+- renvoie -1 si erreur du type (open, read...)
+- renvoie 0 si le nouveau chemin existe et tout s'est bien passé
+- renvoie 1 si le nouveau chemin n'existe pas
+*/
 int cd(char * path_cwd, char * path_nwd)
 {
 	/* si el nouveau chemin est vide */
@@ -29,7 +33,7 @@ int cd(char * path_cwd, char * path_nwd)
 	if(chdir(nwd.c_htar) < 0)
 	{
 		/* le nouveau chemin hors-tar n'existe pas; on ne change pas de cwd */
-		return 0;
+		return 1;
 	}
 
 	/* vérifie que le nouveau chemin implique un tar */
@@ -49,7 +53,7 @@ int cd(char * path_cwd, char * path_nwd)
 		/* le tar n'existe pas à l'endroit indiqué; le nwd n'existe donc pas; on reste dans l'ancien cwd -> on se remet dans le répertoire d'origine */
 		chdir(cwd.c_htar);
 
-		return 0;
+		return 1;
 	}
 
 	/* vérifie que le nouveau chemin dans le tar est non-vide (sinon on est sûr que le chemin existe) */
@@ -72,7 +76,7 @@ int cd(char * path_cwd, char * path_nwd)
 
 			chdir(cwd.c_htar);
 
-			return 0;
+			return 1;
 		}
 
 		/* Récupère la taille du fichier + conversion */
@@ -116,8 +120,8 @@ int cd(char * path_cwd, char * path_nwd)
 
 	}
 
-	return 0;
-
 	close(fd);
+	perror("read");
+	return -1;
 
 }
