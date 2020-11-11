@@ -1,5 +1,4 @@
 #include "list_file.h"
-#include "types/posix_header.h"
 
 
 
@@ -11,7 +10,7 @@ int verif_convert_name(char * name, char * fullname, const char * path_cwd)
 	- fullname : p.name (nom à vérifier puis convertir)
 	- path_cwd : path_cwd
 	*/
-	
+
 	int i, j, size_name;
 	int size_fullname = 100;
 	int len_path_cwd = strlen(path_cwd);
@@ -165,25 +164,27 @@ void get_time(char * time_oct, char * time)
 
 
 
-int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
+int ls(int fd_out, char option, char * path)
 {
 	/*
 	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par la fonction cd qui vérifiera à chaque changement de cwd que le nouveau chemin existe)
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
 	- fd_out : sortie pour affichage (STDOUT_FILENO pour les tests) ce sera le fd du tshell
 	- option : ' ' pour un ls et 'l' pour un ls -l
-	- path_tar : chemin du tar (exemple "chemin/.../test.tar")
-	- path_cwd : chemin de la localisation de l'utilisateur (cwd) à partir du tar avec un '/' à la fin (exemple "dos1/dos2/dos3/") ou "" si il est à la racine du tar
+	- path : chemin absolu (impliquant un unique tar)
 	*/
 
 	//Note : la fonction ne prend pas encore en compte le nombre de liens pour chaque fichiers
+	struct work_directory wd;
+
+	char path_in_tar[sizeof(wd.c_tar)];
+	char path_to_tar[sizeof(wd.c_htar) + 1 + sizeof(wd.tar_name)];
+
 
 	struct posix_header p;
 
-	char buf[BLOCK_SIZE];
-
 	int total = 0;
-	int n, i, shift;
+	int n, shift;
 
 	int size_psize = sizeof(p.size);
 	int size_dec;
@@ -192,11 +193,10 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 	int size_pname = sizeof(p.name);
 	char name[size_pname];
 
-
 	char type[1];
-
-	char time_str[16];
-
+	char time_str[17];
+	char uid[8];
+	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
 
@@ -205,17 +205,28 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 		return -1;
 	}
 
+	fill_wd(path, &wd);
+	if(strlen(wd.tar_name) == 0)
+	{
+		//le chemin n'implique aucun tar
+		return -1;
+	}
 
-	int fd = open(path_tar, O_RDONLY);
+	sprintf(path_in_tar, "%s", wd.c_tar);
+	sprintf(path_to_tar, "%s/", wd.c_htar);
+	strcat(path_to_tar, wd.tar_name);
+
+
+	int fd = open(path_to_tar, O_RDONLY);
 	if(fd < 0)
 	{
 		perror("open");
 		return -1;
 	}
 
-	while(read(fd, buf, BLOCK_SIZE ) > 0)
+	while(read(fd, &p, BLOCK_SIZE ) > 0)
 	{
-		if(buf[0] == '\0')
+		if(p.name[0] == '\0')
 		{
 			/* Fin du tar */
 			close(fd);
@@ -233,74 +244,60 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 			return total;
 		}
 
-		/* Récupère le nom complet du fichier */
-		for (i = 0; i < size_pname; i++)
-		{
-			p.name[i] = buf[i];
-		}
-
-		/* Récupère la taille du fichier + conversion */
-		for (i = 0; i < size_psize; i++)
-		{
-			p.size[i] = buf[124+i];
-		}
-		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
-
 
 		/* Vérification + conversion (à gauche) que le fichier est à afficher */
-		if(verif_convert_name(name, p.name, path_cwd) != 0)
+		if(verif_convert_name(name, p.name, path_in_tar) != 0)
 		{
 			/* Ici name a son nom exact */
 			char affichage[BLOCK_SIZE] = ""; //permet d'afficher fichier par fichier (on ne se pose plus la question du nombre de fichiers à afficher)
 			if(option == 'l')
 			{
 				/* récupère le type */
-				p.typeflag = buf[156];
 				get_type(p.typeflag, type);
 				strcat(affichage, type);
 
-				/* récupère les permissions + ajout */
-				for (i = 0; i < sizeof(p.mode); i++)
-				{
-					p.mode[i] = buf[100+i];
-				}
+				/* ajout de permissions à affichage */
 				get_permissions(p.mode, perm_str);
 				strcat(affichage, perm_str);
 				strcat(affichage, "  ");
 
-				/* devrait récupérer le nombre de liens + ajout */
+				/* devrait récupérer le nombre de liens + ajout (ou le uid si le uname est vide) */
 
-				/* récupère le uname + ajout */
-				for (i = 0; i < sizeof(p.uname); i++)
+				/* ajout de uname ou uid à affichage */
+				if(strlen(p.uname) > 0)
 				{
-					p.uname[i] = buf[265+i];
+					strcat(affichage, p.uname);
 				}
-				strcat(affichage, p.uname);
-				strcat(affichage, " ");
+				else
+				{
+					oct_to_dec(p.uid, uid);
+					strcat(affichage, uid);
+				}
+				strcat(affichage, "/");
 
-				/* récupère le gname + ajout */
-				for (i = 0; i < sizeof(p.gname); i++)
+				/* ajout de gname ou gid à affichage */
+				if(strlen(p.gname) > 0)
 				{
-					p.gname[i] = buf[297+i];
+					strcat(affichage, p.gname);
 				}
-				strcat(affichage, p.gname);
+				else
+				{
+					oct_to_dec(p.gid, gid);
+					strcat(affichage, gid);
+				}
 				strcat(affichage, "  ");
 
-				/* ajoute taille à message */
+				/* ajout de taille à affichage */
 				sprintf(size_str, "%i", size_dec); //conversion int -> str
 				strcat(affichage, size_str);
-				strcat(affichage, "\t");
+				strcat(affichage, "  ");
 
-				/* récupère la date de dernière modification + ajout */
-				for (i = 0; i < sizeof(p.mtime); i++)
-				{
-					p.mtime[i] = buf[136+i];
-				}
+				/* ajout de time à affichage */
 				get_time(p.mtime, time_str);
 				strcat(affichage, time_str);
 				strcat(affichage, "  ");
 
-				/* ajout nom à message */
+				/* ajout nom à affichage */
 				strcat(affichage, name);
 				strcat(affichage,"\n");
 			}
@@ -323,6 +320,7 @@ int ls(int fd_out, char option, const char * path_tar, const char * path_cwd)
 
 
 		/* Passe à l'en-tête suivant */
+		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
 		shift = (size_dec + BLOCK_SIZE -1)/BLOCK_SIZE;
 		n = lseek(fd, shift*BLOCK_SIZE, SEEK_CUR);
 		if(n < 0)
