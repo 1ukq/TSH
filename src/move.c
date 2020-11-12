@@ -1,4 +1,6 @@
 #include "move.h"
+#include "utils/utils_string.h"
+#include "utils/init_header.h"
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes){
 
@@ -376,8 +378,8 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     char *path = concatenate(path_dest, str);
 
     mode_t mode;
-    //sscanf(header.mode, "%ho", &mode); //Line for MacOS
-    sscanf(header.mode, "%o", &mode);
+    sscanf(header.mode, "%ho", &mode); //Line for MacOS
+    //sscanf(header.mode, "%o", &mode);
 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
     if(fd_dest == -1){

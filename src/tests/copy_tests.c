@@ -62,20 +62,13 @@ void cat_test(const char *path_tar, const char *path_file_source){
 
 }
 
+/*
 void ls_test(const char *path_tar, const char *path_file_source, int expected_nb_files){
 
     int ret = ls(STDOUT_FILENO, ' ',path_tar, path_file_source);
     munit_assert_int(expected_nb_files, ==, ret);
 }
-
-void buffarize_test(const char *path_file_source, char *expected_buf, off_t nb_bytes){
-
-    struct stat buf;
-    stat(path_file_source, &buf);
-    char *file_source_buf = buffarize(path_file_source, &buf);
-    munit_assert_memory_equal(nb_bytes, expected_buf, file_source_buf);
-
-}
+*/
 
 int main(void){
 /*
@@ -97,13 +90,6 @@ int main(void){
     printf("\n");
 
 
-
-    char *expected_buf = malloc(sizeof(char) * 2105);
-    int fd = open("targets/bar", O_RDONLY);
-    read(fd, expected_buf, 2105);
-    buffarize_test("targets/bar", expected_buf, 2105);
-    free(expected_buf);
-    close(fd);
 */
     //struct stat buf;
     //stat("a.tar", &buf);
