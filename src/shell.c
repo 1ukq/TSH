@@ -50,12 +50,17 @@ int shell(void)
 	_Bool run = 1;
 	_Bool execute = 1;
 
+	char cd_beg_error[] = "cd: ";
+	char cd_end_error[] = ": No such directory\n";
+
+	char command_not_found[] = ": command not found\n";
+
 	char * tableau[100];
 
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
 
-	char introduction[] = "\t\tTSHELL - by Alessio, Lucas & Luka\n\n";
+	char introduction[] = "\n\n\n\n\t\tTSHELL - by Alessio, Lucas & Luka\n\n\n\n";
 
 	n = write(STDOUT_FILENO, introduction, strlen(introduction));
 
@@ -82,25 +87,60 @@ int shell(void)
 			}
 
 			/* cd ? */
-			if((strcmp(tableau[0], "cd") == 0) && (n > 1))
+			if((strcmp(tableau[0], "cd") == 0))
 			{
 				n = chdir(tableau[1]);
+				if(n < 0)
+				{
+					if(tableau[1] != NULL)
+					{
+						char error[sizeof(cd_beg_error) + sizeof(cd_end_error) + sizeof(tableau[1])];
+						sprintf(error, "%s", cd_beg_error);
+						strcat(error, tableau[1]);
+						strcat(error, cd_end_error);
+
+						n = write(STDERR_FILENO, error, strlen(error));
+						if(n < 0)
+						{
+							perror("write cd error");
+							return -1;
+						}
+					}
+				}
 			}
-
-			/* unique commande avec ou sans options n'impliquant pas de tar */
-			switch(fork())
+			else
 			{
-				case -1 :
-					perror("fork");
-					return -1;
+				/* unique commande avec ou sans options n'impliquant pas de tar */
+				switch(fork())
+				{
+					case -1 :
+						perror("fork");
+						return -1;
 
-				case 0:
-					//fils
-					execvp(tableau[0], tableau);
+					case 0:
+						//fils
+						execvp(tableau[0], tableau);
+						/* gestion des erreurs */
+						if(errno = ENOENT)
+						{
+							char error[sizeof(command_not_found) + sizeof(tableau[0])];
+							sprintf(error, "%s" , tableau[0]);
+							strcat(error, command_not_found);
 
-				default :
-					//père
-					wait(NULL);
+							n = write(STDERR_FILENO, error, strlen(error));
+							if(n < 0)
+							{
+								perror("write error");
+								return -1;
+							}
+
+							return -1;
+						}
+
+					default :
+						//père
+						wait(NULL);
+				}
 			}
 		}
 	}
