@@ -171,6 +171,11 @@ int ls(char option, char * path, char * cwd)
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
 	- option : ' ' pour un ls et 'l' pour un ls -l
 	- path : chemin absolu (impliquant un unique tar)
+
+	return value:
+	- (>= 0) nb fichiers si tout se passe bien
+	- -1 si erreur de type write...
+	- -2 si le chemin n'existe pas
 	*/
 
 	//Note : la fonction ne prend pas encore en compte le nombre de liens pour chaque fichiers
@@ -199,10 +204,7 @@ int ls(char option, char * path, char * cwd)
 	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
-	char ls_beg_error[] = "ls: cannot access ";
-	char ls_end_error[] = ": No such file or directory\n";
-
-	char full_path[strlen(path) + strlen(cwd)];
+	char full_path[strlen(path) + strlen(cwd) + 1];
 
 
 	if(option != 'l' && option != ' ')
@@ -219,25 +221,14 @@ int ls(char option, char * path, char * cwd)
 	}
 
 	sprintf(path_in_tar, "%s", wd.c_tar);
-	sprintf(path_to_tar, "%s/", wd.c_htar);
-	strcat(path_to_tar, wd.tar_name);
+	sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
 
 
 	int fd = open(path_to_tar, O_RDONLY);
 	if(fd < 0)
 	{
-		char ls_error[strlen(ls_beg_error) + strlen(ls_end_error) + strlen(path)];
-		sprintf(ls_error, "%s", ls_beg_error);
-		strcat(ls_error, path);
-		strcat(ls_error, ls_end_error);
-
-		n = write(STDERR_FILENO, ls_error, strlen(ls_error));
-		if(n < 0)
-		{
-			perror("write ls_error");
-			return -1;
-		}
-		return -1;
+		//le chemin n'existe pas
+		return -2;
 	}
 
 	while(read(fd, &p, BLOCK_SIZE ) > 0)
@@ -259,18 +250,8 @@ int ls(char option, char * path, char * cwd)
 
 			if(path_exist == 0)
 			{
-				char ls_error[strlen(ls_beg_error) + strlen(ls_end_error) + strlen(path)];
-				sprintf(ls_error, "%s", ls_beg_error);
-				strcat(ls_error, path);
-				strcat(ls_error, ls_end_error);
-
-				n = write(STDERR_FILENO, ls_error, strlen(ls_error));
-				if(n < 0)
-				{
-					perror("write ls_error");
-					return -1;
-				}
-				return -1;
+				//le chemin n'existe pas
+				return -2;
 			}
 
 			return total;
