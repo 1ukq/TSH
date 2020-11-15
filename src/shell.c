@@ -46,6 +46,8 @@ int read_input(char ** tableau)
 
 int shell(void)
 {
+	struct sigaction action;
+
 	int n, i;
 	_Bool run = 1;
 	_Bool execute = 1;
@@ -62,8 +64,32 @@ int shell(void)
 
 	char introduction[] = "\n\n\n\n\t\tTSHELL - by Alessio, Lucas & Luka\n\n\n\n";
 
-	n = write(STDOUT_FILENO, introduction, strlen(introduction));
 
+
+	/* introduction */
+	n = write(STDOUT_FILENO, introduction, strlen(introduction));
+	if(n < 0)
+	{
+		perror("write introduction");
+		return -1;
+	}
+
+
+
+
+	/* bloquer les signaux */
+	memset(&action, 0, sizeof(struct sigaction));
+	action.sa_handler = SIG_IGN;
+
+	for(i = 1; i <= 64; i++)
+	{
+		sigaction(i, &action, NULL);
+	}
+
+
+
+
+	/* running loop */
 	while(run)
 	{
 		execute = 1;
@@ -83,6 +109,7 @@ int shell(void)
 			if(strcmp(tableau[0], "exit") == 0)
 			{
 				//exit shell
+				//raise(SIGKILL);
 				return 0;
 			}
 
@@ -90,6 +117,8 @@ int shell(void)
 			if((strcmp(tableau[0], "cd") == 0))
 			{
 				n = chdir(tableau[1]);
+				getcwd(cwd, PATH_MAX);
+
 				if(n < 0)
 				{
 					if(tableau[1] != NULL)
@@ -133,9 +162,8 @@ int shell(void)
 								perror("write error");
 								return -1;
 							}
-
-							return -1;
 						}
+						return -1;
 
 					default :
 						//père
@@ -144,13 +172,11 @@ int shell(void)
 			}
 		}
 	}
-
-	//gérer les erreures (command not found...)
-
-
-
 	return 0;
 }
+
+
+
 
 int main(void)
 {
