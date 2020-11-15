@@ -164,12 +164,11 @@ void get_time(char * time_oct, char * time)
 
 
 
-int ls(int fd_out, char option, char * path)
+int ls(char option, char * path, char * cwd)
 {
 	/*
 	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par la fonction cd qui vérifiera à chaque changement de cwd que le nouveau chemin existe)
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
-	- fd_out : sortie pour affichage (STDOUT_FILENO pour les tests) ce sera le fd du tshell
 	- option : ' ' pour un ls et 'l' pour un ls -l
 	- path : chemin absolu (impliquant un unique tar)
 	*/
@@ -185,6 +184,7 @@ int ls(int fd_out, char option, char * path)
 
 	int total = 0;
 	int n, shift;
+	int path_exist = 0;
 
 	int size_psize = sizeof(p.size);
 	int size_dec;
@@ -199,13 +199,19 @@ int ls(int fd_out, char option, char * path)
 	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
+	char ls_beg_error[] = "ls: cannot access ";
+	char ls_end_error[] = ": No such file or directory\n";
+
+	char full_path[strlen(path) + strlen(cwd)];
+
 
 	if(option != 'l' && option != ' ')
 	{
 		return -1;
 	}
 
-	fill_wd(path, &wd);
+	chemin_absolu(cwd, path, full_path);
+	fill_wd(full_path, &wd);
 	if(strlen(wd.tar_name) == 0)
 	{
 		//le chemin n'implique aucun tar
@@ -220,7 +226,17 @@ int ls(int fd_out, char option, char * path)
 	int fd = open(path_to_tar, O_RDONLY);
 	if(fd < 0)
 	{
-		perror("open");
+		char ls_error[strlen(ls_beg_error) + strlen(ls_end_error) + strlen(path)];
+		sprintf(ls_error, "%s", ls_beg_error);
+		strcat(ls_error, path);
+		strcat(ls_error, ls_end_error);
+
+		n = write(STDERR_FILENO, ls_error, strlen(ls_error));
+		if(n < 0)
+		{
+			perror("write ls_error");
+			return -1;
+		}
 		return -1;
 	}
 
@@ -231,9 +247,9 @@ int ls(int fd_out, char option, char * path)
 			/* Fin du tar */
 			close(fd);
 
-			if(total > 0 && option != 'l')
+			if((total > 0) && (option != 'l'))
 			{
-				n = write(fd_out, "\n", 1);
+				n = write(STDOUT_FILENO, "\n", 1);
 				if(n < 0)
 				{
 					perror("write 2");
@@ -241,9 +257,37 @@ int ls(int fd_out, char option, char * path)
 				}
 			}
 
+			if(path_exist == 0)
+			{
+				char ls_error[strlen(ls_beg_error) + strlen(ls_end_error) + strlen(path)];
+				sprintf(ls_error, "%s", ls_beg_error);
+				strcat(ls_error, path);
+				strcat(ls_error, ls_end_error);
+
+				n = write(STDERR_FILENO, ls_error, strlen(ls_error));
+				if(n < 0)
+				{
+					perror("write ls_error");
+					return -1;
+				}
+				return -1;
+			}
+
 			return total;
 		}
 
+		if(path_exist == 0)
+		{
+			if(strlen(path_in_tar) == 0)
+			{
+				path_exist = 1;
+			}
+
+			if(strcmp(p.name, path_in_tar) == 0)
+			{
+				path_exist = 1;
+			}
+		}
 
 		/* Vérification + conversion (à gauche) que le fichier est à afficher */
 		if(verif_convert_name(name, p.name, path_in_tar) != 0)
@@ -308,7 +352,7 @@ int ls(int fd_out, char option, char * path)
 				strcat(affichage, "\t");
 			}
 
-			n = write(fd_out, affichage, sizeof(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
+			n = write(STDOUT_FILENO, affichage, sizeof(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
 			if(n < 0)
 			{
 				perror("write 1");

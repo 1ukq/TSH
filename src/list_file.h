@@ -31,6 +31,6 @@ void get_permissions(char * perm_oct, char * perm_str);
 
 void get_time(char * time_oct, char * time);
 
-int ls(int fd_out, char option, char * path);
+int ls(char option, char * path, char * cwd);
 
 #endif
