@@ -6,10 +6,11 @@ UTILS_DIR = ../utils/
 TYPES_DIR = ../types/
 TESTS_DIR = ./
 
+MUNIT_FILE = munit/munit.c
 MUNIT_OBJ = munit/munit.o
 
 ALL_DIRS = $(SRC_DIR) $(TYPES_DIR) $(UTILS_DIR) $(TESTS_DIR)
-FILES = $(foreach dir, $(ALL_DIRS), $(wildcard $(dir)*.c))
+FILES = $(foreach dir, $(ALL_DIRS), $(wildcard $(dir)*.c)) $(MUNIT_FILE)
 OBJ = $(FILES:%.c=%.o)
 EXECS = move_tests copy_tests remove_tests ls_tests cd_tests makedir_tests pwd_tests
 
@@ -22,6 +23,7 @@ MAKEDIR_OBJ = makedir_tests.o ../makedir.o $(MUNIT_OBJ)
 PWD_OBJ = pwd_tests.o ../pwd.o $(MUNIT_OBJ)
 
 %.o : %.c
+	@echo Compiling $?
 	$(CC) -o $@ -c $< $(FLAGS)
 
 move_tests : $(MOVE_OBJ)
@@ -45,6 +47,16 @@ makedir_tests : $(MAKEDIR_OBJ)
 pwd_tests : $(PWD_OBJ)
 	$(CC) -o $@ $^ $(FLAGS)
 
+all : $(OBJ) $(MUNIT_OBJ)
+	@echo Compiling tests...
+	$(CC) -o move_tests $(MOVE_OBJ)
+	$(CC) -o remove_tests $(REMOVE_OBJ)
+	$(CC) -o copy_tests $(COPY_OBJ)
+	$(CC) -o ls_tests $(LS_OBJ)
+	$(CC) -o cd_tests $(CD_OBJ)
+	$(CC) -o makedir_tests $(MAKEDIR_OBJ)
+	$(CC) -o pwd_tests $(PWD_OBJ)
+
 clean_move :
 	rm $(MOVE_OBJ) move_tests
 
@@ -67,5 +79,6 @@ clean_pwd :
 	rm $(PWD_OBJ) pwd_tests
 
 clean_all :
+	@echo Removing object files and executables
 	rm $(OBJ) $(EXECS)
 
