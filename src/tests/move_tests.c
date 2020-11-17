@@ -103,7 +103,7 @@ int main(int argc, char *argv[]){
     system("./script_rm.sh");
     system("./script.sh");
 
-    int fd_tar = open("targets/test.tar", O_RDONLY);
+    int fd_tar = open("targets/test.tar", O_RDWR);
     int pos_from = 0;
     int pos_to = 6 * BLOCK_SIZE;
     int size_tar = 10240;
