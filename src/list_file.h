@@ -9,6 +9,9 @@
 #include <stdio.h> //perror
 #include <stdlib.h> //atoi
 #include <time.h> //gmtime
+#include "types/work_directory.h"
+#include "utils/fonctions_utiles.h"
+#include "types/posix_header.h"
 
 #define BLOCK_SIZE 512
 #define LTYPE "-7lcbdps"
@@ -28,6 +31,6 @@ void get_permissions(char * perm_oct, char * perm_str);
 
 void get_time(char * time_oct, char * time);
 
-int ls(int fd_out, char option, const char * path_tar, const char * path_loc);
+int ls(char option, char * path, char * cwd);
 
 #endif
