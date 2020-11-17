@@ -80,7 +80,11 @@ void chemin_absolu(char * cwd, char * u_wd, char * u_wd_abs)
 	/* rend u_wd en chemin complet (part de la racine) */
 	if(u_wd[0] != '/')
 	{
-		sprintf(u_wd_abs, "%s/", cwd);
+		sprintf(u_wd_abs, "%s", cwd);
+		if(cwd[strlen(cwd)-1] != '/')
+		{
+			strcat(u_wd_abs, "/");
+		}
 		strcat(u_wd_abs, u_wd);
 	}
 	else
@@ -89,10 +93,11 @@ void chemin_absolu(char * cwd, char * u_wd, char * u_wd_abs)
 	}
 
 	int nb_slash = 0;
-	for(i = 0; i < strlen(u_wd_abs); i++)
+	for(i = 0; i < strlen(u_wd_abs)-1; i++)
 	{
 		nb_slash += (u_wd_abs[i] == '/') ? 1 : 0;
 	}
+
 
 	char liste_rep[nb_slash][50];
 	int ind_rep[nb_slash];
@@ -139,4 +144,6 @@ void chemin_absolu(char * cwd, char * u_wd, char * u_wd_abs)
 			strcat(u_wd_abs, liste_rep[i]);
 		}
 	}
+
+	strcat(u_wd_abs, "/");
 }
