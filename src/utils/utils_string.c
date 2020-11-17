@@ -1,5 +1,20 @@
 #include "utils_string.h"
 
+int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes){
+
+    for(int i = 0; i < nbytes; i++) if(buf1[i] != buf2[i]) return 0;
+    return 1;
+
+}
+
+void copy_string(char *str1, char *str2, int length){
+
+    for(int i = 0; i < length; i++){
+        str1[i] = str2[i];
+    }
+
+}
+
 int str_length(char *str){
     int i = str[0];
     int ret = 0;

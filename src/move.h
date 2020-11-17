@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
-#include "init_header.h"
+#include "utils/init_header.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
@@ -19,9 +19,11 @@
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 
-int find_next_block(int fd_tar, struct stat *restrict buf_stat);
+int find_last_block(int fd_tar, struct stat *restrict buf_stat);
 
 char *buffarize(const char *path_file_source, struct stat *restrict buf);
+
+int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar);
 
 int insert_file_in_tar(const char *path_tar, const char *path_file_source, char *path_in_tar);
 

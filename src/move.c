@@ -1,21 +1,6 @@
 #include "move.h"
 
-int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes){
-
-    for(int i = 0; i < nbytes; i++) if(buf1[i] != buf2[i]) return 0;
-    return 1;
-
-}
-
-void copy_string(char *str1, char *str2, int length){
-
-    for(int i = 0; i < length; i++){
-        str1[i] = str2[i];
-    }
-
-}
-
-int find_next_block(int fd_tar, struct stat *restrict buf_stat){
+int find_last_block(int fd_tar, struct stat *restrict buf_stat){
 
     int nb_blocks = 0;
     int size_tar = buf_stat -> st_size;
@@ -28,7 +13,7 @@ int find_next_block(int fd_tar, struct stat *restrict buf_stat){
 
     int n = read(fd_tar, content, size_tar);
     if(n == -1){
-        perror("read in find_next_block");
+        perror("read in find_last_block");
         return -1;
     }
 
@@ -84,7 +69,7 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
     //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar (bsdtar is the default tar utility on MacOS)
     struct stat stat_tar;
     stat(path_tar, &stat_tar);
-    int b = find_next_block(fd_tar, &stat_tar);
+    int b = find_last_block(fd_tar, &stat_tar);
     int lseek_ret = lseek(fd_tar, b * BLOCK_SIZE, SEEK_SET);
     if(lseek_ret == -1){
         perror("lseek in insert_file_in_tar");
@@ -268,7 +253,8 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
         perror("stat in mv_from_tar_to_tar");
         return -1;
     }
-    int b = find_next_block(fd_target, &stat_target);
+
+    int b = find_last_block(fd_target, &stat_target);
     ret_lseek = lseek(fd_target, b * BLOCK_SIZE, SEEK_SET);
     if(ret_lseek == -1){
         perror("lseek in mv_from_tar_to_tar");
