@@ -1,6 +1,6 @@
 #include "pwd.h"
 
-int pwd(char * path_cwd, int fd_out)
+int pwd(char * path_cwd)
 {
 	int n;
 	char message[strlen(path_cwd) + 1];
@@ -8,7 +8,7 @@ int pwd(char * path_cwd, int fd_out)
 	sprintf(message, "%s", path_cwd);
 	strcat(message, "\n");
 
-	n = write(fd_out, message, strlen(message));
+	n = write(STDOUT_FILENO, message, strlen(message));
 	if(n < 0)
 	{
 		perror("write");
