@@ -27,4 +27,14 @@ AZERTYUIO\c"
 
 echo "Hello world !\c" > targets/test_dir/helloworld
 
-tar cf targets/test.tar targets/bar targets/test_dir
+tar -cf targets/test.tar targets
+
+
+
+mkdir targets/test_dir_ls
+touch targets/test_dir_ls/ls_expected.txt
+touch targets/test_dir_ls/lsl_expected.txt
+
+echo "test_dir\tbar\tdest\t\n\c" > targets/test_dir_ls/ls_expected.txt
+
+echo "drwxr-xr-x  rf/L  0  2020-10-22 13:06  test_dir\n-rw-r--r--  rf/L  19  2020-10-22 13:06  bar\n-rw-r--r--  rf/L  2090  2020-10-22 13:06  dest\n\c" > targets/test_dir_ls/lsl_expected.txt
