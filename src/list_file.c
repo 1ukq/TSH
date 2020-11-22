@@ -333,7 +333,7 @@ int ls(char option, char * path, char * cwd)
 				strcat(affichage, "\t");
 			}
 
-			n = write(STDOUT_FILENO, affichage, sizeof(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
+			n = write(STDOUT_FILENO, affichage, strlen(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
 			if(n < 0)
 			{
 				perror("write 1");
