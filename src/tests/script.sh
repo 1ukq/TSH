@@ -1,9 +1,9 @@
 mkdir targets
 mkdir targets/test_dir
+
 touch targets/test_dir/foo
 touch targets/test_dir/helloworld
 touch targets/bar
-touch targets/dest 
 
 echo > targets/bar "La chose, qui attendait, s'est alertée, elle a fondu sur moi, elle se coule en moi, j'en suis plein. - Ce n'est rien: la Chose, 
 c'est moi. L'existence, libérée, dégagée, reflue sur moi. J'existe. J'existe. C'est doux, si doux, si lent. Et léger: on dirait 
@@ -27,4 +27,8 @@ AZERTYUIO\c"
 
 echo "Hello world !\c" > targets/test_dir/helloworld
 
-gtar cf targets/test.tar targets/bar targets/test_dir
+#tar file use for all tests
+tar cf targets/test.tar targets/bar targets/test_dir
+
+#tar file for suppress_file test
+tar cf targets/expected_suppress_test.tar targets/test_dir
