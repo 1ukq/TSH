@@ -50,7 +50,6 @@ void insert_file_in_tar_test(const char *path_tar, const char *path_file_source,
     sscanf(header.size, "%o", &size);
     char *buf = malloc(sizeof(char) * size);
     read(fd_tar, buf, size);
-    if(buf[size - 1] == '\n') printf("0\n");
     munit_assert_memory_equal(size, buf, expected_content);
     munit_assert_int(size, ==, strlen(expected_content));
     printf("++test for insert_file_in_tar function passed++\n");
@@ -62,6 +61,7 @@ void suppress_file_test(int fd_tar, int pos_from, int pos_to, int size_tar, char
     int ret = suppress_file(fd_tar, pos_from, pos_to, size_tar);
     munit_assert_int(ret, ==, 0);
     char *content = malloc(sizeof(char) * size_tar);
+    lseek(fd_tar, 0, SEEK_SET); //Don't know why without this line, test does not pass on alpine docker
     read(fd_tar, content, size_tar);
     munit_assert_memory_equal(size_tar, expected_content, content);
     printf("+++++++++test for suppress_file_passed+++++++++\n");
@@ -70,8 +70,8 @@ void suppress_file_test(int fd_tar, int pos_from, int pos_to, int size_tar, char
 
 int main(int argc, char *argv[]){
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
     int expected_ret = 11;
     int fd_tar_f = open("targets/test.tar", O_RDONLY);
@@ -79,8 +79,8 @@ int main(int argc, char *argv[]){
     stat("targets/test.tar", &stat_tar);
     find_last_block_test(fd_tar_f, &stat_tar, expected_ret);
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
     char *expected_buf = malloc(sizeof(char) * 2105);
     int fd = open("targets/bar", O_RDONLY);
@@ -89,15 +89,15 @@ int main(int argc, char *argv[]){
     free(expected_buf);
     close(fd);
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
     char *expected_content_insert = "Hello world !";
     char *expected_name = "dir/helloworld";
     insert_file_in_tar_test("targets/test.tar", "targets/test_dir/helloworld", "dir/", expected_name, expected_content_insert);
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
     int fd_tar = open("targets/test.tar", O_RDWR);
     int fd_sup_tar = open("targets/expected_suppress_test.tar", O_RDONLY);
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]){
     close(fd_tar);
     close(fd_sup_tar);
 
-    system("./script_rm.sh");
+    system("bash script_rm.sh");
 
     return 0;
 
