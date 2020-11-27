@@ -174,13 +174,3 @@ int shell(void)
 	}
 	return 0;
 }
-
-
-
-
-int main(void)
-{
-	shell();
-
-	return 0;
-}
