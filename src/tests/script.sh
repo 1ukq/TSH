@@ -34,3 +34,6 @@ tar cf targets/test.tar targets/bar targets/test_dir
 
 #tar file for suppress_file test
 tar cf targets/expected_suppress_test.tar targets/test_dir
+
+#tar file for remove_file_from_tar test
+tar cf targets/expected_remove_file_from_tar_test.tar targets/test_dir
