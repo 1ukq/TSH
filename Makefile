@@ -25,4 +25,4 @@ test:
 	cd $(TESTS_DIR) && $(MAKE)
 
 clean_test:
-	cd $(TESTS_DIR) && $(MAKE) clean
+	cd $(TESTS_DIR) && $(MAKE) clean_all
