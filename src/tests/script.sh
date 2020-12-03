@@ -30,7 +30,7 @@ echo "Hello world !\c" > targets/test_dir/helloworld
 tar -cf targets/test.tar targets
 
 
-
+#ls & ls -l
 mkdir targets/test_dir_ls
 touch targets/test_dir_ls/ls_expected.txt
 touch targets/test_dir_ls/lsl_expected.txt
@@ -38,3 +38,6 @@ touch targets/test_dir_ls/lsl_expected.txt
 echo "test_dir\tbar\tdest\t\n\c" > targets/test_dir_ls/ls_expected.txt
 
 echo "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir\n-rw-r--r--  rf/L  19  $(date +%F) $(date +%R)  bar\n-rw-r--r--  rf/L  2090  $(date +%F) $(date +%R)  dest\n\c" > targets/test_dir_ls/lsl_expected.txt
+
+#pwd
+mkdir targets/test_dir_pwd
