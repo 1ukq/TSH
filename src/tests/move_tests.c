@@ -100,10 +100,7 @@ int main(int argc, char *argv[]){
     system("bash script.sh");
 
     int fd_tar = open("targets/test.tar", O_RDWR);
-<<<<<<< HEAD
-=======
     int fd_sup_tar = open("targets/expected_suppress_test.tar", O_RDONLY);
->>>>>>> 18f990853d07ef182af320904c3869915a825c30
     int pos_from = 0;
     int pos_to = 6 * BLOCK_SIZE;
     int size_tar = 10240;
