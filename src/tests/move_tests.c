@@ -15,6 +15,14 @@
 
 #define BLOCK_SIZE 512
 
+void find_last_block_test(int fd_tar, struct stat *restrict buf_stat, int expected_ret){
+
+    int ret = find_last_block(fd_tar, buf_stat);
+    munit_assert_int(ret, ==, expected_ret);
+    printf("+++++test for find_last_block function passed++++\n");
+
+}
+
 void buffarize_test(const char *path_file_source, char *expected_buf, off_t nb_bytes){
 
     struct stat buf;
@@ -42,49 +50,37 @@ void insert_file_in_tar_test(const char *path_tar, const char *path_file_source,
     sscanf(header.size, "%o", &size);
     char *buf = malloc(sizeof(char) * size);
     read(fd_tar, buf, size);
-    if(buf[size - 1] == '\n') printf("0\n");
-    munit_assert_memory_equal(size - 1, buf, expected_content);
+    munit_assert_memory_equal(size, buf, expected_content);
     munit_assert_int(size, ==, strlen(expected_content));
     printf("++test for insert_file_in_tar function passed++\n");
 
 }
 
-void suppress_file_test(int fd_tar, int pos_from, int pos_to, int size_tar){
+void suppress_file_test(int fd_tar, int pos_from, int pos_to, int size_tar, char *expected_content){
 
     int ret = suppress_file(fd_tar, pos_from, pos_to, size_tar);
     munit_assert_int(ret, ==, 0);
+    char *content = malloc(sizeof(char) * size_tar);
+    lseek(fd_tar, 0, SEEK_SET); //Don't know why without this line, test does not pass on alpine docker
+    read(fd_tar, content, size_tar);
+    munit_assert_memory_equal(size_tar, expected_content, content);
     printf("+++++++++test for suppress_file_passed+++++++++\n");
-
-}
-
-void mv_from_tar_to_tar_test(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, char *path_in_tar){
-
-    int ret = mv_from_tar_to_tar(path_tar_source, path_tar_target, path_file_source, path_in_tar);
-    munit_assert_int(ret, ==, 0);
-    printf("++++++test for mv_from_tar_to_tar passed+++++++\n");
-
-}
-
-void mv_from_dir_to_tar_test(const char *path_tar, const char *path_file_source, char *path_in_tar){
-
-    int ret = mv_from_dir_to_tar(path_tar, path_file_source, path_in_tar);
-    munit_assert_int(ret, ==, 0);
-    printf("+++++++test for mv_from_dir_to_tar passed++++++\n");
-
-}
-
-void mv_from_tar_to_dir_test(const char *path_tar, const char *path_file_source, char *path_dest){
-
-    int ret = mv_from_tar_to_dir(path_tar, path_file_source, path_dest);
-    munit_assert_int(ret, ==, 0);
-    printf("+++++++test for mv_from_tar_to_dir passed++++++\n");
 
 }
 
 int main(int argc, char *argv[]){
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
+
+    int expected_ret = 11;
+    int fd_tar_f = open("targets/test.tar", O_RDONLY);
+    struct stat stat_tar;
+    stat("targets/test.tar", &stat_tar);
+    find_last_block_test(fd_tar_f, &stat_tar, expected_ret);
+
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
     char *expected_buf = malloc(sizeof(char) * 2105);
     int fd = open("targets/bar", O_RDONLY);
@@ -93,36 +89,29 @@ int main(int argc, char *argv[]){
     free(expected_buf);
     close(fd);
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
-    char *expected_content = "Hello world !";
+    char *expected_content_insert = "Hello world !";
     char *expected_name = "dir/helloworld";
-    insert_file_in_tar_test("targets/test.tar", "targets/test_dir/helloworld", "dir/", expected_name, expected_content);
+    insert_file_in_tar_test("targets/test.tar", "targets/test_dir/helloworld", "dir/", expected_name, expected_content_insert);
 
-    system("./script_rm.sh");
-    system("./script.sh");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
     int fd_tar = open("targets/test.tar", O_RDWR);
+    int fd_sup_tar = open("targets/expected_suppress_test.tar", O_RDONLY);
     int pos_from = 0;
     int pos_to = 6 * BLOCK_SIZE;
     int size_tar = 10240;
-    suppress_file_test(fd_tar, pos_from, pos_to, size_tar);
+    char *expected_content_sup = malloc(sizeof(char) * size_tar);
+    read(fd_sup_tar, expected_content_sup, sizeof(char) * size_tar);
+    suppress_file_test(fd_tar, pos_from, pos_to, size_tar, expected_content_sup);
+    free(expected_content_sup);
+    close(fd_tar);
+    close(fd_sup_tar);
 
-    system("./script_rm.sh");
-    system("./script.sh");
-
-    //mv_from_tar_to_tar_test();
-
-    system("./script_rm.sh");
-    system("./script.sh");
-
-    //mv_from_dir_to_tar_test();
-
-    system("./script_rm.sh");
-    system("./script.sh");
-
-    //mv_from_tar_to_dir_test();
+    system("bash script_rm.sh");
 
     return 0;
 
