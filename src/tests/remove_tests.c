@@ -8,8 +8,9 @@ void remove_file_from_tar_test(const char *path_tar, const char *path_file_sourc
     munit_assert_int(ret, ==, 0);
     char *content = malloc(sizeof(char) * size_tar);
     read(fd_tar, content, size_tar);
-    if(content[6673] == '\n') printf("0\n");
     munit_assert_memory_equal(size_tar, expected_content, content);
+    free(content);
+    close(fd_tar);
     printf("++++test for remove_file_from_tar passed++++++\n");
 
 }
@@ -24,8 +25,11 @@ int main(void){
     int fd_expected_tar = open("targets/expected_remove_file_from_tar_test.tar", O_RDONLY);
     read(fd_expected_tar, expected_content, 10240);
     remove_file_from_tar_test("targets/test.tar", "targets/bar", size_tar, expected_content);
-    return 0;
+    free(expected_content);
+    close(fd_expected_tar);
 
     system("bash script_rm.sh");
+
+    return 0;
 
 }
