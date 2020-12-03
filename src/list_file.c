@@ -112,7 +112,7 @@ void get_time(char * time_oct, char * time)
 	char min[2];
 
 	sprintf(year, "%i", 1900+(*t).tm_year);
-	sprintf(month, "%i", (*t).tm_mon);
+	sprintf(month, "%i", 1+(*t).tm_mon);
 	sprintf(day, "%i", (*t).tm_mday);
 	sprintf(hour, "%i", (*t).tm_hour);
 	sprintf(min, "%i", (*t).tm_min);

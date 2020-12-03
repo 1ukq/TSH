@@ -37,4 +37,4 @@ touch targets/test_dir_ls/lsl_expected.txt
 
 echo "test_dir\tbar\tdest\t\n\c" > targets/test_dir_ls/ls_expected.txt
 
-echo "drwxr-xr-x  rf/L  0  2020-10-22 13:06  test_dir\n-rw-r--r--  rf/L  19  2020-10-22 13:06  bar\n-rw-r--r--  rf/L  2090  2020-10-22 13:06  dest\n\c" > targets/test_dir_ls/lsl_expected.txt
+echo "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir\n-rw-r--r--  rf/L  19  $(date +%F) $(date +%R)  bar\n-rw-r--r--  rf/L  2090  $(date +%F) $(date +%R)  dest\n\c" > targets/test_dir_ls/lsl_expected.txt
