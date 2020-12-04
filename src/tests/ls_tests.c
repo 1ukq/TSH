@@ -11,9 +11,12 @@ void ls_test(void){
 
 	int fd1, fd2, n, nb_file;
 	char buf1[500], buf2[500];
-	char cwd[PATH_MAX];
 
+	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
+
+	char path[PATH_MAX];
+	sprintf(path, "%s/%s", cwd, "targets/test.tar/targets/");
 
 	fd1 = open("targets/test_dir_ls/test_ls.txt", O_WRONLY | O_CREAT, 0666);
 	if(fd1 < 0){
@@ -27,7 +30,7 @@ void ls_test(void){
 		exit(1);
 	}
 
-	nb_file = ls(' ', "targets/test.tar/targets/", cwd);
+	nb_file = ls(' ', path);
 
 	close(fd1);
 
@@ -75,9 +78,12 @@ void lsl_test(void){
 
 	int fd1, fd2, n, nb_file;
 	char buf1[500], buf2[500];
-	char cwd[PATH_MAX];
 
+	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
+
+	char path[PATH_MAX];
+	sprintf(path, "%s/%s", cwd, "targets/test.tar/targets/");
 
 	fd1 = open("targets/test_dir_ls/test_ls.txt", O_WRONLY | O_CREAT, 0666);
 	if(fd1 < 0){
@@ -91,7 +97,7 @@ void lsl_test(void){
 		exit(1);
 	}
 
-	nb_file = ls('l', "targets/test.tar/targets/", cwd);
+	nb_file = ls('l', path);
 
 	close(fd1);
 
@@ -137,11 +143,14 @@ void lsl_test(void){
 
 void ls_fail(void){
 	int nb_file;
-	char cwd[PATH_MAX];
 
+	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
 
-	nb_file = ls('l', "targets/test.tar/targets/not_a_dir", cwd);
+	char path[PATH_MAX];
+	sprintf(path, "%s/%s", cwd, "targets/test.tar/targets/not_a_dir");
+
+	nb_file = ls('l', path);
 
 	if(nb_file == -2){
 		printf("++++++test for ls fail passed++++++\n");
