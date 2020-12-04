@@ -10,18 +10,17 @@ void cd_tar_tar(void){
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
 
-	char cwd_expected[PATH_MAX];
-	sprintf(cwd_expected, "%s", cwd);
-	strcat(cwd_expected, "/targets/test.tar/targets");
+	char nwd[PATH_MAX];
+	sprintf(nwd, "%s/%s", cwd, "targets/test.tar/targets");
 
 	//on met le cwd dans le tar
 	strcat(cwd, "/targets/test.tar/targets/test_dir");
 
 	//on applique cd
-	n = cd(cwd, ".././test_dir/././../../targets");
+	n = cd(cwd, nwd);
 
 	//vérification du résultat
-	if(strcmp(cwd, cwd_expected) == 0 && n == 0){
+	if(strcmp(cwd, nwd) == 0 && n == 0){
 		printf("++++++test for cd tar -> tar passed++++++\n");
 	}
 	else{
@@ -35,17 +34,16 @@ void cd_htar_tar(void){
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
 
-	char cwd_expected[PATH_MAX];
-	sprintf(cwd_expected, "%s", cwd);
-	strcat(cwd_expected, "/targets/test.tar/targets");
+	char nwd[PATH_MAX];
+	sprintf(nwd, "%s/%s", cwd, "targets/test.tar/targets");
 
 	//le cwd est bien hors-tar (dans .../tests)
 
 	//on applique cd
-	n = cd(cwd, "targets/test.tar/targets/");
+	n = cd(cwd, nwd);
 
 	//vérification du résultat
-	if(strcmp(cwd, cwd_expected) == 0 && n == 0){
+	if(strcmp(cwd, nwd) == 0 && n == 0){
 		printf("++++++test for cd hors-tar -> tar passed++++++\n");
 	}
 	else{
@@ -59,17 +57,17 @@ void cd_tar_htar(void){
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
 
-	char cwd_expected[PATH_MAX];
-	sprintf(cwd_expected, "%s", cwd);
+	char nwd[PATH_MAX];
+	sprintf(nwd, "%s", cwd);
 
 	//on met le cwd dans le tar
 	strcat(cwd, "/targets/test.tar/targets/test_dir");
 
 	//on applique cd
-	n = cd(cwd, cwd_expected);
+	n = cd(cwd, nwd);
 
 	//vérification du résultat
-	if(strcmp(cwd, cwd_expected) == 0 && n == 0){
+	if(strcmp(cwd, nwd) == 0 && n == 0){
 		printf("++++++test for cd tar -> hors-tar passed++++++\n");
 	}
 	else{
@@ -80,17 +78,22 @@ void cd_tar_htar(void){
 void cd_fail(void){
 	int n;
 
+	//on met le cwd dans le tar
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
-
-	//on met le cwd dans le tar
 	strcat(cwd, "/targets/test.tar/targets/test_dir");
 
+	char cwd_expected[PATH_MAX];
+	sprintf(cwd_expected, "%s", cwd);
+
+	char nwd[PATH_MAX];
+	sprintf(nwd, "%s/%s", cwd, "not_a_dir");
+
 	//on applique cd
-	n = cd(cwd, "../not_a_dir");
+	n = cd(cwd, nwd);
 
 	//vérification du résultat
-	if(n == -2){
+	if(n == -2 && strcmp(cwd, cwd_expected) == 0){
 		printf("++++++test for cd fail passed++++++\n");
 	}
 	else{
