@@ -164,7 +164,7 @@ void get_time(char * time_oct, char * time)
 
 
 
-int ls(char option, char * path, char * cwd)
+int ls(char option, char * path)
 {
 	/*
 	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par la fonction cd qui vérifiera à chaque changement de cwd que le nouveau chemin existe)
@@ -204,16 +204,13 @@ int ls(char option, char * path, char * cwd)
 	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
-	char full_path[strlen(path) + strlen(cwd) + 1];
-
 
 	if(option != 'l' && option != ' ')
 	{
 		return -1;
 	}
 
-	chemin_absolu(cwd, path, full_path);
-	fill_wd(full_path, &wd);
+	fill_wd(path, &wd);
 	if(strlen(wd.tar_name) == 0)
 	{
 		//le chemin n'implique aucun tar
