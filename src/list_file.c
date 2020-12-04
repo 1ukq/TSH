@@ -167,7 +167,7 @@ void get_time(char * time_oct, char * time)
 int ls(char option, char * path)
 {
 	/*
-	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par la fonction cd qui vérifiera à chaque changement de cwd que le nouveau chemin existe)
+	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par les processus lors de l'input de l'utilisateur
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
 	- option : ' ' pour un ls et 'l' pour un ls -l
 	- path : chemin absolu (impliquant un unique tar)
