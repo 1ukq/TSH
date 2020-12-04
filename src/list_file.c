@@ -112,7 +112,7 @@ void get_time(char * time_oct, char * time)
 	char min[2];
 
 	sprintf(year, "%i", 1900+(*t).tm_year);
-	sprintf(month, "%i", (*t).tm_mon);
+	sprintf(month, "%i", 1+(*t).tm_mon);
 	sprintf(day, "%i", (*t).tm_mday);
 	sprintf(hour, "%i", (*t).tm_hour);
 	sprintf(min, "%i", (*t).tm_min);
@@ -164,10 +164,10 @@ void get_time(char * time_oct, char * time)
 
 
 
-int ls(char option, char * path, char * cwd)
+int ls(char option, char * path)
 {
 	/*
-	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par la fonction cd qui vérifiera à chaque changement de cwd que le nouveau chemin existe)
+	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par les processus lors de l'input de l'utilisateur
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
 	- option : ' ' pour un ls et 'l' pour un ls -l
 	- path : chemin absolu (impliquant un unique tar)
@@ -204,16 +204,13 @@ int ls(char option, char * path, char * cwd)
 	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
-	char full_path[strlen(path) + strlen(cwd) + 1];
-
 
 	if(option != 'l' && option != ' ')
 	{
 		return -1;
 	}
 
-	chemin_absolu(cwd, path, full_path);
-	fill_wd(full_path, &wd);
+	fill_wd(path, &wd);
 	if(strlen(wd.tar_name) == 0)
 	{
 		//le chemin n'implique aucun tar
@@ -333,7 +330,7 @@ int ls(char option, char * path, char * cwd)
 				strcat(affichage, "\t");
 			}
 
-			n = write(STDOUT_FILENO, affichage, sizeof(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
+			n = write(STDOUT_FILENO, affichage, strlen(affichage)); //plusieurs appels de write mais fonctionne à chaque fois (pas de depassement de la taille du buffer)
 			if(n < 0)
 			{
 				perror("write 1");

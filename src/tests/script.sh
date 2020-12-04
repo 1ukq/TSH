@@ -31,10 +31,31 @@ AZERTYUIO" > targets/test_dir/foo
 echo -n "Hello world !" > targets/test_dir/helloworld
 
 #tar file use for all tests
-tar cf targets/test.tar targets/bar targets/test_dir
+tar cf targets/test_1.tar targets/bar targets/test_dir
 
 #tar file for suppress_file test
 tar cf targets/expected_suppress_test.tar targets/test_dir
 
 #tar file for remove_file_from_tar test
 tar cf targets/expected_remove_file_from_tar_test.tar targets/test_dir
+
+touch targets/dest
+
+
+#ls & ls -l
+#tar cf targets/test.tar targets
+#mkdir targets/test_dir_ls
+
+#touch targets/test_dir_ls/ls_expected.txt
+#touch targets/test_dir_ls/lsl_expected.txt
+
+#echo -n -e "test_dir\tbar\tdest\t
+#" > targets/test_dir_ls/ls_expected.txt
+
+#echo -n "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir
+#-rw-r--r--  rf/L  19  $(date +%F) $(date +%R)  bar
+#-rw-r--r--  rf/L  2090  $(date +%F) $(date +%R)  dest
+#" > targets/test_dir_ls/lsl_expected.txt
+
+#pwd
+#mkdir targets/test_dir_pwd

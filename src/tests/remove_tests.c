@@ -24,7 +24,7 @@ int main(void){
     char *expected_content = malloc(sizeof(char) * size_tar);
     int fd_expected_tar = open("targets/expected_remove_file_from_tar_test.tar", O_RDONLY);
     read(fd_expected_tar, expected_content, 10240);
-    remove_file_from_tar_test("targets/test.tar", "targets/bar", size_tar, expected_content);
+    remove_file_from_tar_test("targets/test_1.tar", "targets/bar", size_tar, expected_content);
     free(expected_content);
     close(fd_expected_tar);
 

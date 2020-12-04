@@ -17,7 +17,7 @@ EXECS = move_tests copy_tests remove_tests ls_tests cd_tests makedir_tests pwd_t
 MOVE_OBJ = move_tests.o ../utils/init_header.o ../move.o ../utils/utils_string.o $(MUNIT_OBJ)
 REMOVE_OBJ = remove_tests.o ../remove.o $(MUNIT_OBJ)
 COPY_OBJ = copy_tests.o ../copy.o $(MUNIT_OBJ)
-LS_OBJ = ls_tests.o ../list_file.o $(MUNIT_OBJ)
+LS_OBJ = ls_tests.o ../list_file.o ../utils/fonctions_utiles.o $(MUNIT_OBJ)
 CD_OBJ = cd_tests.o ../cd.o ../utils/fonctions_utiles.o $(MUNIT_OBJ)
 MAKEDIR_OBJ = makedir_tests.o ../makedir.o $(MUNIT_OBJ)
 PWD_OBJ = pwd_tests.o ../pwd.o $(MUNIT_OBJ)
@@ -81,4 +81,3 @@ clean_pwd :
 clean_all :
 	@echo Removing object files and executables
 	rm $(OBJ) $(EXECS)
-

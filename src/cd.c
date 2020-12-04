@@ -1,6 +1,6 @@
 #include "cd.h"
 
-/* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu
+/* cette fonction agit comme un cd (dans un tar et aussi hors d'un tar) elle change la variable path_cwd entrée en argument par la variable path_nwd (chemin absolu) si celle-ci est correcte, et ne change pas sinon. De plus le changement "officiel" pour la partie du chemin hors-tar se fait avec un chdir. La fonction renvoie 0 si tout s'est passé comme prévu
 - renvoie -1 si erreur du type (open, read...)
 - renvoie 0 si le nouveau chemin existe et tout s'est bien passé
 - renvoie -2 si le nouveau chemin n'existe pas
@@ -14,10 +14,6 @@ int cd(char * path_cwd, char * path_nwd)
 		return -2;
 	}
 
-	/* rend le nwd chemin absolu */
-	char path_nwd_complet[strlen(path_cwd) + 1 + strlen(path_nwd)];
-	chemin_absolu(path_cwd, path_nwd, path_nwd_complet);
-
 	struct posix_header p;
 
 	char buf[BLOCK_SIZE];
@@ -27,7 +23,7 @@ int cd(char * path_cwd, char * path_nwd)
 	fill_wd(path_cwd, &cwd);
 
 	struct work_directory nwd;
-	fill_wd(path_nwd_complet, &nwd);
+	fill_wd(path_nwd, &nwd);
 
 
 	/* vérfie que le nouveau chemin hors-tar existe et change "vraiment" de directory */

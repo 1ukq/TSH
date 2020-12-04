@@ -74,9 +74,9 @@ int main(int argc, char *argv[]){
     system("bash script.sh");
 
     int expected_ret = 11;
-    int fd_tar_f = open("targets/test.tar", O_RDONLY);
+    int fd_tar_f = open("targets/test_1.tar", O_RDONLY);
     struct stat stat_tar;
-    stat("targets/test.tar", &stat_tar);
+    stat("targets/test_1.tar", &stat_tar);
     find_last_block_test(fd_tar_f, &stat_tar, expected_ret);
 
     system("bash script_rm.sh");
@@ -94,12 +94,12 @@ int main(int argc, char *argv[]){
 
     char *expected_content_insert = "Hello world !";
     char *expected_name = "dir/helloworld";
-    insert_file_in_tar_test("targets/test.tar", "targets/test_dir/helloworld", "dir/", expected_name, expected_content_insert);
+    insert_file_in_tar_test("targets/test_1.tar", "targets/test_dir/helloworld", "dir/", expected_name, expected_content_insert);
 
     system("bash script_rm.sh");
     system("bash script.sh");
 
-    int fd_tar = open("targets/test.tar", O_RDWR);
+    int fd_tar = open("targets/test_1.tar", O_RDWR);
     int fd_sup_tar = open("targets/expected_suppress_test.tar", O_RDONLY);
     int pos_from = 0;
     int pos_to = 6 * BLOCK_SIZE;

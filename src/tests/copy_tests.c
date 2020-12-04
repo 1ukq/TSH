@@ -63,9 +63,9 @@ int main(void){
     system("bash script_rm.sh");
     system("bash script.sh");
 
-    copy_from_tar_test("targets/test.tar", "targets/bar", "targets/bar", "targets/dest/bar", 2105);
-    copy_from_tar_test("targets/test.tar", "targets/test_dir/foo", "targets/test_dir/foo", "targets/dest/foo", 19); 
-    copy_from_tar_test("targets/test.tar", "targets/test_dir/helloworld", "targets/test_dir/helloworld", "targets/dest/helloworld", 13);
+    copy_from_tar_test("targets/test_1.tar", "targets/bar", "targets/bar", "targets/dest/bar", 2105);
+    copy_from_tar_test("targets/test_1.tar", "targets/test_dir/foo", "targets/test_dir/foo", "targets/dest/foo", 19); 
+    copy_from_tar_test("targets/test_1.tar", "targets/test_dir/helloworld", "targets/test_dir/helloworld", "targets/dest/helloworld", 13);
 
     system("bash script_rm.sh");
 
