@@ -32,6 +32,11 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
 
     while(strcmp(header.name, path_file_source)){
 
+        if(header.name[0] == '\0'){
+            printf("no such file\n");
+            return -1;
+        }
+
         sscanf(header.size, "%o", &file_size);
         shift = file_size % BLOCK_SIZE == 0 ? file_size / BLOCK_SIZE : (file_size / BLOCK_SIZE) + 1;
         pos = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);

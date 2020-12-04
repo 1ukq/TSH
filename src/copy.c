@@ -27,6 +27,11 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
     while(strcmp(p.name, path_file_source)){
 
+        if(p.name[0] == '\0'){
+            printf("No such file\n");
+            return -1;
+        }
+
         sscanf(p.size, "%o", &size);
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
         int ret_lseek = lseek(fd_source, shift * BLOCK_SIZE, SEEK_CUR);

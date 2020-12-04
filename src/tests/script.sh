@@ -2,6 +2,7 @@
 
 mkdir targets
 mkdir targets/test_dir
+mkdir targets/dest
 
 touch targets/test_dir/foo
 touch targets/test_dir/helloworld

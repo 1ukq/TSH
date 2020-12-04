@@ -188,6 +188,11 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 
     while(strcmp(header.name, path_file_source)){
 
+        if(header.name[0] == '\0'){
+            printf("No such file\n");
+            return -1;
+        }
+
         sscanf(header.size, "%o", &size);
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
 
@@ -311,6 +316,11 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     }
 
     while(strcmp(header.name, path_file_source)){
+
+        if(header.name[0] == '\0'){
+            printf("No such file\n");
+            return -1;
+        }
 
         sscanf(header.size, "%o", &size);
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;

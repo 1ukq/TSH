@@ -13,25 +13,26 @@
 #include <string.h>
 #include <sys/utsname.h>
 
-void copy_from_tar_test(const char *path_tar, const char *path_file_source, const char *path_file_dest, int file_source_size){
+void copy_from_tar_test(const char *path_tar, const char *path_file_source_in_tar, const char *path_file_source, const char *path_file_dest, int file_source_size){
 
     int fd_dest = open(path_file_dest, O_RDWR|O_CREAT|O_TRUNC, 0000700);
 
-    char *str = "targets/";
-    char root[strlen(str) + strlen(path_file_source) + 1];
-    strcpy(root, str);
+    //char *str = "targets/";
+    //char root[strlen(str) + strlen(path_file_source) + 1];
+    //strcpy(root, str);
 
-    int ret_copy_from_tar = copy_from_tar(path_tar, path_file_source, fd_dest);
+    int ret_copy_from_tar = copy_from_tar(path_tar, path_file_source_in_tar, fd_dest);
     if(ret_copy_from_tar == -1){
-        perror("copy_from_tar");
-        return;
+        //perror("copy_from_tar");
+        //return;
     }
 
     char *buf_source = malloc(file_source_size);
     char *buf_dest = malloc(file_source_size);
     //On concatène "targets" et path_file_source parce path_file_source correspond au chemin absolu de file_source à l'intérieur d'un tarball
-    strcat(root, path_file_source);
-    int fd_source = open(root, O_RDONLY);
+    //strcat(root, path_file_source);
+    //printf("%s\n", root);
+    int fd_source = open(path_file_source, O_RDONLY);
     fd_dest = open(path_file_dest, O_RDONLY);
 
     int size_source = read(fd_source, buf_source, file_source_size);
@@ -49,66 +50,24 @@ void copy_from_tar_test(const char *path_tar, const char *path_file_source, cons
     munit_assert_int(file_source_size, ==, ret_copy_from_tar);
     munit_assert_memory_equal(file_source_size, buf_source, buf_dest);
 
+    printf("+++++test for copy_file_from_tar passed+++++++\n");
+
     close(fd_dest);
     close(fd_source);
     free(buf_dest);
     free(buf_source);
 }
 
-void cat_test(const char *path_tar, const char *path_file_source){
-
-    copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
-    printf("\n");
-
-}
-
-/*
-void ls_test(const char *path_tar, const char *path_file_source, int expected_nb_files){
-
-    int ret = ls(STDOUT_FILENO, ' ',path_tar, path_file_source);
-    munit_assert_int(expected_nb_files, ==, ret);
-}
-*/
-
 int main(void){
-/*
-    copy_from_tar_test("targets/test.tar", "bar", "targets/dest", 2105);
-    copy_from_tar_test("targets/test.tar", "test_dir/foo", "targets/dest", 19); 
-    copy_from_tar_test("targets/test.tar", "test_dir/helloworld", "targets/dest", 13);
 
-    cat_test("targets/test.tar", "bar");
-    printf("\n");
-    cat_test("targets/test.tar", "test_dir/helloworld");
-    printf("\n");
-    cat_test("targets/test.tar", "test_dir/foo");
-    printf("\n");
+    system("bash script_rm.sh");
+    system("bash script.sh");
 
+    copy_from_tar_test("targets/test.tar", "targets/bar", "targets/bar", "targets/dest/bar", 2105);
+    copy_from_tar_test("targets/test.tar", "targets/test_dir/foo", "targets/test_dir/foo", "targets/dest/foo", 19); 
+    copy_from_tar_test("targets/test.tar", "targets/test_dir/helloworld", "targets/test_dir/helloworld", "targets/dest/helloworld", 13);
 
-    ls_test("targets/test.tar", "test_dir/", 2);
-    printf("\n");
-    ls_test("targets/test.tar", "", 2);
-    printf("\n");
-
-
-*/
-    //struct stat buf;
-    //stat("a.tar", &buf);
-    //struct posix_header header;
-    //int fd_tar = open("a.tar", O_RDONLY);
-    //int ret = find_next_block(fd_tar, &buf);
-    //printf("RET : %d\n", ret);
-
-    //makedir(STDOUT_FILENO, "a.tar", "", "tests_dir");
-
-    //insert_file_in_tar("a.tar", "targets/test_dir/helloworld");
-
-    //insert_file_in_tar("a.tar", "targets/bar");
-    //remove_file_from_tar("a.tar", "targets/bar");
-    //remove_file_from_tar("a.tar", "targets/test_dir/foo");
-
-    //mv_from_tar_to_tar("a.tar", "b.tar", "targets/bar", "dir/dir/");
-    //mv_from_tar_to_dir("c.tar", "targets/test_dir/foo", "./");
-    //mv_from_dir_to_tar("d.tar", "targets/test_dir/helloworld", "dir/");
+    system("bash script_rm.sh");
 
    return 0;
 }
