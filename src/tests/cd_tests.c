@@ -149,6 +149,11 @@ int main(void){
 
 	cd_fail();
 
+	n = chdir(real_cwd);
+	if(n < 0){
+		perror("chdir 4");
+		return -1;
+	}
 	system("bash script_bis_rm.sh");
   return 0;
 }
