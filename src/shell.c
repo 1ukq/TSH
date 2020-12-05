@@ -1,9 +1,13 @@
 #include "shell.h"
 
-int read_input(char ** tableau, _Bool * p_tar)
+int read_input(char ** tableau)
 {
 	int n;
 	int indice = 0;
+
+
+
+
 	char input[1024];
 
 	n = write(STDOUT_FILENO, ">>> ", 4);
@@ -22,12 +26,8 @@ int read_input(char ** tableau, _Bool * p_tar)
 
 	input[n-1] = '\0';
 
-	if(strstr(input, ".tar") == NULL){
-		*p_tar = 0;
-	}
-	else{
-		*p_tar = 1;
-	}
+
+
 
 	//char * input = readline(">>> "); //add -lreadline to gcc (sudo apt-get install libreadline6 libreadline6-dev)
 	char * input_copy = strdup(input);
@@ -44,15 +44,13 @@ int read_input(char ** tableau, _Bool * p_tar)
 	return indice;
 }
 
-
-
 int shell(void)
 {
 	struct sigaction action;
 
 	int n, i;
 	_Bool run = 1;
-	_Bool tar = 0;
+	_Bool execute = 1;
 
 	char cd_beg_error[] = "cd: ";
 	char cd_end_error[] = ": No such directory\n";
@@ -94,8 +92,9 @@ int shell(void)
 	/* running loop */
 	while(run)
 	{
+		execute = 1;
 
-		n = read_input(tableau, &tar);
+		n = read_input(tableau);
 		if(n < 0)
 		{
 			perror("read_input");
@@ -114,109 +113,61 @@ int shell(void)
 				return 0;
 			}
 
-			/* tar ? */
-			if((strstr(cwd, ".tar") != NULL) || tar){
-				//ls
-				if(strcmp(tableau[0],"ls") == 0){
-					int ind;
-					char option;
-					if(tableau[1][0] == '-'){
-						option = tableau[1][1];
-						ind = 2;
-					}
-					else{
-						option = ' ';
-						ind = 1;
-					}
+			/* cd ? */
+			if((strcmp(tableau[0], "cd") == 0))
+			{
+				n = chdir(tableau[1]);
+				getcwd(cwd, PATH_MAX);
 
-					char * chemin = strdup(tableau[ind]);
-					char chemin_abs[strlen(cwd) + strlen(chemin) + 1];
-					chemin_absolu(cwd, chemin, chemin_abs);
+				if(n < 0)
+				{
+					if(tableau[1] != NULL)
+					{
+						char error[sizeof(cd_beg_error) + sizeof(cd_end_error) + sizeof(tableau[1])];
+						sprintf(error, "%s", cd_beg_error);
+						strcat(error, tableau[1]);
+						strcat(error, cd_end_error);
 
-					n = ls(option, chemin_abs);
-					if(n == -1){
-						perror("ls tar");
-						return -1;
+						n = write(STDERR_FILENO, error, strlen(error));
+						if(n < 0)
+						{
+							perror("write cd error");
+							return -1;
+						}
 					}
-					if(n == -2){
-						char error_message[] = "ls: cannot access '";
-						strcat(error_message, tableau[ind]);
-						strcat(error_message, "': No such file or directory\n");
-						write(STDERR_FILENO, error_message, strlen(error_message));
-					}
-					if(n == -3){
-						char error_message[] = "ls: invalid option -- '";
-						strcat(error_message, tableau[1]);
-						strcat(error_message, "'\n");
-						write(STDERR_FILENO, error_message, strlen(error_message));
-					}
-				}
-				//cd
-				else if(strcmp(tableau[0],"cd")){
-
-				}
-				//pwd
-				else if(strcmp(tableau[0],"pwd")){
-
 				}
 			}
-			else{
-				/* cd ? */
-				if((strcmp(tableau[0], "cd") == 0))
+			else
+			{
+				/* unique commande avec ou sans options n'impliquant pas de tar */
+				switch(fork())
 				{
-					n = chdir(tableau[1]);
-					getcwd(cwd, PATH_MAX);
+					case -1 :
+						perror("fork");
+						return -1;
 
-					if(n < 0)
-					{
-						if(tableau[1] != NULL)
+					case 0:
+						//fils
+						execvp(tableau[0], tableau);
+						/* gestion des erreurs */
+						if(errno = ENOENT)
 						{
-							char error[sizeof(cd_beg_error) + sizeof(cd_end_error) + sizeof(tableau[1])];
-							sprintf(error, "%s", cd_beg_error);
-							strcat(error, tableau[1]);
-							strcat(error, cd_end_error);
+							char error[sizeof(command_not_found) + sizeof(tableau[0])];
+							sprintf(error, "%s" , tableau[0]);
+							strcat(error, command_not_found);
 
 							n = write(STDERR_FILENO, error, strlen(error));
 							if(n < 0)
 							{
-								perror("write cd error");
+								perror("write error");
 								return -1;
 							}
 						}
-					}
-				}
-				else
-				{
-					/* unique commande avec ou sans options n'impliquant pas de tar */
-					switch(fork())
-					{
-						case -1 :
-							perror("fork");
-							return -1;
+						return -1;
 
-						case 0:
-							//fils
-							execvp(tableau[0], tableau);
-							/* gestion des erreurs */
-							if(errno = ENOENT)
-							{
-								char error[sizeof(command_not_found) + sizeof(tableau[0])];
-								sprintf(error, "%s" , tableau[0]);
-								strcat(error, command_not_found);
-
-								n = write(STDERR_FILENO, error, strlen(error));
-								if(n < 0)
-								{
-									perror("write error");
-									return -1;
-								}
-							}
-							return -1;
-
-						default :
-							//père
-							wait(NULL);
-					}
+					default :
+						//père
+						wait(NULL);
 				}
 			}
 		}
