@@ -267,6 +267,8 @@ int ls(char option, char * path)
 			}
 		}
 
+		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
+
 		/* Vérification + conversion (à gauche) que le fichier est à afficher */
 		if(verif_convert_name(name, p.name, path_in_tar) != 0)
 		{
@@ -342,7 +344,6 @@ int ls(char option, char * path)
 
 
 		/* Passe à l'en-tête suivant */
-		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
 		shift = (size_dec + BLOCK_SIZE -1)/BLOCK_SIZE;
 		n = lseek(fd, shift*BLOCK_SIZE, SEEK_CUR);
 		if(n < 0)

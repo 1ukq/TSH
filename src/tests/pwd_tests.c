@@ -14,12 +14,12 @@ int pwd_test(void){
 	char cwd[PATH_MAX];
 
 	getcwd(cwd, PATH_MAX);
-	strcat(cwd, "/targets");
+	strcat(cwd, "/targets_bis");
 
 	char expected_output[strlen(cwd) + 1];
 	sprintf(expected_output, "%s\n", cwd);
 
-	int fd = open("targets/test_dir_pwd/test_pwd.txt", O_WRONLY | O_CREAT, 0666);
+	int fd = open("targets_bis/test_dir_pwd/test_pwd.txt", O_WRONLY | O_CREAT, 0666);
 	if(fd < 0){
 		perror("open");
 		exit(1);
@@ -41,7 +41,7 @@ int pwd_test(void){
 		exit(1);
 	}
 
-	fd = open("targets/test_dir_pwd/test_pwd.txt", O_RDONLY);
+	fd = open("targets_bis/test_dir_pwd/test_pwd.txt", O_RDONLY);
 	if(fd < 0){
 		perror("open");
 		exit(1);
@@ -66,10 +66,12 @@ int pwd_test(void){
 
 int main(void){
 
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	pwd_test();
+
+	system("bash script_bis_rm.sh");
 
   return 0;
 }
