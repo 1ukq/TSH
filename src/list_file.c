@@ -207,7 +207,7 @@ int ls(char option, char * path)
 
 	if(option != 'l' && option != ' ')
 	{
-		return -1;
+		return -3;
 	}
 
 	fill_wd(path, &wd);
