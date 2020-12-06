@@ -16,9 +16,9 @@ void ls_test(void){
 	getcwd(cwd, PATH_MAX);
 
 	char path[PATH_MAX];
-	sprintf(path, "%s/%s", cwd, "targets/test.tar/targets/");
+	sprintf(path, "%s/%s", cwd, "targets_bis/test.tar/test_dir/");
 
-	fd1 = open("targets/test_dir_ls/test_ls.txt", O_WRONLY | O_CREAT, 0666);
+	fd1 = open("targets_bis/test_dir_ls/test_ls.txt", O_WRONLY | O_CREAT, 0666);
 	if(fd1 < 0){
 		perror("open");
 		exit(1);
@@ -40,13 +40,13 @@ void ls_test(void){
 		exit(1);
 	}
 
-	fd1 = open("targets/test_dir_ls/test_ls.txt", O_RDONLY);
+	fd1 = open("targets_bis/test_dir_ls/test_ls.txt", O_RDONLY);
 	if(fd1 < 0){
 		perror("open");
 		exit(1);
 	}
 
-	fd2 = open("targets/test_dir_ls/ls_expected.txt", O_RDONLY);
+	fd2 = open("targets_bis/test_dir_ls/ls_expected.txt", O_RDONLY);
 	if(fd2 < 0){
 		perror("open");
 		exit(1);
@@ -66,7 +66,7 @@ void ls_test(void){
 	}
 	close(fd2);
 
-	if(strncmp(buf1, buf2, strlen(buf2)) == 0 && nb_file == 3){
+	if(strncmp(buf1, buf2, strlen(buf2)) == 0 && nb_file == 2){
 		printf("++++++test for ls passed++++++\n");
 	}
 	else{
@@ -83,9 +83,9 @@ void lsl_test(void){
 	getcwd(cwd, PATH_MAX);
 
 	char path[PATH_MAX];
-	sprintf(path, "%s/%s", cwd, "targets/test.tar/targets/");
+	sprintf(path, "%s/%s", cwd, "targets_bis/test.tar/");
 
-	fd1 = open("targets/test_dir_ls/test_ls.txt", O_WRONLY | O_CREAT, 0666);
+	fd1 = open("targets_bis/test_dir_ls/test_ls.txt", O_WRONLY | O_CREAT, 0666);
 	if(fd1 < 0){
 		perror("open");
 		exit(1);
@@ -107,13 +107,13 @@ void lsl_test(void){
 		exit(1);
 	}
 
-	fd1 = open("targets/test_dir_ls/test_ls.txt", O_RDONLY);
+	fd1 = open("targets_bis/test_dir_ls/test_ls.txt", O_RDONLY);
 	if(fd1 < 0){
 		perror("open");
 		exit(1);
 	}
 
-	fd2 = open("targets/test_dir_ls/lsl_expected.txt", O_RDONLY);
+	fd2 = open("targets_bis/test_dir_ls/lsl_expected.txt", O_RDONLY);
 	if(fd2 < 0){
 		perror("open");
 		exit(1);
@@ -133,7 +133,7 @@ void lsl_test(void){
 	}
 	close(fd2);
 
-	if(strncmp(buf1, buf2, strlen(buf2)) == 0 && nb_file == 3){
+	if(strncmp(buf1, buf2, strlen(buf2)) == 0 && nb_file == 2){
 		printf("++++++test for ls -l passed++++++\n");
 	}
 	else{
@@ -148,7 +148,7 @@ void ls_fail(void){
 	getcwd(cwd, PATH_MAX);
 
 	char path[PATH_MAX];
-	sprintf(path, "%s/%s", cwd, "targets/test.tar/targets/not_a_dir");
+	sprintf(path, "%s/%s", cwd, "targets_bis/test.tar/test_dir_bis/not_a_dir");
 
 	nb_file = ls('l', path);
 
@@ -164,23 +164,23 @@ void ls_fail(void){
 int main(void){
 
 	/* ls */
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	ls_test();
 
 	/* ls -l */
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	lsl_test();
 
 	/* ls fail */
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	ls_fail();
 
-
+	system("bash script_bis_rm.sh");
   return 0;
 }

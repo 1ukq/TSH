@@ -11,10 +11,10 @@ void cd_tar_tar(void){
 	getcwd(cwd, PATH_MAX);
 
 	char nwd[PATH_MAX];
-	sprintf(nwd, "%s/%s", cwd, "targets/test.tar/targets");
+	sprintf(nwd, "%s/%s", cwd, "targets_bis/test.tar/test_dir");
 
 	//on met le cwd dans le tar
-	strcat(cwd, "/targets/test.tar/targets/test_dir");
+	strcat(cwd, "/targets_bis/test.tar");
 
 	//on applique cd
 	n = cd(cwd, nwd);
@@ -35,7 +35,7 @@ void cd_htar_tar(void){
 	getcwd(cwd, PATH_MAX);
 
 	char nwd[PATH_MAX];
-	sprintf(nwd, "%s/%s", cwd, "targets/test.tar/targets");
+	sprintf(nwd, "%s/%s", cwd, "targets_bis/test.tar/test_dir");
 
 	//le cwd est bien hors-tar (dans .../tests)
 
@@ -61,7 +61,7 @@ void cd_tar_htar(void){
 	sprintf(nwd, "%s", cwd);
 
 	//on met le cwd dans le tar
-	strcat(cwd, "/targets/test.tar/targets/test_dir");
+	strcat(cwd, "/targets_bis/test.tar/test_dir");
 
 	//on applique cd
 	n = cd(cwd, nwd);
@@ -81,7 +81,7 @@ void cd_fail(void){
 	//on met le cwd dans le tar
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
-	strcat(cwd, "/targets/test.tar/targets/test_dir");
+	strcat(cwd, "/targets_bis/test.tar/targets_bis/test_dir");
 
 	char cwd_expected[PATH_MAX];
 	sprintf(cwd_expected, "%s", cwd);
@@ -108,8 +108,8 @@ int main(void){
 	getcwd(real_cwd, PATH_MAX);
 
 	/* tar -> tar */
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	cd_tar_tar();
 
@@ -120,8 +120,8 @@ int main(void){
 		return -1;
 	}
 
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	cd_htar_tar();
 
@@ -132,8 +132,8 @@ int main(void){
 		return -1;
 	}
 
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	cd_tar_htar();
 
@@ -144,10 +144,16 @@ int main(void){
 		return -1;
 	}
 
-	system("./script_rm.sh");
-	system("./script.sh");
+	system("bash script_bis_rm.sh");
+	system("bash script_bis.sh");
 
 	cd_fail();
 
+	n = chdir(real_cwd);
+	if(n < 0){
+		perror("chdir 4");
+		return -1;
+	}
+	system("bash script_bis_rm.sh");
   return 0;
 }
