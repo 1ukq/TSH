@@ -1,21 +1,45 @@
 #include "makedir.h"
 
-void set_checksum_mkdir(struct posix_header *hd)
-{
-  	memset(hd -> chksum, ' ', 8);
-  	unsigned int sum = 0;
-  	char *p = (char *)hd;
-  	for (int i=0; i < BLOCK_SIZE; i++)
-  	{
+void set_checksum_mkdir(struct posix_header *hd){
+
+  memset(hd -> chksum, ' ', 8);
+  unsigned int sum = 0;
+  char *p = (char *)hd;
+  for (int i=0; i < BLOCK_SIZE; i++){
 		sum += p[i];
 	}
-  	sprintf(hd -> chksum, "%06o", sum);
+  sprintf(hd -> chksum, "%06o", sum);
+}
+
+void get_prev_rep(char * path, char * path_prev_rep){
+
+	int len = strlen(path);
+	int i = len;
+	int nb_slash = 0;
+
+	sprintf(path_prev_rep, "%s", "");
+
+	while(i >= 0 && nb_slash < 2){
+		if(path[i] == '/'){
+			nb_slash++;
+		}
+		i--;
+	}
+
+	if(i > 0){
+		char * path_tempo = strndup(path, i+2);
+		sprintf(path_prev_rep,"%s", path_tempo);
+	}
 }
 
 
-int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
+//int makedir(char * path_tar, char * path_cwd, char * dir_name)
+int makedir(char * path)
 {
-	//faire attention au cas où dir_name est de la forme ".../nom_du_dir"
+	struct work_directory wd;
+
+	char path_in_tar[sizeof(wd.c_tar)];
+	char path_to_tar[sizeof(wd.c_htar) + 1 + sizeof(wd.tar_name)];
 
 	struct posix_header p;
 	memset(&p, '\0', BLOCK_SIZE);
@@ -27,24 +51,27 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 
 	int i, n;
 	int shift;
+	int prev_rep_exist = 0;
 
 	int size_psize = sizeof(p.size);
 	int size_dec;
 	int size_pname = sizeof(p.name);
 
-	/* initialisation du nom complet (pour vérifier que le répertoire n'est pas déja existant) */
-	char fullname[size_pname];
-	memset(fullname, '\0', size_pname);
-
-	sprintf(fullname, "%s", path_cwd);
-	strcat(fullname, dir_name);
-	if(dir_name[strlen(dir_name)-1] != '/')
+	fill_wd(path, &wd);
+	if(strlen(wd.tar_name) == 0 || strlen(wd.c_tar) == 0)
 	{
-		strcat(fullname, "/");
+		//le chemin n'implique aucun tar (chemin invalide)
+		return -2;
 	}
 
+	sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
+	sprintf(path_in_tar, "%s", wd.c_tar);
 
-	int fd = open(path_tar, O_RDWR);
+	char path_prev_rep[strlen(path_in_tar)];
+	get_prev_rep(path_in_tar, path_prev_rep);
+
+
+	int fd = open(path_to_tar, O_RDWR);
 	if(fd < 0)
 	{
 		perror("open");
@@ -55,11 +82,18 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 
 	while(read(fd, buf, BLOCK_SIZE ) > 0)
 	{
-		if(buf[0] == '\0')
+		if((buf[0] == '\0'))
 		{
 			/* fin du tar*/
+
+			if(prev_rep_exist == 0){
+				close(fd);
+				//le sous-répertoire n'existe pas (chemin invalide)
+				return -2;
+			}
+
 			/* p.name */
-			sprintf(p.name, "%s", fullname);
+			sprintf(p.name, "%s", path_in_tar);
 
 			/* p.mode */
 			sprintf(p.mode, "%s", "0000755");
@@ -132,6 +166,7 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 
 			return 0;
 		}
+
 		/* Récupère le nom du fichier */
 		for (i = 0; i < size_pname; i++)
 		{
@@ -139,18 +174,19 @@ int makedir(int fd_out, char * path_tar, char * path_cwd, char * dir_name)
 		}
 
 		/* Regarde si le répertoire n'est pas déjà existant */
-		if(strcmp(fullname, p.name) == 0)
+		if(strcmp(path_in_tar, p.name) == 0)
 		{
 			// le répertoire existe deja
 			close(fd);
-			n = write(fd_out, "mkdir: cannot create directory : File already exists\n", 53);
-			if(n < 0)
-			{
-				perror("write 3");
-				return -1;
-			}
 
-			return 0;
+			return -3;
+		}
+
+		/* Regarde si le sous-répertoire existe */
+		if(prev_rep_exist == 0){
+			if(strlen(path_prev_rep) == 0 || strcmp(path_prev_rep, p.name) == 0){
+				prev_rep_exist = 1;
+			}
 		}
 
 		/* Récupère la taille du fichier + conversion */
