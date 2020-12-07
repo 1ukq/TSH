@@ -1,8 +1,7 @@
 #include "pipe.h"
 
-
-int pipe_tsh(const char *cmd1, const char *cmd2){
-
+//If the commands does note have any option you can set opt1 and opt2 to NULL
+int pipe_tsh(const char *cmd1, const char *opt1, const char *cmd2, const char *opt2){
     int fildes[2];
     int ret_pipe = pipe(fildes);
     if(ret_pipe == -1){
@@ -22,14 +21,8 @@ int pipe_tsh(const char *cmd1, const char *cmd2){
         default : //père, write
             close(fildes[0]);
             dup2(fildes[1], STDOUT_FILENO);
-            execlp(cmd1, cmd1, NULL);
+            execlp(cmd1, cmd1, opt1, NULL);
             break;
     }
-    return 0;
-
-}
-
-int main(){
-    pipe_tsh("yes", "head");
     return 0;
 }
