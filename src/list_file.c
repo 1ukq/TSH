@@ -105,11 +105,11 @@ void get_time(char * time_oct, char * time)
 	time_t time_dec_t = time_dec;
 	struct tm * t = localtime(&time_dec_t);
 
-	char year[4];
-	char month[2];
-	char day[2];
-	char hour[2];
-	char min[2];
+	char year[5];
+	char month[3];
+	char day[3];
+	char hour[3];
+	char min[3];
 
 	sprintf(year, "%i", 1900+(*t).tm_year);
 	sprintf(month, "%i", 1+(*t).tm_mon);
@@ -244,7 +244,6 @@ int ls(char option, char * path)
 					return -1;
 				}
 			}
-
 			if(path_exist == 0)
 			{
 				//le chemin n'existe pas
@@ -253,7 +252,7 @@ int ls(char option, char * path)
 
 			return total;
 		}
-
+	
 		if(path_exist == 0)
 		{
 			if(strlen(path_in_tar) == 0)
@@ -271,7 +270,7 @@ int ls(char option, char * path)
 
 		/* Vérification + conversion (à gauche) que le fichier est à afficher */
 		if(verif_convert_name(name, p.name, path_in_tar) != 0)
-		{
+		{	
 			/* Ici name a son nom exact */
 			char affichage[BLOCK_SIZE] = ""; //permet d'afficher fichier par fichier (on ne se pose plus la question du nombre de fichiers à afficher)
 			if(option == 'l')
