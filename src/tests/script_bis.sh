@@ -48,3 +48,20 @@ echo -n "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir
 
 #pwd
 mkdir test_dir_pwd
+
+#mkdir
+mkdir test_dir_mkdir
+
+touch test_dir_mkdir/res_expected
+touch test_dir_mkdir/list_tar.sh
+
+echo -n "drwxr-xr-x rf/L              0 $(date +%F) $(date +%R) test_dir/
+-rw-r--r-- rf/L             13 $(date +%F) $(date +%R) test_dir/helloworld
+-rw-r--r-- rf/L             19 $(date +%F) $(date +%R) test_dir/foo
+-rw-r--r-- rf/L           2090 $(date +%F) $(date +%R) bar
+drwxr-xr-x rf/L              0 $(date +%F) $(date +%R) test_dir/makedir_test/
+" > test_dir_mkdir/res_expected
+
+echo -n "#!/bin/bash
+tar -tvf targets_bis/test.tar
+" > test_dir_mkdir/list_tar.sh
