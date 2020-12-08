@@ -37,5 +37,3 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
     *(pos + 1) = pos_b + size;
     return 0;
 }
-
-int size_file(fd_tar, pos_from){}
