@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#create tar
 mkdir targets_bis
 mkdir targets_bis/test_dir
 
@@ -42,8 +43,8 @@ touch test_dir_ls/lsl_expected.txt
 echo -n -e "helloworld\tfoo\t
 " > test_dir_ls/ls_expected.txt
 
-echo -n "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir
--rw-r--r--  rf/L  2090  $(date +%F) $(date +%R)  bar
+echo -n "drwxr-xr-x  $(users)/$(groups | cut -d ' ' -f 1)  0  $(date +%F) $(date +%R)  test_dir
+-rw-r--r--  $(users)/$(groups | cut -d ' ' -f 1)  2090  $(date +%F) $(date +%R)  bar
 " > test_dir_ls/lsl_expected.txt
 
 #pwd
@@ -56,10 +57,10 @@ touch test_dir_mkdir/res_expected
 touch test_dir_mkdir/list_tar.sh
 
 echo -n "drwxr-xr-x rf/L              0 $(date +%F) $(date +%R) test_dir/
--rw-r--r-- rf/L             13 $(date +%F) $(date +%R) test_dir/helloworld
--rw-r--r-- rf/L             19 $(date +%F) $(date +%R) test_dir/foo
--rw-r--r-- rf/L           2090 $(date +%F) $(date +%R) bar
-drwxr-xr-x rf/L              0 $(date +%F) $(date +%R) test_dir/makedir_test/
+-rw-r--r-- $(users)/$(groups | cut -d ' ' -f 1)             13 $(date +%F) $(date +%R) test_dir/helloworld
+-rw-r--r-- $(users)/$(groups | cut -d ' ' -f 1)             19 $(date +%F) $(date +%R) test_dir/foo
+-rw-r--r-- $(users)/$(groups | cut -d ' ' -f 1)           2090 $(date +%F) $(date +%R) bar
+drwxr-xr-x $(users)/$(groups | cut -d ' ' -f 1)              0 $(date +%F) $(date +%R) test_dir/makedir_test/
 " > test_dir_mkdir/res_expected
 
 echo -n "#!/bin/bash
