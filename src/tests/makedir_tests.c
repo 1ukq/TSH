@@ -69,6 +69,8 @@ void makedir_test(void){
 	}
 
 	// compare buf1 and buf2 (=) compare res and expectation
+	printf("%s\n", buf1);
+	printf("%s\n", buf2);
 	if(strcmp(buf1, buf2) == 0 && ret == 0){
 		printf("++++++test for mkdir passed++++++\n");
 	}

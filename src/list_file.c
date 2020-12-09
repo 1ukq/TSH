@@ -105,11 +105,11 @@ void get_time(char * time_oct, char * time)
 	time_t time_dec_t = time_dec;
 	struct tm * t = localtime(&time_dec_t);
 
-	char year[4];
-	char month[2];
-	char day[2];
-	char hour[2];
-	char min[2];
+	char year[5];
+	char month[3];
+	char day[3];
+	char hour[3];
+	char min[3];
 
 	sprintf(year, "%i", 1900+(*t).tm_year);
 	sprintf(month, "%i", 1+(*t).tm_mon);
