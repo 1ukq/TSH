@@ -1,4 +1,4 @@
-#include "utils_red.h"
+#include "find_file.h"
 
 int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
     struct posix_header header;
@@ -28,12 +28,13 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
 
     }
     sscanf(header.size, "%o", &size);
+    shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
     int pos_b = lseek(fd_tar, 0, SEEK_CUR);
     if(pos_b == -1){
         perror("lseek in pos_file_in_tar");
         return -1;
     }
     *(pos) = pos_b;
-    *(pos + 1) = pos_b + size;
+    *(pos + 1) = pos_b + (shift * BLOCK_SIZE);
     return 0;
 }
