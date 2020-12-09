@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#create tar
 mkdir targets_bis
 mkdir targets_bis/test_dir
 
@@ -42,8 +43,8 @@ touch test_dir_ls/lsl_expected.txt
 echo -n -e "helloworld\tfoo\t
 " > test_dir_ls/ls_expected.txt
 
-echo -n "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir
--rw-r--r--  rf/L  2090  $(date +%F) $(date +%R)  bar
+echo -n "drwxr-xr-x  $(id -u -n)/$(id -g -n)  0  $(date +%F) $(date +%R)  test_dir
+-rw-r--r--  $(id -u -n)/$(id -g -n)  2090  $(date +%F) $(date +%R)  bar
 " > test_dir_ls/lsl_expected.txt
 
 #pwd
@@ -55,11 +56,11 @@ mkdir test_dir_mkdir
 touch test_dir_mkdir/res_expected
 touch test_dir_mkdir/list_tar.sh
 
-echo -n "drwxr-xr-x rf/L              0 $(date +%F) $(date +%R) test_dir/
--rw-r--r-- rf/L             13 $(date +%F) $(date +%R) test_dir/helloworld
--rw-r--r-- rf/L             19 $(date +%F) $(date +%R) test_dir/foo
--rw-r--r-- rf/L           2090 $(date +%F) $(date +%R) bar
-drwxr-xr-x rf/L              0 $(date +%F) $(date +%R) test_dir/makedir_test/
+echo -n "drwxr-xr-x $(id -u -n)/$(id -g -n)         0 $(date +%F) $(date +%T) test_dir/
+-rw-r--r-- $(id -u -n)/$(id -g -n)        13 $(date +%F) $(date +%T) test_dir/helloworld
+-rw-r--r-- $(id -u -n)/$(id -g -n)        19 $(date +%F) $(date +%T) test_dir/foo
+-rw-r--r-- $(id -u -n)/$(id -g -n)      2090 $(date +%F) $(date +%T) bar
+drwxr-xr-x $(id -u -n)/$(id -g -n)         0 $(date +%F) $(date +%T) test_dir/makedir_test/
 " > test_dir_mkdir/res_expected
 
 echo -n "#!/bin/bash
