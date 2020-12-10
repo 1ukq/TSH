@@ -144,13 +144,13 @@ int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char
 
     int wr = write(fd_tar, buf_cmd, sizeof(char) * size_buf_cmd);
     if(wr == -1){
-        perror("write in red_output_append_in_tar");
+        perror("write1 in red_output_append_in_tar");
         return -1;
     }
 
-    wr = write(fd_tar, buf, sizeof(char) * (size_tar - ret_lseek) * BLOCK_SIZE);
+    wr = write(fd_tar, buf, sizeof(char) * (size_tar - ret_lseek));
     if(wr == -1){
-        perror("write in red_output_append_in_tar");
+        perror("write2 in red_output_append_in_tar");
         return -1;
     }
 
@@ -177,7 +177,7 @@ int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char
     }
     wr = write(fd_tar, &header, BLOCK_SIZE);
     if(wr == -1){
-        perror("write in red_output_append_in_tar");
+        perror("write3 in red_output_append_in_tar");
         return -1;
     }
 
