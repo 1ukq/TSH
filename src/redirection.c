@@ -103,11 +103,11 @@ int red_input_in_tar(const char *path_tar, const char *path_in_tar){
 }
 
 int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
-    int pos[2];
+    int pos[3];
     int fd_tar = open(path_tar, O_RDWR);
 
     if(fd_tar == -1){
-        perror("open in red_output_append_in_tar");
+        perror("open in red_output_trunc_in_tar");
         return -1;
     }
 
@@ -118,13 +118,13 @@ int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char 
 
     int size_tar = lseek(fd_tar, 0, SEEK_END);
     if(size_tar == -1){
-        perror("lseek in red_input_in_tar");
+        perror("lseek in red_output_trunc_in_tar");
         return -1;
     }
 
     int ret_lseek = lseek(fd_tar, pos[1], SEEK_SET); // end of file (path_in_tar file)
     if(ret_lseek == -1){
-        perror("lseek in red_input_in_tar");
+        perror("lseek in red_output_trunc_in_tar");
         return -1;
     }
 
@@ -132,25 +132,25 @@ int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char 
     memset(buf, '\0', sizeof(char) * (size_tar - ret_lseek));
     int rd = read(fd_tar, buf, sizeof(char) * (size_tar - ret) * BLOCK_SIZE);
     if(rd == -1){
-        perror("read in red_output_append_in_tar");
+        perror("read in red_output_trunc_in_tar");
         return -1;
     }
 
     ret_lseek = lseek(fd_tar, pos[0], SEEK_SET); // beginning of file (path_in_tar file)
     if(ret_lseek == -1){
-        perror("lseek in red_output_append_in_tar");
+        perror("lseek in red_output_trunc_in_tar");
         return -1;
     }
 
     int wr = write(fd_tar, buf_cmd, sizeof(char) * size_buf_cmd);
     if(wr == -1){
-        perror("write1 in red_output_append_in_tar");
+        perror("write1 in red_output_trunc_in_tar");
         return -1;
     }
 
     wr = write(fd_tar, buf, sizeof(char) * (size_tar - ret_lseek));
     if(wr == -1){
-        perror("write2 in red_output_append_in_tar");
+        perror("write2 in red_output_trunc_in_tar");
         return -1;
     }
 
@@ -158,17 +158,117 @@ int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char 
     int size_file = str_length(buf_cmd);
     ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
     if(ret_lseek == -1){
-        perror("lseek in red_output_append_in_tar");
+        perror("lseek in red_output_trunc_in_tar");
         return -1;
     }
     struct posix_header header;
     rd = read(fd_tar, &header, BLOCK_SIZE);
     if(rd == -1){
-        perror("read in red_output_append_in_tar");
+        perror("read in red_output_trunc_in_tar");
         return -1;
     }
     //sprintf(header.size, "%011o", size_file); //Line MacOS
     sprintf(header.size, "%011o", size_file);
+    set_checksum(&header);
+    ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in red_output_trunc_in_tar");
+        return -1;
+    }
+    wr = write(fd_tar, &header, BLOCK_SIZE);
+    if(wr == -1){
+        perror("write3 in red_output_trunc_in_tar");
+        return -1;
+    }
+
+    free(buf);
+    close(fd_tar);
+
+    return 0;
+}
+
+int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+    int pos[3];
+    int fd_tar = open(path_tar, O_RDWR);
+    if(fd_tar == -1){
+        perror("open in red_output_append_in_tar");
+        return -1;
+
+    }
+
+    int ret = pos_file_in_tar(fd_tar, path_in_tar, pos);
+    if(ret == -1){
+        return -1;
+    }
+
+    int size_file = pos[2] - pos[0];
+    int size = str_length(buf_cmd);
+    int nb_blocks = (size + size_file) % BLOCK_SIZE == 0 ? (size + size_file) / BLOCK_SIZE : ((size + size_file) / BLOCK_SIZE) + 1;
+
+    // buffer_wr
+    char *buffer_wr = malloc(sizeof(char) * nb_blocks * BLOCK_SIZE);
+    memset(buffer_wr, '\0', sizeof(char) * nb_blocks * BLOCK_SIZE);
+    int begin_file = lseek(fd_tar, pos[0], SEEK_SET);
+    if(begin_file == -1){
+        perror("lseek in red_output_trunc_in_tar");
+        return -1;
+    }
+    int rd = read(fd_tar, buffer_wr, size_file);
+    if(rd == -1){
+        perror("read in red_output_append_in_tar");
+        return -1;
+    }
+    memcpy(buffer_wr + size_file, buf_cmd, size);
+
+    // buffer_mv
+    int size_tar = lseek(fd_tar, 0, SEEK_END);
+    if(size_tar == -1){
+        perror("lseek in red_output_trunc_in_tar");
+        return -1;
+    }
+    int end_file = lseek(fd_tar, pos[1], SEEK_SET);
+    if (end_file == -1){
+        perror("lseek in red_output_append_in_tar");
+        return -1;
+    }
+    char *buffer_mv = malloc(sizeof(char) * (size_tar - end_file));
+    memset(buffer_mv, '\0', sizeof(char) * (size_tar - end_file));
+    rd = read(fd_tar, buffer_mv, (size_tar - end_file));
+    if(rd == -1){
+        perror("read in red_output_append_in_tar");
+        return -1;
+    }
+
+    int ret_lseek = lseek(fd_tar, pos[0], SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in red_output_trunc_in_tar");
+        return -1;
+    }
+    int wr = write(fd_tar, buffer_wr, nb_blocks * BLOCK_SIZE);
+    if(wr == -1){
+        perror("write in red_output_append_in_tar");
+        return -1;
+    }
+    wr = write(fd_tar, buffer_mv, (size_tar - end_file));
+    if(wr == -1){
+        perror("write in red_output_append_in_tar");
+        return -1;
+    }
+
+    // change header file
+    struct posix_header header;
+    ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in red_output_trunc_in_tar");
+        return -1;
+    }
+    rd = read(fd_tar, &header, BLOCK_SIZE);
+    if(rd == -1){
+        perror("read in red_output_append_in_tar");
+        return -1;
+    }
+    //sprintf(header.size, "%011o", (size + size_file)); //Line MacOS
+    sprintf(header.size, "%011o", (size + size_file));
     set_checksum(&header);
     ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
     if(ret_lseek == -1){
@@ -177,14 +277,14 @@ int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char 
     }
     wr = write(fd_tar, &header, BLOCK_SIZE);
     if(wr == -1){
-        perror("write3 in red_output_append_in_tar");
+        perror("write in red_output_append_in_tar");
         return -1;
     }
 
-    return 0;
-}
+    free(buffer_wr);
+    free(buffer_mv);
+    close(fd_tar);
 
-int red_output_append_in_tar(const char *path_tar, const char *path_in_tar){
     return 0;
 }
 

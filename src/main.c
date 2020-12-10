@@ -26,7 +26,7 @@ int main(void){
         close(fildes[1]);
         char *ret = malloc(BLOCK_SIZE);
         int n = buffarize_output(fildes[0], ret);
-        red_output_trunc_in_tar("test.tar", "b", ret, n);
+        red_output_append_in_tar("test.tar", "c", ret, n);
         //printf("%s\n", ret);
     }
     return 0;

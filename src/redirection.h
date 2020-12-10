@@ -24,7 +24,7 @@ int red_input_in_tar(const char *path_tar, const char *path_in_tar);
 
 int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd);
 
-int red_output_append_in_tar(const char *path_tar, const char *path_in_tar);
+int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd);
 
 int red_err_append_in_tar(const char *path_tar, const char *path_in_tar);
 

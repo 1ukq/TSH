@@ -36,5 +36,6 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
     }
     *(pos) = pos_b;
     *(pos + 1) = pos_b + (shift * BLOCK_SIZE);
+    *(pos + 2) = pos_b + size;
     return 0;
 }
