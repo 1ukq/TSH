@@ -102,7 +102,7 @@ int red_input_in_tar(const char *path_tar, const char *path_in_tar){
     return 0;
 }
 
-int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
     int pos[2];
     int fd_tar = open(path_tar, O_RDWR);
 
@@ -184,7 +184,7 @@ int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char
     return 0;
 }
 
-int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar){
+int red_output_append_in_tar(const char *path_tar, const char *path_in_tar){
     return 0;
 }
 
