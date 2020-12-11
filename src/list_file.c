@@ -357,3 +357,20 @@ int ls(char option, char * path)
 	perror("read");
 	return -1;
 }
+
+int main(int argc, char ** argv){
+	int ret = 0;
+
+	if(argc >= 2){
+		/*
+		1- regarde si il y a des options et si elles sont toutes égales à "-l" renvoie une erreur sinon
+		2- lance ls sur les chemins qui ne sont pas des options
+		*/
+	}
+	else{
+		// pas assez d'arguments
+		ret = -2
+	}
+
+	return ret;
+}
