@@ -230,6 +230,10 @@ int main(int argc, char ** argv)
 			}
 		}
 	}
+	else{
+		// pas assez d'arguments
+		ret = -2;
+	}
 
 	return ret;
 }
