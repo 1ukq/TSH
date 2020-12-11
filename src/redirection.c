@@ -14,8 +14,44 @@ int buffarize_output(int fd_read_end, char *buffer){
     return nb_loop * BLOCK_SIZE;
 }
 
+int input_to_pipe(int fd_write_end, char *path_tar, const char *path_in_tar){
+    int fd_tar = open(path_tar, O_RDONLY);
+    if(fd_tar == -1){
+        perror("open input_to_pipe");
+        return -1;
+    }
+    int pos[3];
+    pos_file_in_tar(fd_tar, path_in_tar, pos);
+    char *buf = malloc(sizeof(char) * (pos[2] - pos[0]));
+    int ret_lseek = lseek(fd_tar, pos[0], SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in input_to_pipe");
+        return -1;
+    }
+    int rd = read(fd_tar, buf, pos[2] - pos[0]);
+    if(rd == -1){
+        perror("read in input_to_pipe");
+        return -1;
+    }
+    int wr = write(fd_write_end, buf, pos[2] - pos[0]);
+    if(wr == -1){
+        perror("write in input_to_pipe");
+        return -1;
+    }
+    return 0;
+}
+
 int red_output_to_pipe(int fd_write_end){
     int ret_dup2 = dup2(fd_write_end, STDOUT_FILENO);
+    if(ret_dup2 == -1){
+        perror("dup2 in red_output_to_pipe");
+        return -1;
+    }
+    return 0;
+}
+
+int red_err_to_pipe(int fd_write_end){
+    int ret_dup2 = dup2(fd_write_end, STDERR_FILENO);
     if(ret_dup2 == -1){
         perror("dup2 in red_output_to_pipe");
         return -1;
@@ -98,11 +134,16 @@ int red_err_trunc_out_tar(const char *file){
     return fd;
 }
 
-int red_input_in_tar(const char *path_tar, const char *path_in_tar){
+int red_input_in_tar(int fd_read_end){
+    int ret_dup2 = dup2(fd_read_end, STDIN_FILENO);
+    if(ret_dup2 == -1){
+        perror("dup2 in red_input_in_tar");
+        return -1;
+    }
     return 0;
 }
 
-int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+int red_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
     int pos[3];
     int fd_tar = open(path_tar, O_RDWR);
 
@@ -187,7 +228,7 @@ int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char 
     return 0;
 }
 
-int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+int red_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
     int pos[3];
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
@@ -288,10 +329,22 @@ int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char
     return 0;
 }
 
-int red_err_append_in_tar(const char *path_tar, const char *path_in_tar){
-    return 0;
+int red_output_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+    int ret = red_append_in_tar(path_tar, path_in_tar, buf_cmd, size_buf_cmd);
+    return ret;
 }
 
-int red_err_trunc_in_tar(const char *path_tar, const char *path_in_tar){
-    return 0;
+int red_output_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+    int ret = red_trunc_in_tar(path_tar, path_in_tar, buf_cmd, size_buf_cmd);
+    return ret;
+}
+
+int red_err_append_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+    int ret = red_append_in_tar(path_tar, path_in_tar, buf_cmd, size_buf_cmd);
+    return ret;
+}
+
+int red_err_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cmd, int size_buf_cmd){
+    int ret = red_trunc_in_tar(path_tar, path_in_tar, buf_cmd, size_buf_cmd);
+    return ret;
 }
