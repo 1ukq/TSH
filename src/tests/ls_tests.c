@@ -9,6 +9,7 @@
 
 void ls_test(void){
 
+
 	int fd1, fd2, n, nb_file;
 	char buf1[500], buf2[500];
 
@@ -30,7 +31,7 @@ void ls_test(void){
 		exit(1);
 	}
 
-	nb_file = ls(' ', path);
+	nb_file = ls(NULL, path);
 
 	close(fd1);
 
@@ -97,7 +98,7 @@ void lsl_test(void){
 		exit(1);
 	}
 
-	nb_file = ls('l', path);
+	nb_file = ls("-l", path);
 
 	close(fd1);
 
@@ -150,7 +151,7 @@ void ls_fail(void){
 	char path[PATH_MAX];
 	sprintf(path, "%s/%s", cwd, "targets_bis/test.tar/test_dir_bis/not_a_dir");
 
-	nb_file = ls('l', path);
+	nb_file = ls("-l", path);
 
 	if(nb_file == -2){
 		printf("++++++test for ls fail passed++++++\n");

@@ -164,12 +164,12 @@ void get_time(char * time_oct, char * time)
 
 
 
-int ls(char option, char * path)
+int ls(char * option, char * path)
 {
 	/*
 	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par les processus lors de l'input de l'utilisateur
 	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
-	- option : ' ' pour un ls et 'l' pour un ls -l
+	- option : NULL pour un ls et "-l" pour un ls -l
 	- path : chemin absolu (impliquant un unique tar)
 
 	return value:
@@ -204,10 +204,10 @@ int ls(char option, char * path)
 	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
-
-	if(option != 'l' && option != ' ')
-	{
-		return -3;
+	if(option != NULL){
+		if(strcmp(option,"-l") != 0){
+			return -3;
+		}
 	}
 
 	fill_wd(path, &wd);
@@ -216,7 +216,6 @@ int ls(char option, char * path)
 		//le chemin n'implique aucun tar
 		return -1;
 	}
-
 	sprintf(path_in_tar, "%s", wd.c_tar);
 	sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
 
@@ -234,8 +233,7 @@ int ls(char option, char * path)
 		{
 			/* Fin du tar */
 			close(fd);
-
-			if((total > 0) && (option != 'l'))
+			if((total > 0) && (option == NULL))
 			{
 				n = write(STDOUT_FILENO, "\n", 1);
 				if(n < 0)
@@ -274,7 +272,7 @@ int ls(char option, char * path)
 		{
 			/* Ici name a son nom exact */
 			char affichage[BLOCK_SIZE] = ""; //permet d'afficher fichier par fichier (on ne se pose plus la question du nombre de fichiers à afficher)
-			if(option == 'l')
+			if(option != NULL)
 			{
 				/* récupère le type */
 				get_type(p.typeflag, type);
@@ -356,21 +354,4 @@ int ls(char option, char * path)
 
 	perror("read");
 	return -1;
-}
-
-int main(int argc, char ** argv){
-	int ret = 0;
-
-	if(argc >= 2){
-		/*
-		1- regarde si il y a des options et si elles sont toutes égales à "-l" renvoie une erreur sinon
-		2- lance ls sur les chemins qui ne sont pas des options
-		*/
-	}
-	else{
-		// pas assez d'arguments
-		ret = -2
-	}
-
-	return ret;
 }
