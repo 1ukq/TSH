@@ -186,3 +186,50 @@ int makedir(char * path)
 	perror("read");
 	return -1;
 }
+
+
+int main(int argc, char ** argv)
+{
+	int i, n, ret = 0;
+
+	if(argc >= 2){
+		for(i = 1; i < argc; i++){
+
+			// lance makedir
+			n = makedir(argv[i]);
+
+			if(n == -1){
+				// erreur de type affichage...
+				ret = -1;
+			}
+			else if(n == -2){
+				// chemin invalide
+				char error[] = "mkdir: cannot create directory '";
+				strcat(error, argv[i]);
+				strcat(error, "': No such file or directory");
+
+				// affiche le message d'erreur
+				n = write(STDERR_FILENO, error, strlen(error));
+				if(n < 0){
+					perror("main : write1");
+					return -1;
+				}
+			}
+			else if(n == -3){
+				// le répertoire existe déjà
+				char error[] = "mkdir: cannot create directory '";
+				strcat(error, argv[i]);
+				strcat(error, "': File exists");
+
+				// affiche le message d'erreur
+				n = write(STDERR_FILENO, error, strlen(error));
+				if(n < 0){
+					perror("main : write2");
+					return -1;
+				}
+			}
+		}
+	}
+
+	return ret;
+}
