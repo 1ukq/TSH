@@ -18,17 +18,3 @@ int pwd(char * path_cwd)
 
 	return 0;
 }
-
-int main(int argc, char ** argv)
-{
-	int n;
-
-	if(argc == 2){
-		n = pwd(argv[1]);
-	}
-	else{
-		n = -2; // mauvais nombre d'arguments donné au main
-	}
-
-	return n;
-}
