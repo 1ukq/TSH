@@ -171,7 +171,7 @@ int red_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cm
 
     char *buf = malloc(sizeof(char) * (size_tar - ret_lseek));
     memset(buf, '\0', sizeof(char) * (size_tar - ret_lseek));
-    int rd = read(fd_tar, buf, sizeof(char) * (size_tar - ret) * BLOCK_SIZE);
+    int rd = read(fd_tar, buf, sizeof(char) * (size_tar - ret_lseek));
     if(rd == -1){
         perror("read in red_output_trunc_in_tar");
         return -1;

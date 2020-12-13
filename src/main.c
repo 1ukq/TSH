@@ -46,6 +46,8 @@ int main(void){
     execlp("cat", "cat", NULL);
     */
 
+    copy_in_tar("a", "test.tar", "b");
+
     return 0;
 
 }
