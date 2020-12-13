@@ -14,7 +14,7 @@ int main(int argc, char ** argv){
 			}
 			else if(n == -2){
 				// chemin invalide
-				char error[] = "mkdir: cannot create directory: No such file or directory";
+				char error[] = "mkdir: cannot create directory: No such file or directory\n";
 
 				// affiche le message d'erreur
 				n = write(STDERR_FILENO, error, strlen(error));
@@ -25,7 +25,7 @@ int main(int argc, char ** argv){
 			}
 			else if(n == -3){
 				// le répertoire eciste déjà
-				char error[] = "mkdir: cannot create directory: File exists";
+				char error[] = "mkdir: cannot create directory: File exists\n";
 
 				// affiche le message d'erreur
 				n = write(STDERR_FILENO, error, strlen(error));
