@@ -2,11 +2,11 @@
 #define MOVE
 
 #include "types/posix_header.h"
-#include "utils/utils_string.c"
+#include "utils/utils_string.h"
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
-#include "utils/init_header.c"
+#include "utils/init_header.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
@@ -17,7 +17,7 @@
 #include <time.h>
 #include <sys/wait.h>
 #include "types/work_directory.h"
-#include "utils/fonctions_utiles.c"
+#include "utils/fonctions_utiles.h"
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 

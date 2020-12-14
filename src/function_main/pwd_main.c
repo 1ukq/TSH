@@ -1,4 +1,4 @@
-#include "pwd.h"
+#include "../pwd.h"
 
 int main(int argc, char ** argv){
 	int ret;

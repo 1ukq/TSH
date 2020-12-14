@@ -1,4 +1,4 @@
-#include "copy.h"
+#include "../copy.h"
 
 int main(int argc, char ** argv){
 

@@ -1,4 +1,4 @@
-#include "makedir.h"
+#include "../makedir.h"
 
 int main(int argc, char ** argv){
 	int i, n, ret = 0;

@@ -1,4 +1,4 @@
-#include "list_file.h"
+#include "../list_file.h"
 
 int main(int argc, char ** argv){
 	int i, n, ret = 0;

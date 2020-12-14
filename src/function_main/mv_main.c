@@ -1,4 +1,4 @@
-#include "move.c"
+#include "../move.h"
 
 int main(int argc, char ** argv){
 	int n, i, ret = 0;
