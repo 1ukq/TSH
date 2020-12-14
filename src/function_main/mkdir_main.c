@@ -19,7 +19,7 @@ int main(int argc, char ** argv){
 					return -1;
 				}
 
-				ret += -1;
+				ret -= 1;
 			}
 			else if(n == -2){
 				// invalid path
