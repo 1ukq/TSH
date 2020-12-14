@@ -1,5 +1,5 @@
-#include "../copy.c"
-#include "../utils/fonctions_utiles.c"
+#include "../copy.h"
+#include "../utils/fonctions_utiles.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -13,7 +13,7 @@ int main(int argc, char ** argv){
 			// implique un tar ?
 			struct work_directory wd;
 			fill_wd(argv[i], &wd);
-			
+
 			if(strlen(wd.tar_name) == 0){
 				// pas de tar impliqué -> chemin invalide
 				char error[] = "cat: No such file\n";
