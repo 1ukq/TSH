@@ -1,4 +1,5 @@
 #include "munit/munit.h"
+#include "../utils/find_file.h"
 #include "../copy.h"
 #include "../list_file.h"
 #include "../makedir.h"
