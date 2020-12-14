@@ -88,7 +88,7 @@ int makedir(char * path)
 		return -2;
 	}
 
-	sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name); //chemin extérieur au tar
+	sprintf(path_to_tar, "%s%s", wd.c_htar, wd.tar_name); //chemin extérieur au tar
 	sprintf(path_in_tar, "%s", wd.c_tar); //chemin interne au tar
 
 	char path_prev_rep[strlen(path_in_tar)];

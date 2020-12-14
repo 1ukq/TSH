@@ -56,7 +56,7 @@ int cd(char * path_cwd, char * path_nwd)
 	/* vérifie que le nouveau chemin dans le tar est non-vide (sinon on est sûr que le chemin existe) */
 	if(strlen(nwd.c_tar) <= 0)
 	{
-		/* le nouveau chemin dans le tar est vide; on sûr que nwd existe; cwd devient nwd */
+		/* le nouveau chemin dans le tar est vide; on est sûr que nwd existe; cwd devient nwd */
 		cwd = nwd;
 		get_wd(cwd, path_cwd);
 

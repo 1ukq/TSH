@@ -18,10 +18,11 @@ void fill_wd(char * path_wd, struct work_directory * ad_wd)
 	else
 	{
 		/* regarde si le chemin implique un tar et ajoute le chemin hors tar dans c_htar */
+		strcat((*ad_wd).c_htar, "/");
 		while(strstr(token, ".tar") == NULL)
 		{
-			strcat((*ad_wd).c_htar, "/");
 			strcat((*ad_wd).c_htar, token);
+			strcat((*ad_wd).c_htar, "/");
 
 			token = strtok(NULL, "/");
 
@@ -50,6 +51,15 @@ void fill_wd(char * path_wd, struct work_directory * ad_wd)
 			}
 		}
 	}
+
+	if(path_wd[strlen(path_wd)-1] != '/'){
+		if(strlen((*ad_wd).c_tar) > 0){
+			(*ad_wd).c_tar[strlen((*ad_wd).c_tar)-1] = '\0';
+		}
+		else if(strlen((*ad_wd).tar_name) == 0){
+			(*ad_wd).c_htar[strlen((*ad_wd).c_htar)-1] = '\0';
+		}
+	}
 }
 
 /* cette fonction permet de récupérer un chemin dans une chaîne de caractères à partir d'un chemin dans la structure work_directory */
@@ -60,14 +70,13 @@ void get_wd(struct work_directory wd, char * path_wd)
 	if(strlen(wd.tar_name) > 0)
 	{
 		/* ajoute le nom du tar à la chaine de caractères si il y en a un */
-		strcat(path_wd, "/");
 		strcat(path_wd, wd.tar_name);
 
 		if(strlen(wd.c_tar) > 0)
 		{
 			/* ajoute le chemin dans le tar à la chaine de caractères si il existe */
 			strcat(path_wd, "/");
-			strncat(path_wd, wd.c_tar, strlen(wd.c_tar)-1);
+			strncat(path_wd, wd.c_tar, strlen(wd.c_tar));
 		}
 	}
 }

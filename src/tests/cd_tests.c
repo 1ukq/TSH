@@ -11,10 +11,10 @@ void cd_tar_tar(void){
 	getcwd(cwd, PATH_MAX);
 
 	char nwd[PATH_MAX];
-	sprintf(nwd, "%s/%s", cwd, "targets_bis/test.tar/test_dir");
+	sprintf(nwd, "%s/%s", cwd, "targets_bis/test.tar/test_dir/");
 
 	//on met le cwd dans le tar
-	strcat(cwd, "/targets_bis/test.tar");
+	strcat(cwd, "/targets_bis/test.tar/");
 
 	//on applique cd
 	n = cd(cwd, nwd);
@@ -35,7 +35,7 @@ void cd_htar_tar(void){
 	getcwd(cwd, PATH_MAX);
 
 	char nwd[PATH_MAX];
-	sprintf(nwd, "%s/%s", cwd, "targets_bis/test.tar/test_dir");
+	sprintf(nwd, "%s/%s", cwd, "targets_bis/test.tar/test_dir/");
 
 	//le cwd est bien hors-tar (dans .../tests)
 
@@ -81,7 +81,7 @@ void cd_fail(void){
 	//on met le cwd dans le tar
 	char cwd[PATH_MAX];
 	getcwd(cwd, PATH_MAX);
-	strcat(cwd, "/targets_bis/test.tar/targets_bis/test_dir");
+	strcat(cwd, "/targets_bis/test.tar/targets_bis/test_dir/");
 
 	char cwd_expected[PATH_MAX];
 	sprintf(cwd_expected, "%s", cwd);
