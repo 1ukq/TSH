@@ -189,7 +189,7 @@ int red_trunc_in_tar(const char *path_tar, const char *path_in_tar, char *buf_cm
         return -1;
     }
 
-    wr = write(fd_tar, buf, sizeof(char) * (size_tar - ret_lseek));
+    wr = write(fd_tar, buf, sizeof(char) * (size_tar - pos[1]));
     if(wr == -1){
         perror("write2 in red_output_trunc_in_tar");
         return -1;

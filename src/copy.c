@@ -100,7 +100,7 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
     memset(buf, '\0', size_tar - pos[1]);
     int ret_lseek = lseek(fd_tar, pos[1], SEEK_SET);
     int rd = read(fd_tar, buf, size_tar - pos[1]);
-    printf("pos 1 = %d\n", pos[1]);
+    printf("pos 1 = %lu\n", sizeof(char));
 
     int size_source = lseek(fd_source, 0, SEEK_END);
     int nb_blocks = size_source % BLOCK_SIZE == 0 ? size_source / BLOCK_SIZE : (size_source / BLOCK_SIZE) + 1;
@@ -110,7 +110,7 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
     rd = read(fd_source, buf_source, size_source);
 
     ret_lseek = lseek(fd_tar, pos[0], SEEK_SET);
-    int wr = write(fd_tar, buf_source, size_source);
+    int wr = write(fd_tar, buf_source, nb_blocks * BLOCK_SIZE);
     wr = write(fd_tar, buf, size_tar - pos[1]);
 
     //change header
