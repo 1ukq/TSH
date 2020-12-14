@@ -3,6 +3,7 @@
 
 #include "types/posix_header.h"
 #include "utils/utils_string.h"
+#include "utils/find_file.h"
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
@@ -22,8 +23,6 @@ int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 int find_last_block(int fd_tar, struct stat *restrict buf_stat);
 
 char *buffarize(const char *path_file_source, struct stat *restrict buf);
-
-int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar);
 
 int insert_file_in_tar(const char *path_tar, const char *path_file_source, char *path_in_tar);
 

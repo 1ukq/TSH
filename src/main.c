@@ -1,4 +1,6 @@
 #include "copy.h"
+#include "remove.h"
+#include "utils/find_file.h"
 #include "shell.h"
 #include "list_file.h"
 #include "types/posix_header.h"
@@ -45,6 +47,10 @@ int main(void){
     close(fildes[0]);
     execlp("cat", "cat", NULL);
     */
+
+    //remove_file_from_tar_r("test.tar", "dir");
+    //int fd = open("test.tar", O_RDWR);
+    //suppress_file(fd, 1024, 2048, 10240);
 
     return 0;
 

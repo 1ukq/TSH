@@ -12,10 +12,7 @@ int find_last_block(int fd_tar, struct stat *restrict buf_stat){
     memset(buf2, '\0', BLOCK_SIZE);
 
     int n = read(fd_tar, content, size_tar);
-    if(n == -1){
-        perror("read in find_last_block");
-        return -1;
-    }
+    if(check_sys_call(n, "read in find_last_block") == -1) return -1;
 
     copy_string(buf1, content, BLOCK_SIZE);
 
@@ -34,10 +31,7 @@ int find_last_block(int fd_tar, struct stat *restrict buf_stat){
 char *buffarize(const char *restrict path_file_source, struct stat *restrict buf){
 
     int fd_source = open(path_file_source, O_RDONLY);
-    if(fd_source == -1){
-        perror("open in buffarize");
-        return NULL;
-    }
+    if(check_sys_call(fd_source, "open in buffarize") == -1) return NULL;
 
     off_t size = buf -> st_size;
 
@@ -49,10 +43,7 @@ char *buffarize(const char *restrict path_file_source, struct stat *restrict buf
     }
 
     int nb_char_read = read(fd_source, file_source_buf, size);
-    if(nb_char_read == -1){
-        perror("read in buffarize");
-        return NULL;
-    }
+    if(check_sys_call(nb_char_read, "read in buffarize") == -1) return NULL;
 
     return file_source_buf;
 
@@ -61,27 +52,18 @@ char *buffarize(const char *restrict path_file_source, struct stat *restrict buf
 int insert_file_in_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(fd_tar == -1){
-        perror("open in insert_file_in_tar");
-        return -1;
-    }
+    if(check_sys_call(fd_tar, "open in insert_file_in_tar") == -1) return -1;
 
     //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar (bsdtar is the default tar utility on MacOS)
     struct stat stat_tar;
     stat(path_tar, &stat_tar);
     int b = find_last_block(fd_tar, &stat_tar);
     int lseek_ret = lseek(fd_tar, b * BLOCK_SIZE, SEEK_SET);
-    if(lseek_ret == -1){
-        perror("lseek in insert_file_in_tar");
-        return -1;
-    }
+    if(check_sys_call(lseek_ret, "lseek in insert_file_in_tar") == -1) return -1;
 
     struct stat stat_buf_source;
     int check_stat = stat(path_file_source, &stat_buf_source);
-    if(check_stat == -1){
-        perror("stat in insert_file_in_tar");
-        return -1;
-    }
+    if(check_sys_call(check_stat, "stat in insert_file_in_tar") == -1) return -1;
     struct posix_header header;
     memset(&header, '\0', sizeof(char) * BLOCK_SIZE);
 
@@ -89,18 +71,12 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
     char *file_source_buf = buffarize(path_file_source, &stat_buf_source);
 
     int wr = write(fd_tar, &header, BLOCK_SIZE);
-    if(wr == -1){
-        perror("write in insert_file_in_tar");
-        return -1;
-    }
+    if(check_sys_call(wr, "write in insert_file_in_tar") == -1) return -1;
 
     int size = stat_buf_source.st_size;
     int nb_blocks = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
     wr = write(fd_tar, file_source_buf, nb_blocks * BLOCK_SIZE);
-    if(wr == -1){
-        perror("write in insert_file_in_tar");
-        return -1;
-    }
+    if(check_sys_call(wr, "write in insert_file_in_tar") == -1) return -1;
 
     free(file_source_buf);
     close(fd_tar);
@@ -109,58 +85,13 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
 
 }
 
-int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
-
-    char *buf_sup = malloc(sizeof(char) * (size_tar - pos_from));
-    if(buf_sup == NULL){
-        perror("malloc in suppress_file");
-        return -1;
-    }
-    memset(buf_sup, '\0', sizeof(char) * (size_tar - pos_from));
-
-    int ret_lseek = lseek(fd_tar, pos_to, SEEK_SET);
-    if(ret_lseek == -1){
-        perror("lseek in suppress_file");
-        return -1;
-    }
-
-    int size_read = read(fd_tar, buf_sup, sizeof(char) * (size_tar - pos_to));
-    if(size_read == -1){
-        perror("read in suppress_file");
-        return -1;
-    }
-
-    ret_lseek = lseek(fd_tar, pos_from, SEEK_SET);
-    if(ret_lseek == -1){
-        perror("lseek in suppress_file");
-        return -1;
-    }
-
-    int size_write = write(fd_tar, buf_sup, size_tar - pos_from);
-    if(size_write == -1){
-        perror("write in suppress_file");
-        return -1;
-    }
-
-    free(buf_sup);
-
-    return 0;
-
-}
-
 int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, char *path_in_tar){
 
     int fd_source = open(path_tar_source, O_RDWR);
-    if(fd_source == -1){
-        perror("open in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(fd_source, "open in mv_from_tar_to_tar") == -1) return -1;
 
     int fd_target = open(path_tar_target, O_RDWR);
-    if(fd_target == -1){
-        perror("open in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(fd_target, "open in mv_from_tar_to_tar") == -1) return -1;
 
     int size_tar = lseek(fd_source, 0, SEEK_END);
     if(size_tar == -1){
@@ -169,10 +100,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     }
 
     int pos = lseek(fd_source, 0, SEEK_SET);
-    if(pos == -1){
-        perror("lseek in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(pos, "lseek in mv_from_tar_to_tar") == -1) return -1;
 
     int size_read = 0;
     int size = 0;
@@ -181,10 +109,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     struct posix_header header;
 
     size_read = read(fd_source, &header, BLOCK_SIZE);
-    if(size_read == -1){
-        perror("read in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(size_read, "read in mv_from_tar_to_tar") == -1) return -1;
 
     while(strcmp(header.name, path_file_source)){
 
@@ -197,16 +122,10 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
 
         ret_lseek = lseek(fd_source, shift * BLOCK_SIZE, SEEK_CUR);
-        if(ret_lseek == -1){
-            perror("lseek in mv_from_tar_to_tar");
-            return -1;
-        }
+        if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_tar") == -1) return -1;
 
         size_read = read(fd_source, &header, BLOCK_SIZE);
-        if(size_read == -1){
-            perror("read in mv_from_tar_to_tar");
-            return -1;
-        }
+        if(check_sys_call(size_read, "read in mv_from_tar_to_tar") == -1) return -1;
 
     }
 
@@ -220,18 +139,12 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     }
 
     ret_lseek = lseek(fd_source, -BLOCK_SIZE, SEEK_CUR);
-    if(ret_lseek == -1){
-        perror("lseek in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_tar") == -1) return -1;
 
     struct posix_header hd;
 
     size_read = read(fd_source, &hd, BLOCK_SIZE);
-    if(size_read == -1){
-        perror("read in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(size_read, "read in mv_from_tar_to_tar") == -1) return -1;
 
     char *str = name(path_file_source);
     char *path = concatenate(path_in_tar, str);
@@ -240,10 +153,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     set_checksum(&hd);
 
     size_read = read(fd_source, buf, shift * BLOCK_SIZE);
-    if(size_read == -1){
-        perror("read in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(size_read, "read in mv_from_tar_to_tar") == -1) return -1;
 
     int pos_from = ret_lseek;
     int pos_to = pos_from + (shift + 1) * BLOCK_SIZE;
@@ -254,29 +164,17 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 
     struct stat stat_target;
     int check_stat = stat(path_tar_source, &stat_target);
-    if(check_stat == -1){
-        perror("stat in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(check_stat, "stat in mv_from_tar_to_tar") == -1) return -1;
 
     int b = find_last_block(fd_target, &stat_target);
     ret_lseek = lseek(fd_target, b * BLOCK_SIZE, SEEK_SET);
-    if(ret_lseek == -1){
-        perror("lseek in mv_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_tar") == -1) return -1;
 
     int size_write = write(fd_target, &hd, BLOCK_SIZE);
-    if(size_write == -1){
-        perror("Write in move_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
 
     size_write = write(fd_target, buf, shift * BLOCK_SIZE);
-    if(size_write == -1){
-        perror("Write in move_from_tar_to_tar");
-        return -1;
-    }
+    if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
 
     close(fd_source);
     close(fd_target);
@@ -299,10 +197,7 @@ int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, char 
 int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char *path_dest){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(fd_tar == -1){
-        perror("open in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(fd_tar, "open in mv_from_tar_to_dir") == -1) return -1;
 
     int size = 0;
     int shift = 0;
@@ -310,10 +205,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
 
     struct posix_header header;
     int size_read = read(fd_tar, &header, BLOCK_SIZE);
-    if(size_read == -1){
-        perror("read in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(size_read, "read in mv_from_tar_to_dir") == -1) return -1;
 
     while(strcmp(header.name, path_file_source)){
 
@@ -326,16 +218,10 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
 
         ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);
-        if(ret_lseek == -1){
-            perror("lseek in mv_from_tar_to_tar");
-            return -1;
-        }
+        if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_dir") == -1) return -1;
 
         size_read = read(fd_tar, &header, BLOCK_SIZE);
-        if(size_read == -1){
-            perror("read in mv_from_tar_to_tar");
-            return -1;
-        }
+        if(check_sys_call(size_read, "read in mv_from_tar_to_dir") == -1) return -1;
 
     }
 
@@ -347,24 +233,15 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
         perror("malloc in mv_from_tar_to_dir");
     }
     size_read = read(fd_tar, buf, sizeof(char) * shift * BLOCK_SIZE);
-    if(size_read == -1){
-        perror("read in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(size_read, "read in mv_from_tar_to_dir") == -1) return -1;
 
     ret_lseek = lseek(fd_tar, -BLOCK_SIZE * (shift + 1), SEEK_CUR);
-    if(ret_lseek == -1){
-        perror("lseek in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_dir") == -1) return -1;
 
     int pos_from = ret_lseek;
     int pos_to = pos_from + (shift + 1) * BLOCK_SIZE;
     int size_tar = lseek(fd_tar, 0, SEEK_END);
-    if(size_tar == -1){
-        perror("lseek size_tar in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(size_tar, "lseek in mv_from_tar_to_dir") == -1) return -1;
     int sup = suppress_file(fd_tar, pos_from, pos_to, size_tar);
     if(sup == -1) return -1;
 
@@ -376,16 +253,10 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     sscanf(header.mode, "%o", &mode);
 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
-    if(fd_dest == -1){
-        perror("open dest in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(fd_dest, "open in mv_from_tar_to_dir") == -1) return -1;
 
     int size_write = write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
-    if(size_write == -1){
-        perror("write in mv_from_tar_to_dir");
-        return -1;
-    }
+    if(check_sys_call(size_write, "write in mv_from_tar_to_dir") == -1) return -1;
 
     free(str);
     free(path);
