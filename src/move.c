@@ -318,7 +318,6 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     while(strcmp(header.name, path_file_source)){
 
         if(header.name[0] == '\0'){
-            printf("No such file\n");
             return -1;
         }
 
@@ -393,4 +392,61 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
 
     return 0;
 
+}
+
+int mv(char * path_file_source, char * path_file_dest){
+	int n;
+
+	// get path_to_tar_source & path_in_tar_source
+	struct work_directory wd_source;
+	char path_in_tar_source[sizeof(wd_source.c_tar)];
+	char path_to_tar_source[sizeof(wd_source.c_htar) + 1 + sizeof(wd_source.tar_name)];
+
+	fill_wd(path_file_source, &wd_source);
+	sprintf(path_in_tar_source, "%s", wd_source.c_tar);
+	sprintf(path_to_tar_source, "%s/%s", wd_source.c_htar, wd_source.tar_name);
+
+	// get path_to_tar_dest & path_in_tar_dest
+	struct work_directory wd_dest;
+	char path_in_tar_dest[sizeof(wd_dest.c_tar)];
+	char path_to_tar_dest[sizeof(wd_dest.c_htar) + 1 + sizeof(wd_dest.tar_name)];
+
+	fill_wd(path_file_dest, &wd_dest);
+	sprintf(path_in_tar_dest, "%s", wd_dest.c_tar);
+	sprintf(path_to_tar_dest, "%s/%s", wd_dest.c_htar, wd_dest.tar_name);
+
+	printf("%s\t%s\n", path_to_tar_source, path_in_tar_source);
+	printf("%s\t%s\n", path_to_tar_dest, path_in_tar_dest);
+
+	// get the right mv function
+	//source: tar -> dest: non-tar
+	if(strlen(wd_source.tar_name) == 0){
+		if(strlen(wd_dest.tar_name) == 0){
+			// aucun chemin n'implque de tar
+			return -2;
+		}
+		else{
+			n = mv_from_dir_to_tar(path_to_tar_dest, wd_source.c_htar, path_in_tar_dest);
+
+			return n;
+		}
+	}
+	//source: non-tar -> dest: tar
+	else if(strlen(wd_dest.tar_name) == 0){
+		if(strlen(wd_source.tar_name) == 0){
+			// aucun chemin n'implique de tar
+			return -2;
+		}
+		else{
+			n = mv_from_tar_to_dir(path_to_tar_source, path_in_tar_source, wd_dest.c_htar);
+
+			return n;
+		}
+	}
+	//source: tar -> dest: tar
+	else{
+		n = mv_from_tar_to_tar(path_to_tar_source, path_to_tar_dest, path_in_tar_source, path_in_tar_dest);
+
+		return n;
+	}
 }
