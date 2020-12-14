@@ -11,7 +11,7 @@ int main(int argc, char ** argv){
 			if(n == -1){
 				// erreur du type read/write -> voir makedir.c
 				//n'est jamais censé arriver
-				char error[] = "mkdir: error in makedir.c code";
+				char error[] = "mkdir: error in makedir.c code\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
