@@ -150,7 +150,7 @@ int shell(void)
 						//fils
 						execvp(tableau[0], tableau);
 						/* gestion des erreurs */
-						if(errno = ENOENT)
+						if(errno == ENOENT)
 						{
 							char error[sizeof(command_not_found) + sizeof(tableau[0])];
 							sprintf(error, "%s" , tableau[0]);

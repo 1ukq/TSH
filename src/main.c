@@ -48,7 +48,7 @@ int main(void){
     execlp("cat", "cat", NULL);
     */
 
-    remove_file_from_tar_r("test.tar", "dir");
+    //remove_file_from_tar_r("test.tar", "dir");
     //int fd = open("test.tar", O_RDWR);
     //suppress_file(fd, 1024, 2048, 10240);
 
