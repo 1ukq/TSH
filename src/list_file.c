@@ -182,7 +182,7 @@ int ls(char * option, char * path)
 	struct work_directory wd;
 
 	char path_in_tar[sizeof(wd.c_tar)];
-	char path_to_tar[sizeof(wd.c_htar) + 1 + sizeof(wd.tar_name)];
+	char path_to_tar[sizeof(wd.c_htar) sizeof(wd.tar_name)];
 
 
 	struct posix_header p;
@@ -217,7 +217,7 @@ int ls(char * option, char * path)
 		return -2;
 	}
 	sprintf(path_in_tar, "%s", wd.c_tar);
-	sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
+	sprintf(path_to_tar, "%s%s", wd.c_htar, wd.tar_name);
 
 
 	int fd = open(path_to_tar, O_RDONLY);
