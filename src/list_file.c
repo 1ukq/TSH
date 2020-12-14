@@ -182,7 +182,7 @@ int ls(char * option, char * path)
 	struct work_directory wd;
 
 	char path_in_tar[sizeof(wd.c_tar)];
-	char path_to_tar[sizeof(wd.c_htar) sizeof(wd.tar_name)];
+	char path_to_tar[sizeof(wd.c_htar) + 1 + sizeof(wd.tar_name)];
 
 
 	struct posix_header p;

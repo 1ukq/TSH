@@ -7,7 +7,7 @@ int main(int argc, char ** argv){
 
 	if(argc >= 2){
 		for(i = 1; i < argc; i++){
-			if((argv[i][0] == '-')){
+			if(argv[i][0] == '-'){
 				ind_option = i;
 				sprintf(option,"%s",argv[i]);
 				break;

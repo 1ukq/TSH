@@ -104,7 +104,7 @@ int makedir(char * path)
 
 	while(read(fd, buf, BLOCK_SIZE ) > 0)
 	{
-		if((buf[0] == '\0')){
+		if(buf[0] == '\0'){
 			// on se place à la fin du tar
 
 			if(!prev_rep_exist){

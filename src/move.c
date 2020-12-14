@@ -286,13 +286,11 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 }
 
 int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
-		int n;
-
+	int n = 0;
     int ret = fork();
     if(ret == 0) execlp("rm", "rm", path_file_source, NULL);
     else if(ret == -1) perror("fork in mv_from_ext_to_tar");
     else n = insert_file_in_tar(path_tar, path_file_source, path_in_tar);
-
     return n;
 
 }
