@@ -153,13 +153,13 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     int fd_source = open(path_tar_source, O_RDWR);
     if(fd_source == -1){
         perror("open in mv_from_tar_to_tar");
-        return -1;
+        return -2;
     }
 
     int fd_target = open(path_tar_target, O_RDWR);
     if(fd_target == -1){
         perror("open in mv_from_tar_to_tar");
-        return -1;
+        return -3;
     }
 
     int size_tar = lseek(fd_source, 0, SEEK_END);
@@ -189,8 +189,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     while(strcmp(header.name, path_file_source)){
 
         if(header.name[0] == '\0'){
-            printf("No such file\n");
-            return -1;
+            return -2;
         }
 
         sscanf(header.size, "%o", &size);
@@ -287,12 +286,14 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 }
 
 int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
+		int n;
 
     int ret = fork();
     if(ret == 0) execlp("rm", "rm", path_file_source, NULL);
     else if(ret == -1) perror("fork in mv_from_ext_to_tar");
-    else insert_file_in_tar(path_tar, path_file_source, path_in_tar);
-    return 0;
+    else n = insert_file_in_tar(path_tar, path_file_source, path_in_tar);
+
+    return n;
 
 }
 
@@ -301,7 +302,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     int fd_tar = open(path_tar, O_RDWR);
     if(fd_tar == -1){
         perror("open in mv_from_tar_to_dir");
-        return -1;
+        return -2;
     }
 
     int size = 0;
@@ -318,7 +319,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     while(strcmp(header.name, path_file_source)){
 
         if(header.name[0] == '\0'){
-            return -1;
+            return -2;
         }
 
         sscanf(header.size, "%o", &size);
@@ -377,7 +378,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
     if(fd_dest == -1){
         perror("open dest in mv_from_tar_to_dir");
-        return -1;
+        return -3;
     }
 
     int size_write = write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
@@ -400,20 +401,20 @@ int mv(char * path_file_source, char * path_file_dest){
 	// get path_to_tar_source & path_in_tar_source
 	struct work_directory wd_source;
 	char path_in_tar_source[sizeof(wd_source.c_tar)];
-	char path_to_tar_source[sizeof(wd_source.c_htar) + 1 + sizeof(wd_source.tar_name)];
+	char path_to_tar_source[sizeof(wd_source.c_htar) + sizeof(wd_source.tar_name)];
 
 	fill_wd(path_file_source, &wd_source);
 	sprintf(path_in_tar_source, "%s", wd_source.c_tar);
-	sprintf(path_to_tar_source, "%s/%s", wd_source.c_htar, wd_source.tar_name);
+	sprintf(path_to_tar_source, "%s%s", wd_source.c_htar, wd_source.tar_name);
 
 	// get path_to_tar_dest & path_in_tar_dest
 	struct work_directory wd_dest;
 	char path_in_tar_dest[sizeof(wd_dest.c_tar)];
-	char path_to_tar_dest[sizeof(wd_dest.c_htar) + 1 + sizeof(wd_dest.tar_name)];
+	char path_to_tar_dest[sizeof(wd_dest.c_htar) + sizeof(wd_dest.tar_name)];
 
 	fill_wd(path_file_dest, &wd_dest);
 	sprintf(path_in_tar_dest, "%s", wd_dest.c_tar);
-	sprintf(path_to_tar_dest, "%s/%s", wd_dest.c_htar, wd_dest.tar_name);
+	sprintf(path_to_tar_dest, "%s%s", wd_dest.c_htar, wd_dest.tar_name);
 
 	printf("%s\t%s\n", path_to_tar_source, path_in_tar_source);
 	printf("%s\t%s\n", path_to_tar_dest, path_in_tar_dest);
@@ -426,7 +427,7 @@ int mv(char * path_file_source, char * path_file_dest){
 			return -2;
 		}
 		else{
-			n = mv_from_dir_to_tar(path_to_tar_dest, wd_source.c_htar, path_in_tar_dest);
+			n = mv_from_dir_to_tar(path_to_tar_dest, path_file_source, path_in_tar_dest);
 
 			return n;
 		}
@@ -438,7 +439,7 @@ int mv(char * path_file_source, char * path_file_dest){
 			return -2;
 		}
 		else{
-			n = mv_from_tar_to_dir(path_to_tar_source, path_in_tar_source, wd_dest.c_htar);
+			n = mv_from_tar_to_dir(path_to_tar_source, path_in_tar_source, path_file_dest);
 
 			return n;
 		}

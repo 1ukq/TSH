@@ -38,6 +38,13 @@ int main(int argc, char ** argv){
 	}
 	else{
 		// pas assez d'arguments donnés au main
+		char error [] = "mv: missing destination file operand\n";
+
+		n = write(STDERR_FILENO, error, strlen(error));
+		if(n < 0){
+			perror("mv_main write3");
+			return -1;
+		}
 		ret = -2;
 	}
 
