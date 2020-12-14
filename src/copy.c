@@ -22,8 +22,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
     while(strcmp(p.name, path_file_source)){
 
         if(p.name[0] == '\0'){
-            printf("No such file\n");
-            return -1;
+            return -2;
         }
 
         sscanf(p.size, "%o", &size);
@@ -61,7 +60,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 
     close(fd_source);
     free(buf);
-    
+
     return nb_char_in_buf;
 
 }
@@ -69,7 +68,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
 int copy_in_tar(const char *path_file_source, const char *path_tar, const char *target){
     int fd_tar = open(path_tar, O_RDWR);
     if(check_sys_call(fd_tar, "open in copy_in_tar") == -1) return -1;
-    
+
     int fd_source = open(path_file_source, O_RDONLY);
     if(check_sys_call(fd_source, "open in copy_in_tar") == -1) return -1;
 
@@ -119,11 +118,11 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
     //change header
     ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
     if(check_sys_call(ret_lseek, "lseek in copy_in_tar") == -1) return -1;
-    
+
     struct posix_header header;
     rd = read(fd_tar, &header, BLOCK_SIZE);
     if(check_sys_call(rd, "read in copy_in_tar") == -1) return -1;
-    
+
     sprintf(header.size, "%011o", size_source);
     set_checksum(&header);
     ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
@@ -139,10 +138,9 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
     return 0;
 }
 
-void cat(const char *path_tar, const char *path_file_source){
+int cat(const char *path_tar, const char *path_file_source){
 
     int n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
-    if(n == 1) perror("");
+    return n;
 
 }
-
