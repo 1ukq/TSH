@@ -14,6 +14,7 @@
 #include "types/work_directory.h"
 #include "utils/fonctions_utiles.h"
 #include "utils/init_header.h"
+#include "utils/utils_string.h"
 
 
 #define BLOCK_SIZE 512
