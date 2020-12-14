@@ -91,36 +91,96 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
         return -1;
     }
     int fd_source = open(path_file_source, O_RDONLY);
+    if(fd_source == -1){
+        perror("open in copy_in_tar");
+        return -1;
+    }
+
     int pos[3];
     int r = pos_file_in_tar(fd_tar, target, pos);
     if(r == -1) return -1;
-    int size_tar = lseek(fd_tar, 0, SEEK_END);
 
+    int size_tar = lseek(fd_tar, 0, SEEK_END);
     char *buf = malloc(sizeof(char) * (size_tar - pos[1]));
+    if(buf == NULL){
+        perror("malloc in copy_in_tar");
+        return -1;
+    }
     memset(buf, '\0', size_tar - pos[1]);
     int ret_lseek = lseek(fd_tar, pos[1], SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in copy_in_tar");
+        return -1;
+    }
     int rd = read(fd_tar, buf, size_tar - pos[1]);
-    printf("pos 1 = %lu\n", sizeof(char));
+    if(rd == -1){
+        perror("read in copy_in_tar");
+        return -1;
+    }
 
     int size_source = lseek(fd_source, 0, SEEK_END);
+    if(size_source == -1){
+        perror("lseek in copy_in_tar");
+        return -1;
+    }
     int nb_blocks = size_source % BLOCK_SIZE == 0 ? size_source / BLOCK_SIZE : (size_source / BLOCK_SIZE) + 1;
     char *buf_source = malloc(nb_blocks * BLOCK_SIZE);
+    if(buf_source == NULL){
+        perror("malloc in copy_in_tar");
+        return -1;
+    }
     memset(buf_source, '\0', nb_blocks * BLOCK_SIZE);
     ret_lseek = lseek(fd_source, 0, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in copy_in_tar");
+        return -1;
+    }
     rd = read(fd_source, buf_source, size_source);
+    if(rd == -1){
+        perror("read in copy_in_tar");
+        return -1;
+    }
 
     ret_lseek = lseek(fd_tar, pos[0], SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in copy_in_tar");
+        return -1;
+    }
     int wr = write(fd_tar, buf_source, nb_blocks * BLOCK_SIZE);
+    if(wr == -1){
+        perror("write in copy_in_tar");
+        return -1;
+    }
     wr = write(fd_tar, buf, size_tar - pos[1]);
+    if(wr == -1){
+        perror("write in copy_in_tar");
+        return -1;
+    }
 
     //change header
     ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in copy_in_tar");
+        return -1;
+    }
     struct posix_header header;
     rd = read(fd_tar, &header, BLOCK_SIZE);
+    if(rd == -1){
+        perror("read in copy_in_tar");
+        return -1;
+    }
     sprintf(header.size, "%011o", size_source);
     set_checksum(&header);
     ret_lseek = lseek(fd_tar, pos[0] - BLOCK_SIZE, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in copy_in_tar");
+        return -1;
+    }
     wr = write(fd_tar, &header, BLOCK_SIZE);
+    if(wr == -1){
+        perror("write in copy_in_tar");
+        return -1;
+    }
 
     free(buf);
     free(buf_source);

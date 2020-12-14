@@ -109,45 +109,6 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
 
 }
 
-int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
-
-    char *buf_sup = malloc(sizeof(char) * (size_tar - pos_from));
-    if(buf_sup == NULL){
-        perror("malloc in suppress_file");
-        return -1;
-    }
-    memset(buf_sup, '\0', sizeof(char) * (size_tar - pos_from));
-
-    int ret_lseek = lseek(fd_tar, pos_to, SEEK_SET);
-    if(ret_lseek == -1){
-        perror("lseek in suppress_file");
-        return -1;
-    }
-
-    int size_read = read(fd_tar, buf_sup, sizeof(char) * (size_tar - pos_to));
-    if(size_read == -1){
-        perror("read in suppress_file");
-        return -1;
-    }
-
-    ret_lseek = lseek(fd_tar, pos_from, SEEK_SET);
-    if(ret_lseek == -1){
-        perror("lseek in suppress_file");
-        return -1;
-    }
-
-    int size_write = write(fd_tar, buf_sup, size_tar - pos_from);
-    if(size_write == -1){
-        perror("write in suppress_file");
-        return -1;
-    }
-
-    free(buf_sup);
-
-    return 0;
-
-}
-
 int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, char *path_in_tar){
 
     int fd_source = open(path_tar_source, O_RDWR);

@@ -39,3 +39,50 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
     *(pos + 2) = pos_b + size;
     return 0;
 }
+
+int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
+
+    char *buf_sup = malloc(sizeof(char) * (size_tar - pos_from));
+    if(buf_sup == NULL){
+        perror("malloc in suppress_file");
+        return -1;
+    }
+    memset(buf_sup, '\0', sizeof(char) * (size_tar - pos_from));
+
+    int ret_lseek = lseek(fd_tar, pos_to, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in suppress_file");
+        return -1;
+    }
+
+    int size_read = read(fd_tar, buf_sup, sizeof(char) * (size_tar - pos_to));
+    if(size_read == -1){
+        perror("read in suppress_file");
+        return -1;
+    }
+
+    ret_lseek = lseek(fd_tar, pos_from, SEEK_SET);
+    if(ret_lseek == -1){
+        perror("lseek in suppress_file");
+        return -1;
+    }
+
+    int size_write = write(fd_tar, buf_sup, size_tar - pos_from);
+    if(size_write == -1){
+        perror("write in suppress_file");
+        return -1;
+    }
+
+    free(buf_sup);
+
+    return 0;
+
+}
+
+int check_sys_call(int ret_sys_call, char *err_msg){
+    if(ret_sys_call == -1){
+        perror(err_msg);
+        return -1;
+    }
+    return 0;
+}
