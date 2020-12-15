@@ -7,7 +7,7 @@
 int main(int argc, char ** argv){
 	int n, i;
 
-	if(argc >= 1){
+	if(argc > 1){
 		for(i = 1; i < argc; i++){
 
 			// implique un tar ?
@@ -52,12 +52,13 @@ int main(int argc, char ** argv){
 	}
 	else{
 		// execute real cat
+		printf("here\n");
 		n = fork();
 		if(n < 0){
 			perror("cat_main fork");
 			return -1;
 		}
-		else if(n == 0){
+		else if(n != 0){
 			execlp("cat", "cat", NULL);
 		}
 		else{
