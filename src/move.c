@@ -52,7 +52,7 @@ char *buffarize(const char *restrict path_file_source, struct stat *restrict buf
 int insert_file_in_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(check_sys_call(fd_tar, "open in insert_file_in_tar") == -1) return -1;
+    if(check_sys_call(fd_tar, "open in insert_file_in_tar") == -1) return -2;
 
     //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar (bsdtar is the default tar utility on MacOS)
     struct stat stat_tar;
@@ -88,10 +88,10 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
 int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target, const char *path_file_source, char *path_in_tar){
 
     int fd_source = open(path_tar_source, O_RDWR);
-    if(check_sys_call(fd_source, "open in mv_from_tar_to_tar") == -1) return -1;
+    if(check_sys_call(fd_source, "open in mv_from_tar_to_tar") == -1) return -2;
 
     int fd_target = open(path_tar_target, O_RDWR);
-    if(check_sys_call(fd_target, "open in mv_from_tar_to_tar") == -1) return -1;
+    if(check_sys_call(fd_target, "open in mv_from_tar_to_tar") == -1) return -2;
 
     int size_tar = lseek(fd_source, 0, SEEK_END);
     if(size_tar == -1){
@@ -185,19 +185,20 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 }
 
 int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
+		int n, ret;
 
-    int ret = fork();
+		ret = fork();
     if(ret == 0) execlp("rm", "rm", path_file_source, NULL);
     else if(ret == -1) perror("fork in mv_from_ext_to_tar");
-    else insert_file_in_tar(path_tar, path_file_source, path_in_tar);
-    return 0;
+    else n = insert_file_in_tar(path_tar, path_file_source, path_in_tar);
+    return n;
 
 }
 
 int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char *path_dest){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(check_sys_call(fd_tar, "open in mv_from_tar_to_dir") == -1) return -1;
+    if(check_sys_call(fd_tar, "open in mv_from_tar_to_dir") == -1) return -2;
 
     int size = 0;
     int shift = 0;
@@ -205,7 +206,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
 
     struct posix_header header;
     int size_read = read(fd_tar, &header, BLOCK_SIZE);
-    if(check_sys_call(size_read, "read in mv_from_tar_to_dir") == -1) return -1;
+    if(check_sys_call(size_read, "read in mv_from_tar_to_dir") == -1) return -2;
 
     while(strcmp(header.name, path_file_source)){
 
@@ -253,7 +254,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     sscanf(header.mode, "%o", &mode);
 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
-    if(check_sys_call(fd_dest, "open in mv_from_tar_to_dir") == -1) return -1;
+    if(check_sys_call(fd_dest, "open in mv_from_tar_to_dir") == -1) return -2;
 
     int size_write = write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
     if(check_sys_call(size_write, "write in mv_from_tar_to_dir") == -1) return -1;
@@ -264,4 +265,64 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
 
     return 0;
 
+}
+
+int mv(char * path_file_source, char * path_file_dest){
+	int n;
+
+	// get path_to_tar_source & path_in_tar_source
+	struct work_directory wd_source;
+	char path_to_tar_source[sizeof(wd_source.c_htar) + 1 + sizeof(wd_source.tar_name)];
+	char path_in_tar_source[sizeof(wd_source.c_tar)];
+
+	fill_wd(path_file_source, &wd_source);
+	sprintf(path_to_tar_source, "%s/%s", wd_source.c_htar, wd_source.tar_name);
+	sprintf(path_in_tar_source, "%s", wd_source.c_tar);
+
+	// get path_to_tar_dest & path_in_tar_dest
+	struct work_directory wd_dest;
+	char path_to_tar_dest[sizeof(wd_dest.c_htar) + 1 + sizeof(wd_dest.tar_name)];
+	char path_in_tar_dest[sizeof(wd_dest.c_tar)];
+
+	fill_wd(path_file_dest, &wd_dest);
+	sprintf(path_to_tar_dest, "%s/%s", wd_dest.c_htar, wd_dest.tar_name);
+	sprintf(path_in_tar_dest, "%s", wd_dest.c_tar);
+
+	// get the right mv function
+	//source: non-tar -> dest: tar
+	if(strlen(wd_source.tar_name) == 0){
+		if(strlen(wd_dest.tar_name) != 0){
+			// on lance mv_from_dir_to_tar
+			n = mv_from_dir_to_tar(path_to_tar_dest, path_file_source, path_in_tar_dest);
+
+			return n;
+		}
+		else{
+			//source: non-tar -> dest: non-tar
+			// aucun chemin n'implique de tar
+			return -2;
+		}
+	}
+	//source: tar -> dest: non-tar
+	else if(strlen(wd_source.tar_name) != 0){
+		//on enlève le / à la fin de path_in_tar_source si il y en a un
+		int taille = strlen(path_in_tar_source);
+		if(taille > 0 && path_in_tar_source[taille-1] == '/'){
+			path_in_tar_source[taille-1] = '\0';
+		}
+
+		if(strlen(wd_dest.tar_name) == 0){
+			// on lance mv_from_tar_to_dir
+			n = mv_from_tar_to_dir(path_to_tar_source, path_in_tar_source, path_file_dest);
+
+			return n;
+		}
+		else{
+			//source: tar -> dest: tar
+			// on lance mv_from_tar_to_tar
+			n = mv_from_tar_to_tar(path_to_tar_source, path_to_tar_dest, path_in_tar_source, path_in_tar_dest);
+
+			return n;
+		}
+	}
 }

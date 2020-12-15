@@ -7,7 +7,7 @@ int main(int argc, char ** argv){
 		// recherche de l'option si il y en a une
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] == '-'){
-				// cat ne prends pas d'options dans lorsqu'il est appelé dans un tar
+				// mkdir ne prends pas d'options dans lorsqu'il est appelé dans un tar
 				char error[] = "mkdir: invalid option\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
