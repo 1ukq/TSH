@@ -142,7 +142,7 @@ int copy_from_tar_r(const char *path_tar_source, const char *path_dir, const cha
     int fd_tar = open(path_tar_source, O_RDONLY);
     if(check_sys_call(fd_tar, "open in copy_from_tar_r") == -1) return -1;
 
-    int fd_dest = open(path_file_dest, O_WRONLY, O_APPEND);
+    int fd_dest = open(path_file_dest, O_WRONLY|O_APPEND);
     if(check_sys_call(fd_dest, "open in copy_from_tar_r") == -1) return -1;
 
     struct posix_header header;
@@ -179,11 +179,93 @@ int copy_from_tar_r(const char *path_tar_source, const char *path_dir, const cha
         if(check_sys_call(rd, "read in copy_from_tar_r") == -1) return -1;
 
     }
+    close(fd_tar);
+    close(fd_dest);
+    free(buf);
+    return 0;
+}
+
+int copy_in_tar_r(const char *path_tar, const char *file_dest, const char *path_dir){
+    int fd_tar = open(path_tar, O_RDWR);
+    if(check_sys_call(fd_tar, "open in copy_in_tar_r") == -1) return -1;
+
+    struct DIR *dir;
+    dir = opendir(path_dir);
+    if(dir == NULL){
+        return -1;
+    }
+
+    struct dirent *entry;
+    entry = readdir(dir);
+
+    int fd = 0;
+    int st = 0;
+    int rd = 0;
+    int wr = 0;
+    int size_copied = 0;
+    int ret_lseek = 0;
+    char *entry_name;
+    struct stat statbuf;
+    char *buf;
+    int pos[3];
+    pos_file_in_tar(fd_tar, file_dest, pos);
+
+    int size_tar = lseek(fd_tar, 0, SEEK_END);
+    if(check_sys_call(size_tar, "lseek in copy_in_tar_r") == -1) return -1;
+    char *buf_mv = malloc(size_tar - pos[1]);
+    rd = read(fd_tar, buf_mv, size_tar - pos[1]);
+    if(check_sys_call(rd, "read in copy_in_tar_r") == -1) return -1;
+    
+
+    while(entry != NULL){
+
+        entry_name = entry -> d_name;
+        st = stat(entry_name, &statbuf);
+        if(check_sys_call(st, "open in copy_in_tar_r") == -1) return -1;
+
+        if(S_ISREG(st.st_mode)){
+            fd = open(entry_name, O_RDONLY);
+            if(check_sys_call(fd, "open in copy_in_tar_r") == -1) return -1;
+            buf = malloc(statbuf.st_size);
+            if(buf == NULL){
+                perror("malloc in copy_in_tar_r");
+                return -1;
+            }
+            rd = read(fd, buf, statbuf.st_size);
+            if(check_sys_call(rd, "read in copy_in_tar_r") == -1) return -1;
+            ret_lseek = lseek(fd_tar, pos[0], SEEK_SET);
+            if(check_sys_call(ret_lseek, "lseek in copy_in_tar_r") == -1) return -1;
+            wr = write(fd, buf, statbuf.st_size);
+            if(check_sys_call(wr, "write in copy_in_tar_r") == -1) return -1;
+            pos[0] += statbuf.st_size;
+        }
+
+        size_copied += statbuf.st_size;
+        entry = readdir(dir);
+
+    }
+
+    int nb_blocks = size_copied % BLOCK_SIZE == 0 ? size_copied / BLOCK_SIZE : (size_copied / BLOCK_SIZE) + 1;
+    int s = (nb_blocks * BLOCK_SIZE) - size_copied;
+    char *complete = malloc(s);
+    if(complete == NULL){
+        perror("malloc in copy_in_tar_r");
+        return -1;
+    }
+    memset(complete, '\0', s);
+    write(fd_tar, complete, s);
+    if(check_sys_call(wr, "write in copy_in_tar_r") == -1) return -1;
+    write(fd_tar, buf_mv, size_tar - pos[1]);
+
+    close(fd_tar);
+    closedir(dir);
+    free(complete);
+    free(buf);
+    free(buf_mv);
     return 0;
 }
 
 void cat(const char *path_tar, const char *path_file_source){
-
     int n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
     return n;
 
