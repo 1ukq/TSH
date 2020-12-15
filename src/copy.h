@@ -15,12 +15,15 @@
 #include <pwd.h>
 #include <grp.h>
 #include <time.h>
+#include <dirent.h>
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest);
 
 int copy_in_tar(const char *path_file_source, const char *path_tar, const char *target);
 
 int copy_from_tar_r(const char *path_tar_source, const char *path_dir, const char *path_file_dest);
+
+int copy_in_tar_r(const char *path_tar, const char *file_dest, char *path_dir);
 
 void cat(const char *path_tar, const char *path_file_source);
 

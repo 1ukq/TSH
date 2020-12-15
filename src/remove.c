@@ -120,6 +120,7 @@ int remove_file_from_tar_r(const char *path_tar, const char *path_dir){
         if(check_sys_call(rd, "read in remove_file_from_tar_r") == -1) return -1;
 
     }
+    close(fd_tar);
     return 0;
 
 }

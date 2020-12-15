@@ -29,6 +29,9 @@ OBJ_PWD = src/main/pwd_main.o src/pwd.o
 EXEC_RM = rm_t
 OBJ_RM = src/main/rm_main.o src/remove.o src/utils/find_file.o src/utils/fonctions_utiles.o
 
+EXEC_CP = cp_t
+OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o
+
 %.o : %.c
 	$(CC) -o $@ -c $< $(FLAGS)
 
@@ -47,6 +50,10 @@ $(EXEC_MKDIR) : $(OBJ_MKDIR)
 $(EXEC_MV) : $(OBJ_MV)
 	$(CC) -o $@ $^ $(FLAGS)
 	mv $(EXEC_MV) src/execs
+
+$(EXEC_CP) : $(OBJ_CP)
+	$(CC) -o $@ $^ $(FLAGS)
+	mv $(EXEC_CP) src/execs
 
 all : $(OBJ)
 	$(CC) -o $(EXEC_LS) $(OBJ_LS) $(FLAGS)
