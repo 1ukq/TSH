@@ -8,8 +8,22 @@ int main(int argc, char ** argv){
 	int n, i;
 
 	if(argc > 1){
+		// recherche de l'option si il y en a une
 		for(i = 1; i < argc; i++){
+			if(argv[i][0] == '-'){
+				// cat ne prends pas d'options dans lorsqu'il est appelé dans un tar
+				char error[] = "cat: invalid option\n";
 
+				n = write(STDERR_FILENO, error, strlen(error));
+				if(n < 0){
+					perror("cat_main write1");
+					return -1;
+				}
+				return 0;
+			}
+		}
+
+		for(i = 1; i < argc; i++){
 			// implique un tar ?
 			struct work_directory wd;
 			fill_wd(argv[i], &wd);
@@ -20,7 +34,7 @@ int main(int argc, char ** argv){
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
-					perror("cat_main write1");
+					perror("cat_main write2");
 					return -1;
 				}
 			}
@@ -42,17 +56,15 @@ int main(int argc, char ** argv){
 
 					n = write(STDERR_FILENO, error, strlen(error));
 					if(n < 0){
-						perror("cat_main write2");
+						perror("cat_main write3");
 						return -1;
 					}
 				}
-				//gerer les erreurs de cat
 			}
 		}
 	}
 	else{
 		// execute real cat
-		printf("here\n");
 		n = fork();
 		if(n < 0){
 			perror("cat_main fork");

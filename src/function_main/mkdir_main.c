@@ -4,6 +4,21 @@ int main(int argc, char ** argv){
 	int i, n, ret = 0;
 
 	if(argc >= 2){
+		// recherche de l'option si il y en a une
+		for(i = 1; i < argc; i++){
+			if(argv[i][0] == '-'){
+				// cat ne prends pas d'options dans lorsqu'il est appelé dans un tar
+				char error[] = "mkdir: invalid option\n";
+
+				n = write(STDERR_FILENO, error, strlen(error));
+				if(n < 0){
+					perror("mkdir_main write1");
+					return -1;
+				}
+				return 0;
+			}
+		}
+
 		for(i = 1; i < argc; i++){
 			// applqiue makedir
 			n = makedir(argv[i]);
@@ -15,7 +30,7 @@ int main(int argc, char ** argv){
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
-					perror("mkdir_main write1");
+					perror("mkdir_main write2");
 					return -1;
 				}
 
@@ -27,7 +42,7 @@ int main(int argc, char ** argv){
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
-					perror("mkdir_main write2");
+					perror("mkdir_main write3");
 					return -1;
 				}
 
@@ -38,7 +53,7 @@ int main(int argc, char ** argv){
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
-					perror("mkdir_main write3");
+					perror("mkdir_main write4");
 					return -1;
 				}
 			}

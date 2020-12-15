@@ -215,7 +215,7 @@ int ls(char * option, char * path)
 	if(strlen(wd.tar_name) == 0)
 	{
 		//le chemin n'implique aucun tar
-		return -1;
+		return -2;
 	}
 
 	sprintf(path_in_tar, "%s", wd.c_tar);

@@ -1,9 +1,9 @@
 #include "../list_file.h"
 
 int main(int argc, char ** argv){
-	int i, n, ind_option = -1;
+	int i, n;
 	int ret = 0;
-	char option[50];
+	int option = 0;
 
 	if(argc >= 2){
 
@@ -11,16 +11,25 @@ int main(int argc, char ** argv){
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] == '-'){
 				//sauvegarde l'indice de l'option et l'option elle-même
-				ind_option = i;
-				sprintf(option, "%s", argv[i]);
-				break;
+				option = 1;
+				if(strcmp(argv[i],"-l") != 0){
+					// option invalide
+					char error[] = "ls: invalid option\n";
+
+					n = write(STDERR_FILENO, error, strlen(error));
+					if(n < 0){
+						perror("ls_main write1");
+						return -1;
+					}
+					return 0;
+				}
 			}
 		}
 
 		for(i = 1; i < argc; i++){
-			if(i != ind_option){
+			if(argv[i][0] != '-'){
 				// on lance ls
-				n = ls(ind_option == -1 ? NULL : option, argv[i]);
+				n = ls( option ? "-l" : NULL, argv[i]);
 
 				// gérer les erreurs
 				if(n == -1){
@@ -29,7 +38,7 @@ int main(int argc, char ** argv){
 
 					n = write(STDERR_FILENO, error, strlen(error));
 					if(n < 0){
-						perror("ls_main write1");
+						perror("ls_main write2");
 						return -1;
 					}
 
@@ -41,17 +50,18 @@ int main(int argc, char ** argv){
 
 					n = write(STDERR_FILENO, error, strlen(error));
 					if(n < 0){
-						perror("ls_main write2");
+						perror("ls_main write3");
 						return -1;
 					}
 				}
 				else if(n == -3){
-					// option invalide
+					// ne rentre jamais ici
+					// option invalide (ce cas est déjà vérifié plus haut)
 					char error[] = "ls: invalid option\n";
 
 					n = write(STDERR_FILENO, error, strlen(error));
 					if(n < 0){
-						perror("ls_main write3");
+						perror("ls_main write4");
 						return -1;
 					}
 
