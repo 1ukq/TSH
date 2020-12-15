@@ -10,7 +10,6 @@ int main(int argc, char ** argv){
 		// recherche de l'option si il y en a une
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] == '-'){
-				//sauvegarde l'indice de l'option et l'option elle-même
 				option = 1;
 				if(strcmp(argv[i],"-l") != 0){
 					// option invalide

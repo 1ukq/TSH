@@ -46,7 +46,11 @@ int main(int argc, char ** argv){
 				sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
 				sprintf(path_in_tar, "%s", wd.c_tar);
 
-				path_in_tar[strlen(path_in_tar)-1] = '\0';
+				//on enlève le / à la fin de path_in_tar si il y est
+				int taille = strlen(path_in_tar);
+				if(taille > 0 && path_in_tar[taille-1] == '/'){
+					path_in_tar[strlen(path_in_tar)-1] = '\0';
+				}
 
 				// applique le cat
 				n = cat(path_to_tar, path_in_tar);
