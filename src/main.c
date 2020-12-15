@@ -48,7 +48,7 @@ int main(void){
     execlp("cat", "cat", NULL);
     */
 
-    copy_from_tar_r("test.tar", "dir", "a");
+    //copy_from_tar_r("test.tar", "dir", "a");
 
     return 0;
 
