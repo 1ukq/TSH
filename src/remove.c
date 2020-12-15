@@ -4,7 +4,7 @@
 int remove_file_from_tar(const char *path_tar, const char *path_file_source){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(check_sys_call(fd_tar, "open in remove_file_from_tar") == -1) return -1;
+    if(check_sys_call(fd_tar, "open in remove_file_from_tar") == -1) return -2;
 
     int size_tar = lseek(fd_tar, 0, SEEK_END);
     if(check_sys_call(size_tar, "lseek in remove_file_from_tar") == -1) return -1;
@@ -22,8 +22,7 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
     while(strcmp(header.name, path_file_source)){
 
         if(header.name[0] == '\0'){
-            printf("no such file\n");
-            return -1;
+            return -2;
         }
 
         sscanf(header.size, "%o", &file_size);
@@ -48,7 +47,7 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
 
     pos = lseek(fd_tar, BLOCK_SIZE * (shift + 1), SEEK_CUR);
     if(check_sys_call(pos, "lseek in remove_file_from_tar") == -1) return -1;
-    
+
     size_read = read(fd_tar, buf_write, (size_tar - n));
     if(check_sys_call(size_read, "read in remove_file_from_tar") == -1) return -1;
 
@@ -63,13 +62,13 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
     free(buf_write);
 
     return 0;
-    
+
 }
 
 int remove_file_from_tar_r(const char *path_tar, const char *path_dir){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(check_sys_call(fd_tar, "open in remove_file_from_tar_r") == -1) return -1;
+    if(check_sys_call(fd_tar, "open in remove_file_from_tar_r") == -1) return -2;
 
     struct posix_header header;
     int rd = read(fd_tar, &header, BLOCK_SIZE);
