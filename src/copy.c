@@ -138,7 +138,51 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
     return 0;
 }
 
-int cat(const char *path_tar, const char *path_file_source){
+int copy_from_tar_r(const char *path_tar_source, const char *path_dir, const char *path_file_dest){
+    int fd_tar = open(path_tar_source, O_RDONLY);
+    if(check_sys_call(fd_tar, "open in copy_from_tar_r") == -1) return -1;
+
+    int fd_dest = open(path_file_dest, O_WRONLY, O_APPEND);
+    if(check_sys_call(fd_dest, "open in copy_from_tar_r") == -1) return -1;
+
+    struct posix_header header;
+    int rd = read(fd_tar, &header, BLOCK_SIZE);
+    if(check_sys_call(rd, "read in copy_from_tar_r") == -1) return -1;
+
+    int ret_lseek = 0;
+    int nb_blocks = 0;
+    int file_size = 0;
+    int wr = 0;
+
+    char *buf;
+
+    while(header.name[0] != '\0'){
+
+        sscanf(header.size, "%o", &file_size);
+        nb_blocks = file_size % BLOCK_SIZE == 0 ? file_size / BLOCK_SIZE : (file_size / BLOCK_SIZE) + 1;
+        if(strstr(header.name, path_dir) != NULL){
+            buf = malloc(file_size);
+            if(buf == NULL){
+                perror("malloc in copy_from_tar_r");
+                return -1;
+            }
+            rd = read(fd_tar, buf, file_size);
+            if(check_sys_call(rd, "read in copy_from_tar_r") == -1) return -1;
+            wr = write(fd_dest, buf, file_size);
+            if(check_sys_call(wr, "write in copy_from_tar_r") == -1) return -1;
+        }
+        ret_lseek = lseek(fd_tar, -file_size, SEEK_CUR);
+        if(check_sys_call(ret_lseek, "lseek in copy_from_tar_r") == -1) return -1;
+        ret_lseek = lseek(fd_tar, nb_blocks * BLOCK_SIZE, SEEK_CUR);
+        if(check_sys_call(ret_lseek, "lseek in copy_from_tar_r") == -1) return -1;
+        rd = read(fd_tar, &header, BLOCK_SIZE);
+        if(check_sys_call(rd, "read in copy_from_tar_r") == -1) return -1;
+
+    }
+    return 0;
+}
+
+void cat(const char *path_tar, const char *path_file_source){
 
     int n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
     return n;
