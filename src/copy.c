@@ -462,8 +462,8 @@ int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_tar_dest, 
 
 }
 
-void cat(const char *path_tar, const char *path_file_source){
+int cat(const char *path_tar, const char *path_file_source){
     int n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
-    //return n;
+    return n;
 
 }
