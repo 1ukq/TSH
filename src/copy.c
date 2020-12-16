@@ -138,6 +138,76 @@ int copy_in_tar(const char *path_file_source, const char *path_tar, const char *
     return 0;
 }
 
+int copy_from_tar_to_tar(const char *path_tar_src, const char* path_tar_dest, const char *file_src, const char *file_dest){
+    int fd_src = open(path_tar_src, O_RDONLY);
+    if(check_sys_call(fd_src, "open in copy_from_tar_to_tar") == -1) return -1;
+    int fd_dest = open(path_tar_dest, O_RDWR);
+    if(check_sys_call(fd_src, "open in copy_from_tar_to_tar") == -1) return -1;
+
+    int pos_src[3];
+    int pos_dest[3];
+
+    int ret1 = pos_file_in_tar(fd_src, file_src, pos_src);
+    if(ret1 == -1) return -1;
+    int ret2 = pos_file_in_tar(fd_dest, file_dest, pos_dest);
+    if(ret2 == -1) return -1;
+
+    int size_src = pos_src[1] - pos_src[0];
+    char *buf_src = malloc(size_src);
+    if(buf_src == NULL){
+        perror("malloc1 in copy_from_tar_to_tar");
+        return -1;
+    }
+
+    int ret_lseek = lseek(fd_src, pos_src[0], SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar") == -1) return -1;
+
+    int rd = read(fd_src, buf_src, size_src);
+    if(check_sys_call(rd, "read in copy_from_tar_to_tar") == -1) return -1;
+
+    int size_tar_dest = lseek(fd_dest, 0, SEEK_END);
+    if(check_sys_call(size_tar_dest, "lseek in copy_from_tar_to_tar") == -1) return -1;
+    char *buf_mv = malloc(size_tar_dest - pos_dest[1]);
+    if(buf_mv == NULL){
+        perror("malloc2 in copy_from_tar_to_tar");
+        return -1;
+    }
+    ret_lseek = lseek(fd_dest, pos_dest[1], SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar") == -1) return -1;
+    rd = read(fd_dest, buf_mv, size_tar_dest - pos_dest[1]);
+    if(check_sys_call(rd, "read in copy_from_tar_to_tar") == -1) return -1;
+
+    ret_lseek = lseek(fd_dest, pos_dest[0], SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar") == -1) return -1;
+    int wr = write(fd_dest, buf_src, size_src);
+    if(check_sys_call(wr, "write in copy_from_tar_to_tar") == -1) return -1;
+    wr = write(fd_dest, buf_mv, size_tar_dest - pos_dest[1]);
+    if(check_sys_call(wr, "write in copy_from_tar_to_tar") == -1) return -1;
+
+    //change header
+    ret_lseek = lseek(fd_dest, pos_dest[0] - BLOCK_SIZE, SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar") == -1) return -1;
+
+    struct posix_header header;
+    rd = read(fd_dest, &header, BLOCK_SIZE);
+    if(check_sys_call(rd, "read in copy_from_tar_to_tar") == -1) return -1;
+
+    sprintf(header.size, "%011o", pos_src[2] - pos_src[0]);
+    set_checksum(&header);
+    ret_lseek = lseek(fd_dest, pos_dest[0] - BLOCK_SIZE, SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar") == -1) return -1;
+
+    wr = write(fd_dest, &header, BLOCK_SIZE);
+    if(check_sys_call(wr, "write in copy_from_tar_to_tar") == -1) return -1;
+
+    close(fd_src);
+    close(fd_dest);
+    free(buf_src);
+    free(buf_mv);
+
+    return 0;
+}
+
 int copy_from_tar_r(const char *path_tar_source, const char *path_dir, const char *path_file_dest){
     int fd_tar = open(path_tar_source, O_RDONLY);
     if(check_sys_call(fd_tar, "open in copy_from_tar_r") == -1) return -1;
