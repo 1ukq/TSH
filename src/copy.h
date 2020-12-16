@@ -27,4 +27,6 @@ int copy_in_tar_r(const char *path_tar, const char *file_dest, char *path_dir);
 
 void cat(const char *path_tar, const char *path_file_source);
 
+int copy_from_tar_to_tar(const char *path_tar_src, const char* path_tar_dest, const char *file_src, const char *file_dest);
+
 #endif
