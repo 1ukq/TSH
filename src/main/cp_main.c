@@ -2,7 +2,7 @@
 
 int main(){
 
-    //copy_in_tar_r("test.tar", "a", "dir/");
+    copy_from_tar_to_tar_r("test1.tar", "test2.tar", "dir", "c");
     return 0;
 
 }
