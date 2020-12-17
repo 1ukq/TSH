@@ -90,8 +90,12 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     int fd_source = open(path_tar_source, O_RDWR);
     if(check_sys_call(fd_source, "open in mv_from_tar_to_tar") == -1) return -2;
 
-    int fd_target = open(path_tar_target, O_RDWR);
-    if(check_sys_call(fd_target, "open in mv_from_tar_to_tar") == -1) return -2;
+    int fd_target = fd_source;
+
+    if(strcmp(path_tar_source, path_tar_target)){
+        fd_target = open(path_tar_target, O_RDWR);
+        if(check_sys_call(fd_target, "open in mv_from_tar_to_tar") == -1) return -2;
+    }
 
     int size_tar = lseek(fd_source, 0, SEEK_END);
     if(size_tar == -1){
