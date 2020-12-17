@@ -8,6 +8,7 @@ int main(int argc, char ** argv){
 	int n, i, option = 0;
 
 	if(argc > 1){
+
 		// recherche de l'option si il y en a une
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] == '-'){
@@ -26,6 +27,7 @@ int main(int argc, char ** argv){
 			}
 		}
 
+		// boucle d'éxecution
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] != '-'){
 				// c'est bien un chemin et pas une option
@@ -66,13 +68,9 @@ int main(int argc, char ** argv){
 						char path_in_tar[strlen(wd.c_tar)];
 						sprintf(path_in_tar, "%s", wd.c_tar);
 
-						printf("%s\n", path_to_tar);
-						printf("%s\n", path_in_tar);
-
 						if(option){
 							//applique rm -r
 							n = remove_file_from_tar_r(path_to_tar, path_in_tar);
-							printf("%i\n", n);
 						}
 						else{
 							//on enlève le / à la fin de path_in_tar si il y est

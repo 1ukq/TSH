@@ -12,7 +12,7 @@ int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_des
     struct posix_header p;
 
     int fd_source = open(path_tar, O_RDONLY);
-    if(check_sys_call(fd_source, "open in copy_from_tar") == -1) return -1;
+    if(check_sys_call(fd_source, "open in copy_from_tar") == -1) return -2;
 
     int shift = 0;
 
@@ -294,7 +294,7 @@ int copy_in_tar_r(const char *path_tar, const char *file_dest, char *path_dir){
     if(check_sys_call(ret_lseek, "lseek in copy_in_tar_r") == -1) return -1;
     rd = read(fd_tar, buf_mv, size_tar - pos[1]);
     if(check_sys_call(rd, "read in copy_in_tar_r") == -1) return -1;
-    
+
 
     while(entry != NULL){
 
