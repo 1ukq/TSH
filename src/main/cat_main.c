@@ -28,8 +28,8 @@ int main(int argc, char ** argv){
 			struct work_directory wd;
 			fill_wd(argv[i], &wd);
 
-			if(strlen(wd.tar_name) == 0){
-				// pas de tar impliqué -> chemin invalide
+			if(strlen(wd.c_tar) == 0){
+				// pas de fichier dans tar impliqué -> chemin invalide
 				char error[] = "cat: No such file\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
@@ -39,7 +39,7 @@ int main(int argc, char ** argv){
 				}
 			}
 			else{
-				// le chemin implique un tar
+				// le chemin implique un fichier dans un tar
 				char path_to_tar[strlen(wd.c_htar) + 1 + strlen(wd.tar_name)];
 				char path_in_tar[strlen(wd.c_tar)];
 

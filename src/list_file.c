@@ -270,7 +270,7 @@ int ls(char * option, char * path)
 		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
 
 		/* Vérification + conversion (à gauche) que le fichier est à afficher */
-		if(verif_convert_name(name, p.name, path_in_tar) != 0)
+		if(path_exist && verif_convert_name(name, p.name, path_in_tar) != 0)
 		{
 			/* Ici name a son nom exact */
 			char affichage[BLOCK_SIZE] = ""; //permet d'afficher fichier par fichier (on ne se pose plus la question du nombre de fichiers à afficher)
