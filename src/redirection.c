@@ -31,7 +31,7 @@ int input_to_pipe(int fd_write_end, char *path_tar, const char *path_in_tar){
     if(check_sys_call(wr, "write in input_to_pipe") == -1) return -1;
     return 0;
 }
-
+/*
 int red_output_to_pipe(int fd_write_end){
     int ret_dup2 = dup2(fd_write_end, STDOUT_FILENO);
     if(check_sys_call(ret_dup2, "dup2 in red_output_to_pipe") == -1) return -1;
@@ -43,6 +43,7 @@ int red_err_to_pipe(int fd_write_end){
     if(check_sys_call(ret_dup2, "dup2 in red_err_to_pipe") == -1) return -1;
     return 0;
 }
+*/
 
 int red_input_out_tar(const char *file){
     int fd = open(file, O_RDONLY);
