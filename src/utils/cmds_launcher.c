@@ -41,7 +41,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                 close(red_fildes[1]);
             }
             if(cmds[it + 1] == NULL && (red_type == RED_OUT_APPEND_OUT_TAR || red_type == RED_OUT_TRUNC_OUT_TAR)){
-                int fd;
+                int fd = 0;
                 if(red_type == RED_OUT_APPEND_OUT_TAR) fd = red_output_append_out_tar(file);
                 else if(red_type == RED_OUT_TRUNC_OUT_TAR) fd = red_output_trunc_out_tar(file);
                 close(fd);
@@ -49,7 +49,6 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
             execvp(cmds[it][0], cmds[it]);
         }
         else{
-            wait(NULL);
             if(it > 0){
                 close(old_fildes[0]);
                 close(old_fildes[1]);
@@ -63,7 +62,6 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                 char *buf = malloc(BLOCK_SIZE);
                 int r = buffarize_output(red_fildes[0], buf);
                 close(red_fildes[0]);
-                printf("%d\n", r);
                 if(red_type == RED_OUT_APPEND_IN_TAR) red_append_in_tar("test.tar", "b", buf, r);
                 else if(red_type == RED_OUT_TRUNC_IN_TAR) red_trunc_in_tar("test.tar", "b", buf, r);
             }
@@ -91,6 +89,8 @@ int main(){
 
     char *s2 = "head";
 
+    char *s3 = "wc";
+
     char *file = "a";
 
     char *ss1[3];
@@ -105,15 +105,15 @@ int main(){
     ss2[0] = s2;
     ss2[1] = NULL;
 
-    ss3[0] = file;
+    ss3[0] = s3;
     ss3[1] = NULL;
 
-    char ***cmds = malloc(sizeof(char**) * 3);
+    char ***cmds = malloc(sizeof(char**) * 4);
     cmds[0] = ss1;
     cmds[1] = ss2;
-    cmds[2] = NULL;
-    //cmds[3] = NULL;
-    cmds_launcher(cmds, RED_OUT_TRUNC_OUT_TAR, file);
+    cmds[2] = ss3;
+    cmds[3] = NULL;
+    cmds_launcher(cmds, RED_OUT_TRUNC_IN_TAR, file);
     execlp("ls", "ls", NULL);
 
 }

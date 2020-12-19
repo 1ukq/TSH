@@ -55,6 +55,9 @@ $(EXEC_CP) : $(OBJ_CP)
 	$(CC) -o $@ $^ $(FLAGS)
 	mv $(EXEC_CP) src/execs
 
+cmds_launcher : src/utils/cmds_launcher.o src/redirection.o src/utils/utils_string.o src/utils/init_header.o src/utils/find_file.o
+	$(CC) -o $@ $^ $(FLAGS)
+
 all : $(OBJ)
 	$(CC) -o $(EXEC_LS) $(OBJ_LS) $(FLAGS)
 	mv $(EXEC_LS) src/execs
