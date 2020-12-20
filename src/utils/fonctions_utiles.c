@@ -73,9 +73,10 @@ void get_wd(struct work_directory wd, char * path_wd)
 }
 
 /* cette fonction permet de rendre u_wd absolu en sachant que l'on est en cwd pour le moment */
-void chemin_absolu(char * cwd, char * u_wd, char * u_wd_abs)
+char * chemin_absolu(char * cwd, char * u_wd)
 {
 	int i, j;
+	char * u_wd_abs = malloc(sizeof(char) * (strlen(cwd) + strlen(u_wd) + 2));
 
 	/* rend u_wd en chemin complet (part de la racine) */
 	if(u_wd[0] != '/')
@@ -113,6 +114,8 @@ void chemin_absolu(char * cwd, char * u_wd, char * u_wd_abs)
 		i++;
 	}
 
+	//free(u_wd_copy);
+
 	for(i = 0; i < nb_slash; i++)
 	{
 		if(strcmp(liste_rep[i], ".") == 0)
@@ -146,4 +149,6 @@ void chemin_absolu(char * cwd, char * u_wd, char * u_wd_abs)
 	}
 
 	strcat(u_wd_abs, "/");
+	
+	return u_wd_abs;
 }
