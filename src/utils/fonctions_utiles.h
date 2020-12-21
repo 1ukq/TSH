@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "../types/work_directory.h"
 
 void fill_wd(char * path_wd, struct work_directory * ad_wd);

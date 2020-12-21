@@ -149,6 +149,6 @@ char * chemin_absolu(char * cwd, char * u_wd)
 	}
 
 	strcat(u_wd_abs, "/");
-	
+
 	return u_wd_abs;
 }
