@@ -104,6 +104,7 @@ int rdr_type(char * string, char * cwd){
 			token = strtok(NULL, " ");
 		}
 	}
+	// aucunes redirections ou redirection non reconnue
 	return 0;
 }
 

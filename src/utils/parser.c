@@ -86,6 +86,7 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 	i = 0;
 	while(tab[i] != NULL){
+		//séparer cas ls et pwd des autres cas car peuvent etre appelées sans arguments... + ajouter cwd si pwd ou ls appelé sans arguments
 		j = 0;
 		while(tab[i][j] != NULL){
 			if(j > 0 && tab[i][j][0] != '-'){
