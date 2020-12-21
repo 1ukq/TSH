@@ -108,7 +108,6 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 	}
 
 	// get abs_path to execs for functions that implies a tar
-
 	i = 0;
 	while(tab[i] != NULL){
 		if(implique_tar[i]){
@@ -145,9 +144,6 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_pwd);
 			}
-			else if(strcmp(name, "cd") == 0){
-				printf("%s\n", "cd n'est pas un executable\n");
-			}
 			else if(strcmp(name, "rm") == 0){
 				char path_to_rm[PATH_MAX];
 				sprintf(path_to_rm, "%s/%s", path_to_tsh, "src/execs/rm_t");
@@ -166,8 +162,11 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_mkdir);
 			}
+			else if(strcmp(name, "cd") == 0){
+				//cd n'a pas d'executable
+			}
 			else{
-				printf("fonction non reconnue\n");
+				//fonction non reconnue
 			}
 		}
 		i++;
@@ -177,8 +176,9 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 }
 //free tab
 
+/*
 int main(void){
-	char *** tab = parser("ls -l ../../ok.tar/yoyoyoy/./../     ok/hey/ | head | mkdir yoyo/ hey/", "/home/rf/Bureau/dir2/", "/home/rf/Bureau/U2021/Projets/tsh");
+	char *** tab = parser("ls -l ../../ok.tar/yoyoyoy/./../     ok/hey/ ", "/home/rf/Bureau/dir2/", "/home/rf/Bureau/U2021/Projets/tsh/");
 	int i = 0, j;
 
 	printf("[ ");
@@ -200,3 +200,4 @@ int main(void){
 
 	return 0;
 }
+*/
