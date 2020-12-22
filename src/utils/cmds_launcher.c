@@ -6,9 +6,9 @@ void split_path(char * path, char * path_to_tar, char * path_in_tar){
 	struct work_directory wd;
 	fill_wd(path, &wd);
 
-	//get path_to_tar
-	sprintf(path_to_tar, "%s/", wd.c_htar);
-	strcat(path_to_tar, wd.tar_name);
+    //get path_to_tar
+    sprintf(path_to_tar, "%s/", wd.c_htar);
+    strcat(path_to_tar, wd.tar_name);
 
 	if(strlen(wd.c_tar) > 0){
 		//get path_in_tar
@@ -20,6 +20,7 @@ void split_path(char * path, char * path_to_tar, char * path_in_tar){
 		//path_in_tar devient vide
 		sprintf(path_in_tar, "%s", "");
 	}
+    
 }
 
 int cmds_launcher(char ***cmds, int red_type, char *file){
@@ -38,6 +39,8 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
 		char path_to_tar[strlen(file)];
 		char path_in_tar[strlen(file)];
 		split_path(file, path_to_tar, path_in_tar);
+        printf("%s\n", path_to_tar);
+        printf("%s\n", path_in_tar);
 
     while(cmds[it] != NULL){
 
