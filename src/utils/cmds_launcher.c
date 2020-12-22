@@ -10,6 +10,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
     int new_fildes[2];
     int red_fildes[2];
     int err_fildes[2];
+    int in_fildes[2];
 
     while(cmds[it] != NULL){
 
@@ -25,6 +26,11 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
 
         if(cmds[it + 1] == NULL && (red_type == RED_ERR_APPEND_IN_TAR || red_type == RED_ERR_TRUNC_IN_TAR)){
             ret_pipe = pipe(err_fildes);
+            if(check_sys_call(ret_pipe, "pipe in cmds_launcher") == -1) return -1;
+        }
+
+        if(cmds[1] == NULL && red_type == RED_IN_FROM_TAR){
+            ret_pipe = pipe(in_fildes);
             if(check_sys_call(ret_pipe, "pipe in cmds_launcher") == -1) return -1;
         }
 
@@ -77,6 +83,20 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                 close(err_fildes[1]);
             }
 
+            // Redirection < hors et dans tar
+            if(cmds[1] == NULL && (red_type == RED_IN_FROM_FILE || red_type == RED_IN_FROM_TAR)){
+                if(red_type == RED_IN_FROM_FILE){
+                    int fd = red_input_out_tar(file);
+                    close(fd);
+                }
+                else if(red_type == RED_IN_FROM_TAR){
+                    input_to_pipe(in_fildes[1], "test.tar", "b");
+                    close(in_fildes[1]);
+                    red_input_in_tar(in_fildes[0]);
+                    close(in_fildes[0]);
+                }
+            }
+
             execvp(cmds[it][0], cmds[it]);
         }
         else{ // Père
@@ -99,7 +119,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                 int r = buffarize_output(red_fildes[0], buf);
                 close(red_fildes[0]);
                 if(red_type == RED_OUT_APPEND_IN_TAR) red_append_in_tar("test.tar", "b", buf, r);
-                else if(red_type == RED_OUT_TRUNC_IN_TAR) red_trunc_in_tar("test.tar", "b", buf, r);
+                else if(red_type == RED_OUT_TRUNC_IN_TAR) red_trunc_in_tar("test.tar", "c", buf, r);
             }
 
             //Redirection 2> et 2>> dans tar : création d'un buffer pour accueillir le contenu du pipe de redirection
@@ -108,7 +128,6 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                 close(err_fildes[1]);
                 char *buf = malloc(BLOCK_SIZE);
                 int r = buffarize_output(err_fildes[0], buf);
-                printf("%d\n", r);
                 close(err_fildes[0]);
                 if(red_type == RED_ERR_APPEND_IN_TAR) red_append_in_tar("test.tar", "b", buf, r);
                 else if(red_type == RED_ERR_TRUNC_IN_TAR) red_trunc_in_tar("test.tar", "b", buf, r);
