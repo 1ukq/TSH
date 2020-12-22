@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "find_file.h"
 #include "../redirection.h"
+#include "fonctions_utiles.h"
 
 #define NO_RED 0
 
@@ -20,3 +21,5 @@
 #define RED_IN_FROM_TAR 10
 
 int cmds_launcher(char ***cmds, int red_type, char *file);
+
+void split_path(char * path, char * path_to_tar, char * path_in_tar);
