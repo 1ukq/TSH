@@ -34,14 +34,22 @@ int tshell(void){
 	/* bloquage les signaux */
 	memset(&action, 0, sizeof(struct sigaction));
 	action.sa_handler = SIG_IGN;
-
 	for(i = 1; i <= 64; i++)
 	{
 		sigaction(i, &action, NULL);
 	}
 
+	/* init cwd */
+	char cwd[PATH_MAX];
+	getcwd(cwd, PATH_MAX);
+
+	/* get path_to_tsh */
+	char path_to_tsh[PATH_MAX];
+	getcwd(path_to_tsh, PATH_MAX);
+
 	/* boucle principale */
 	while(run){
+
 		/* read user input */
 		n = read_input(input);
 		if(n < 0){
@@ -53,7 +61,26 @@ int tshell(void){
 			return 0;
 		}
 
-		printf("%s\n", input);
+		/* parser */
+		char *** tab = parser(input, cwd, path_to_tsh);
+
+		//print tab
+		i = 0;
+		int j;
+		printf("[ ");
+		while(tab[i] != NULL){
+			j = 0;
+			printf("[ ");
+			while(tab[i][j] != NULL){
+				printf("%s ", tab[i][j]);
+				j++;
+			}
+			printf("] ");
+			i++;
+		}
+		printf("]");
+		printf("\n");
+
 	}
 }
 

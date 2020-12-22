@@ -2,6 +2,9 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include "utils/parser.c"
+
+#include "utils/fonctions_utiles.c"
 
 #define PATH_MAX 4096
 
