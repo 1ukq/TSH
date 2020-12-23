@@ -1,4 +1,7 @@
 #include "tshell.h"
+/*
+à lire avant d'utiliser. le problème des chemins n'est pas résolu pour le lancement des executables des fonctions. (je fais reference ici à la partie du parser)
+*/
 
 int read_input(char * input){
 	int n;
@@ -122,10 +125,12 @@ int tshell(void){
 	}
 }
 
-
+//main
+/*
 int main(void){
 
 	int n = tshell();
 
 	return n;
 }
+*/
