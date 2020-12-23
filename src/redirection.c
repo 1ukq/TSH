@@ -3,16 +3,19 @@
 int buffarize_output(int fd_read_end, char *buffer){
     int rd;
     int nb_loop = 0;
+    int nb_blocks = 2;
     char buf[BLOCK_SIZE];
     memset(buf, '\0', BLOCK_SIZE);
     while((rd = read(fd_read_end, buf, BLOCK_SIZE)) > 0){
         memcpy(buffer + (nb_loop * BLOCK_SIZE), buf, BLOCK_SIZE);
         memset(buf, '\0', BLOCK_SIZE);
-        buffer = realloc(buffer, BLOCK_SIZE);
+        buffer = realloc(buffer, nb_blocks * BLOCK_SIZE);
         nb_loop++;
+        nb_blocks++;
     }
-    return nb_loop * BLOCK_SIZE;
+    return nb_blocks * BLOCK_SIZE;
 }
+
 
 int input_to_pipe(int fd_write_end, char *path_tar, const char *path_in_tar){
     int fd_tar = open(path_tar, O_RDONLY);

@@ -35,10 +35,10 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
     int err_fildes[2];
     int in_fildes[2];
 
-		//split file path
-		char path_to_tar[strlen(file)];
-		char path_in_tar[strlen(file)];
-		split_path(file, path_to_tar, path_in_tar);
+	//split file path
+	char path_to_tar[strlen(file)];
+	char path_in_tar[strlen(file)];
+	split_path(file, path_to_tar, path_in_tar);
         
     while(cmds[it] != NULL){
 
@@ -142,6 +142,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
             //Redirection > et >> dans tar : création d'un buffer pour accueillir le contenu du pipe de redirection
             // puis écriture dans le tar (au bon endroit)
             if(cmds[it + 1] == NULL && (red_type == RED_OUT_APPEND_IN_TAR || red_type == RED_OUT_TRUNC_IN_TAR)){
+                wait(NULL);
                 close(red_fildes[1]);
                 char *buf = malloc(BLOCK_SIZE);
                 int r = buffarize_output(red_fildes[0], buf);
@@ -153,6 +154,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
             //Redirection 2> et 2>> dans tar : création d'un buffer pour accueillir le contenu du pipe de redirection
             // puis écriture dans le tar (au bon endroit)
             if(cmds[it + 1] == NULL && (red_type == RED_ERR_APPEND_IN_TAR || red_type == RED_ERR_TRUNC_IN_TAR)){
+                wait(NULL);
                 close(err_fildes[1]);
                 char *buf = malloc(BLOCK_SIZE);
                 int r = buffarize_output(err_fildes[0], buf);

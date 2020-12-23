@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/wait.h>
 #include "find_file.h"
 #include "../redirection.h"
 #include "fonctions_utiles.h"
