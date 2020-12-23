@@ -61,10 +61,47 @@ int tshell(void){
 			return 0;
 		}
 
+		/* get redirection type and file */
+		int redirection_type = rdr_type(input, cwd);
+		char redirection_file[PATH_MAX];
+		if(redirection_type > 0){
+			sprintf(redirection_file, "%s", rdr_file(input, cwd));
+		}
+		else{
+			sprintf(redirection_file, "%s", "");
+		}
+
+		/* artificially delete redirection from input */
+		if(redirection_type == 1 || redirection_type == 6){
+			input[strstr(input, " < ") - input] = '\0';
+		}
+		else if(redirection_type == 2 || redirection_type == 7){
+			input[strstr(input, " > ") - input] = '\0';
+		}
+		else if(redirection_type == 3 || redirection_type == 8){
+			input[strstr(input, " >> ") - input] = '\0';
+		}
+		else if(redirection_type == 4 || redirection_type == 9){
+			input[strstr(input, " 2> ") - input] = '\0';
+		}
+		else if(redirection_type == 5 || redirection_type == 10){
+			input[strstr(input, " 2>> ") - input] = '\0';
+		}
+		else if(redirection_type == -1){
+			//unusual redirection
+			char unusual_symbol_error[] = "bash: unusual use of symbol\n";
+			n = write(STDERR_FILENO, unusual_symbol_error, strlen(unusual_symbol_error));
+			if(n < 0){
+				perror("write redirection error");
+			}
+			continue;
+		}
+
 		/* parser */
 		char *** tab = parser(input, cwd, path_to_tsh);
 
-		//print tab
+		//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
+		/*
 		i = 0;
 		int j;
 		printf("[ ");
@@ -80,15 +117,15 @@ int tshell(void){
 		}
 		printf("]");
 		printf("\n");
+		*/
 
 	}
 }
 
 
 int main(void){
+
 	int n = tshell();
 
-	printf("%i\n", n);
-
-	return 0;
+	return n;
 }
