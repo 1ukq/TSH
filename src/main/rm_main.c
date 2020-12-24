@@ -37,12 +37,17 @@ int main(int argc, char ** argv){
 
 				if(strlen(wd.tar_name) == 0){
 					// pas de tar impliqué -> chemin invalide
-					char error[] = "rm: No such file or directory\n";
-
-					n = write(STDERR_FILENO, error, strlen(error));
+					// on applique le vrai rm
+					n = fork();
 					if(n < 0){
-						perror("rm_main write2");
+						perror("rm_main fork");
 						return -1;
+					}
+					else if(n != 0){
+						execlp("rm", "rm", argv[i], NULL);
+					}
+					else{
+						wait(NULL);
 					}
 				}
 				else{

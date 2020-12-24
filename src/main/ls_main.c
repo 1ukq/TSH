@@ -1,8 +1,9 @@
 #include "../list_file.h"
+#include <sys/types.h>
+#include <sys/wait.h>
 
 int main(int argc, char ** argv){
 	int i, n;
-	int ret = 0;
 	int option = 0;
 
 	if(argc >= 2){
@@ -28,7 +29,23 @@ int main(int argc, char ** argv){
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] != '-'){
 				// on lance ls
-				n = ls( option ? "-l" : NULL, argv[i]);
+				if(strstr(argv[i], ".tar") == NULL){
+					// execute real ls
+					n = fork();
+					if(n < 0){
+						perror("ls_main fork");
+						return -1;
+					}
+					else if(n != 0){
+						execlp("ls", "ls", argv[i], option ? "-l" : NULL, NULL);
+					}
+					else{
+						wait(NULL);
+					}
+				}
+				else{
+					n = ls( option ? "-l" : NULL, argv[i]);
+				}
 
 				// gérer les erreurs
 				if(n == -1){
@@ -66,9 +83,6 @@ int main(int argc, char ** argv){
 
 					return -3;
 				}
-				else{
-					ret += n;
-				}
 			}
 		}
 	}
@@ -86,5 +100,5 @@ int main(int argc, char ** argv){
 
 
 	// return ?
-	return ret;
+	return 0;
 }

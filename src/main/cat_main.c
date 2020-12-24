@@ -30,12 +30,17 @@ int main(int argc, char ** argv){
 
 			if(strlen(wd.c_tar) == 0){
 				// pas de fichier dans tar impliqué -> chemin invalide
-				char error[] = "cat: No such file\n";
-
-				n = write(STDERR_FILENO, error, strlen(error));
+				// execute real cat
+				n = fork();
 				if(n < 0){
-					perror("cat_main write2");
+					perror("cat_main fork");
 					return -1;
+				}
+				else if(n != 0){
+					execlp("cat", "cat", argv[i], NULL);
+				}
+				else{
+					wait(NULL);
 				}
 			}
 			else{
