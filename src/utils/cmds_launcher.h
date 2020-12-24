@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include "find_file.h"
-#include "../redirection.h"
+#include "redirection.h"
 #include "fonctions_utiles.h"
 
 #define NO_RED 0
