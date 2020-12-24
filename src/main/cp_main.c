@@ -3,6 +3,10 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+//#include "../utils/find_file.c"
+//#include "../utils/init_header.c"
+//#include "../utils/utils_string.c"
+
 int main(int argc, char ** argv){
 	int n, i, option = 0, dest_tar, ret = 0, fd;
 
@@ -75,7 +79,7 @@ int main(int argc, char ** argv){
 						//source:non-tar -> dest:tar
 						if(option){
 							//cp_nontar_tar -r
-							n = copy_in_tar_r(argv[i], path_to_tar_dest, path_in_tar_dest);
+							n = copy_in_tar_r(path_to_tar_dest, path_in_tar_dest, argv[i]);
 						}
 						else{
 							//cp_nontar_tar
