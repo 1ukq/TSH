@@ -75,19 +75,19 @@ int tshell(void){
 			}
 
 			/* artificially delete redirection from input */
-			if(redirection_type == 1 || redirection_type == 6){
+			if(redirection_type == STDIN || redirection_type == STDIN_TAR){
 				input[strstr(input, " < ") - input] = '\0';
 			}
-			else if(redirection_type == 2 || redirection_type == 7){
+			else if(redirection_type == STDOUT_1 || redirection_type == STDOUT_1_TAR){
 				input[strstr(input, " > ") - input] = '\0';
 			}
-			else if(redirection_type == 3 || redirection_type == 8){
+			else if(redirection_type == STDOUT_2 || redirection_type == STDOUT_2_TAR){
 				input[strstr(input, " >> ") - input] = '\0';
 			}
-			else if(redirection_type == 4 || redirection_type == 9){
+			else if(redirection_type == STDERR_1 || redirection_type == STDERR_1_TAR){
 				input[strstr(input, " 2> ") - input] = '\0';
 			}
-			else if(redirection_type == 5 || redirection_type == 10){
+			else if(redirection_type == STDERR_2 || redirection_type == STDERR_2_TAR){
 				input[strstr(input, " 2>> ") - input] = '\0';
 			}
 			else if(redirection_type == -1){
@@ -105,7 +105,7 @@ int tshell(void){
 			//printf("%d\n", redirection_type);
 
 			cmds_launcher(tab, redirection_type, redirection_file);
-			
+
 			wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
 
 			//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
