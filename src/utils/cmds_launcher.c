@@ -126,25 +126,25 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                     close(in_fildes[0]);
                 }
             }
-
+            
             execvp(cmds[it][0], cmds[it]);
-						/* gestion des erreurs */
-						if(errno == ENOENT)
-						{
-							char command_not_found[] = ": command not found\n";
-							char error[sizeof(command_not_found) + sizeof(cmds[it][0])];
-							sprintf(error, "%s" , cmds[it][0]);
-							strcat(error, command_not_found);
 
-							n = write(STDERR_FILENO, error, strlen(error));
-							if(n < 0)
-							{
-								perror("write error");
-								return -1;
-							}
-						}
+			/* gestion des erreurs */
+			if(errno == ENOENT)
+			{
+				char command_not_found[] = ": command not found\n";
+				char error[sizeof(command_not_found) + sizeof(cmds[it][0])];
+				sprintf(error, "%s" , cmds[it][0]);
+				strcat(error, command_not_found);
 
-						exit(1);
+				n = write(STDERR_FILENO, error, strlen(error));
+				if(n < 0)
+				{
+					perror("write error");
+					return -1;
+				}
+			}
+            exit(1);
         }
         else{ // Père
 
