@@ -104,9 +104,10 @@ int tshell(void){
 			char *** tab = parser(input, cwd, path_to_tsh);
 			//printf("%d\n", redirection_type);
 
-			//cmds_launcher(tab, redirection_type, redirection_file);
+			cmds_launcher(tab, redirection_type, redirection_file);
 
 			//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
+			/*
 			printf("%s\n", redirection_file);
 			
 			i = 0;
@@ -123,7 +124,9 @@ int tshell(void){
 				i++;
 			}
 			printf("]");
-			printf("\n");		
+			printf("\n");	
+			*/
+				
 			
 		}
 	}
