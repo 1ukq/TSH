@@ -20,7 +20,7 @@ void split_path(char * path, char * path_to_tar, char * path_in_tar){
 		//path_in_tar devient vide
 		sprintf(path_in_tar, "%s", "");
 	}
-    
+
 }
 
 int cmds_launcher(char ***cmds, int red_type, char *file){
@@ -41,7 +41,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
     if(file != NULL){
 	    split_path(file, path_to_tar, path_in_tar);
     }
-        
+
     while(cmds[it] != NULL){
 
         if(cmds[it + 1] != NULL){
@@ -128,6 +128,23 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
             }
 
             execvp(cmds[it][0], cmds[it]);
+						/* gestion des erreurs */
+						if(errno == ENOENT)
+						{
+							char command_not_found[] = ": command not found\n";
+							char error[sizeof(command_not_found) + sizeof(cmds[it][0])];
+							sprintf(error, "%s" , cmds[it][0]);
+							strcat(error, command_not_found);
+
+							n = write(STDERR_FILENO, error, strlen(error));
+							if(n < 0)
+							{
+								perror("write error");
+								return -1;
+							}
+						}
+
+						exit(1);
         }
         else{ // Père
 

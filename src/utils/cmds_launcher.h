@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include "find_file.h"
 #include "redirection.h"
 #include "fonctions_utiles.h"
