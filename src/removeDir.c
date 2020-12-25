@@ -16,20 +16,23 @@ int removeDirectory(const char *path_tar, const char *path_file_source){
   ssize_t size_read = read(fd_tar, &header, BLOCK_SIZE);
   if(check_sys_call(size_read, "read in remove_file_from_tar") == -1) return -1;
 
+  int count = 0;
   int pos_dir = 0;
   int file_size = 0;
   int shift = 0;
 
-  while((header.name[0] == '\0')){
+  while((header.name[0] != '\0')){
+
     /*je regarde combien de fois le nom du dossier désiré est présent. Si il l'est plus d'une fois il n'est pas vide. Je retiens la position de la première occurence du dossier,
     car si il y en a une deuxième il y a erreur. Et cette position me permettra de déplacerle reste du tar afin de supprimer le dossier*/
     if(strncmp(header.name, path_file_source, strlen(path_file_source)) == 0){
       count++;
       //directory non vide
       if(count > 1) return -2;
-      pos_dir = pos - BLOCK_SIZE;
+      //pos est le début du header du directory à supprimer.
+      pos_dir = pos;
     }
-    sscanf(header.size, "%o", &file_size)
+    sscanf(header.size, "%o", &file_size);
     //le shift pour passer au bloc suivant
     shift = file_size % BLOCK_SIZE == 0 ? file_size / BLOCK_SIZE : (file_size / BLOCK_SIZE) + 1;
     pos = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);
@@ -40,29 +43,20 @@ int removeDirectory(const char *path_tar, const char *path_file_source){
   }
   //Si il y a exactement une occurence du dossier
   if(count != 0){
-    //j'ai repris le code de Lucas, car le principe pour supprimer un dossier et un fichier est le même à partir de là.
-    sscanf(header.size, "%o", &file_size);
-    shift = file_size % BLOCK_SIZE == 0 ? file_size / BLOCK_SIZE : (file_size / BLOCK_SIZE) + 1;
+    //le buffer où stocker le contenu du tar à deplacer.
+    char *buf_write = malloc(sizeof(char) * (size_tar - pos_dir - BLOCK_SIZE));
+    memset(buf_write, '\0', sizeof(char) * (size_tar - pos_dir - BLOCK_SIZE));
 
-    pos = lseek(fd_tar, -BLOCK_SIZE, SEEK_CUR);
+    //Je met la tête de lecture après le directory qu'on veut supprimer, et je lis tout le contenu.
+    pos = lseek(fd_tar, pos_dir+ BLOCK_SIZE, SEEK_SET);
+    if(check_sys_call(pos, "lseek in remove_file_from_tar") == -1) return -1;
+    size_read = read(fd_tar, buf_write, (size_tar - pos_dir - BLOCK_SIZE));
+    if(check_sys_call(size_read, "read in remove_fichemin de racin jusqu'au tarle_from_tar") == -1) return -1;
+    //Je met la tête de lecture au début du directory à supprimer afin de le supprimer
+    pos = lseek(fd_tar, pos_dir, SEEK_SET);
     if(check_sys_call(pos, "lseek in remove_file_from_tar") == -1) return -1;
 
-    char *buf_write = malloc(sizeof(char) * (size_tar - pos));
-    memset(buf_write, '\0', sizeof(char) * (size_tar - pos));
-
-    int n = pos;
-
-    pos = lseek(fd_tar, BLOCK_SIZE * (shift + 1), SEEK_CUR);
-    if(check_sys_call(pos, "lseek in remove_file_from_tar") == -1) return -1;
-
-    size_read = read(fd_tar, buf_write, (size_tar - n));
-    if(check_sys_call(size_read, "read in remove_file_from_tar") == -1) return -1;
-
-
-    pos = lseek(fd_tar, n, SEEK_SET);
-    if(check_sys_call(pos, "lseek in remove_file_from_tar") == -1) return -1;
-
-    int size_write = write(fd_tar, buf_write, size_tar - n);
+    int size_write = write(fd_tar, buf_write, (size_tar - pos_dir - BLOCK_SIZE));
     if(check_sys_call(size_write, "write in remove_file_from_tar") == -1) return -1;
 
     close(fd_tar);
