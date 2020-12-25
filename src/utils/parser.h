@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#include "fonctions_utiles.h"
+#include "fonctions_utiles.c"
 
 #define PATH_MAX 4096
 

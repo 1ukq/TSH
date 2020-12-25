@@ -94,7 +94,16 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 				char path[strlen(tab[i][j])];
 				sprintf(path, "%s", tab[i][j]);
 
-				tab[i][j] = strdup(chemin_absolu(cwd, path));
+				char * path_abs = strdup(chemin_absolu(cwd, path));
+
+				if(strstr(path_abs, ".tar") == NULL){
+					tab[i][j] = strdup(path);
+				}
+				else{
+					tab[i][j] = strdup(path_abs);
+				}
+
+				free(path_abs);
 
 				if(implique_tar[i] == 0){
 					if(strstr(tab[i][j], ".tar") != NULL){
@@ -179,7 +188,7 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 /*
 int main(void){
-	char *** tab = parser("ls -l ../../ok.tar/yoyoyoy/./../     ok/hey/ ", "/home/rf/Bureau/dir2/", "/home/rf/Bureau/U2021/Projets/tsh/");
+	char *** tab = parser("ls -l ../../ok.tar/yoyoyoy/./../     ok/hey | mkdir prout", "/home/rf/Bureau/dir2/", "/home/rf/Bureau/U2021/Projets/tsh/");
 	int i = 0, j;
 
 	printf("[ ");
