@@ -105,11 +105,13 @@ int tshell(void){
 			//printf("%d\n", redirection_type);
 
 			cmds_launcher(tab, redirection_type, redirection_file);
+			
+			wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
 
 			//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
 			/*
 			printf("%s\n", redirection_file);
-			
+
 			i = 0;
 			int j;
 			printf("[ ");
@@ -124,10 +126,10 @@ int tshell(void){
 				i++;
 			}
 			printf("]");
-			printf("\n");	
+			printf("\n");
 			*/
-				
-			
+
+
 		}
 	}
 	return 0;
@@ -141,4 +143,3 @@ int main(void){
 
 	return n;
 }
-
