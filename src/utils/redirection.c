@@ -1,6 +1,7 @@
 #include "redirection.h"
 
 // Permet de mettre dans un buffer ce qu'il y a dans un pipe
+
 int buffarize_output(int fd_read_end, char *buffer){
     int rd;
     int nb_loop = 0;
@@ -14,7 +15,7 @@ int buffarize_output(int fd_read_end, char *buffer){
         nb_loop++;
         nb_blocks++;
     }
-    return nb_blocks * BLOCK_SIZE;
+    return nb_loop * BLOCK_SIZE;
 }
 
 // Permet d'écrire dans un pipe le contenu d'un input (input = contenu d'un fichier dans un tar)
