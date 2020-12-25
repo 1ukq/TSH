@@ -21,8 +21,24 @@ int main(int argc, char ** argv){
 
 		//boucle principale, on considère que mv f1 f2 f3 f4 d (=) mv f1 d ; mv f2 d ; ...
 		for(i = 1; i < argc-1; i++){
-			// on applique mv
-			n = mv(argv[i], argv[argc-1]);
+			// applique mv
+			if(strstr(argv[i], ".tar") == NULL){
+				// execute real mv
+				n = fork();
+				if(n < 0){
+					perror("mv_main fork");
+					return -1;
+				}
+				else if(n != 0){
+					execlp("mv", "mv", argv[i], argv[argc-1], NULL);
+				}
+				else{
+					wait(NULL);
+				}
+			}
+			else{
+				n = mv(argv[i], argv[argc-1]);
+			}
 
 			if(n == -1){
 				//gérer les erreurs
