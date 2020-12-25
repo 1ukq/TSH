@@ -7,7 +7,7 @@ int read_input(char * input){
 	int n;
 
 	/* write prompt */
-	n = write(STDOUT_FILENO, ">>> ", 4);
+	n = write(STDOUT_FILENO, ">>> ", 5);
 	if(n < 0){
 		perror("write prompt");
 		return -1;
@@ -22,7 +22,6 @@ int read_input(char * input){
 
 	//enlever le '\n' de l'input
 	input[n-1] = '\0';
-
 	return n;
 }
 
@@ -64,67 +63,69 @@ int tshell(void){
 			return 0;
 		}
 
-		/* get redirection type and file */
-		int redirection_type = rdr_type(input, cwd);
-		char redirection_file[PATH_MAX];
-		if(redirection_type > 0){
-			sprintf(redirection_file, "%s", rdr_file(input, cwd));
-		}
-		else{
-			sprintf(redirection_file, "%s", "");
-		}
-
-		/* artificially delete redirection from input */
-		if(redirection_type == 1 || redirection_type == 6){
-			input[strstr(input, " < ") - input] = '\0';
-		}
-		else if(redirection_type == 2 || redirection_type == 7){
-			input[strstr(input, " > ") - input] = '\0';
-		}
-		else if(redirection_type == 3 || redirection_type == 8){
-			input[strstr(input, " >> ") - input] = '\0';
-		}
-		else if(redirection_type == 4 || redirection_type == 9){
-			input[strstr(input, " 2> ") - input] = '\0';
-		}
-		else if(redirection_type == 5 || redirection_type == 10){
-			input[strstr(input, " 2>> ") - input] = '\0';
-		}
-		else if(redirection_type == -1){
-			//unusual redirection
-			char unusual_symbol_error[] = "bash: unusual use of symbol\n";
-			n = write(STDERR_FILENO, unusual_symbol_error, strlen(unusual_symbol_error));
-			if(n < 0){
-				perror("write redirection error");
+		if(n > 1){
+			/* get redirection type and file */
+			int redirection_type = rdr_type(input, cwd);
+			char redirection_file[PATH_MAX];
+			if(redirection_type > 0){
+				sprintf(redirection_file, "%s", rdr_file(input, cwd));
 			}
-			continue;
-		}
+			else{
+				sprintf(redirection_file, "%s", "");
+			}
 
-		/* parser */
-		char *** tab = parser(input, cwd, path_to_tsh);
-		//printf("%d\n", redirection_type);
+			/* artificially delete redirection from input */
+			if(redirection_type == 1 || redirection_type == 6){
+				input[strstr(input, " < ") - input] = '\0';
+			}
+			else if(redirection_type == 2 || redirection_type == 7){
+				input[strstr(input, " > ") - input] = '\0';
+			}
+			else if(redirection_type == 3 || redirection_type == 8){
+				input[strstr(input, " >> ") - input] = '\0';
+			}
+			else if(redirection_type == 4 || redirection_type == 9){
+				input[strstr(input, " 2> ") - input] = '\0';
+			}
+			else if(redirection_type == 5 || redirection_type == 10){
+				input[strstr(input, " 2>> ") - input] = '\0';
+			}
+			else if(redirection_type == -1){
+				//unusual redirection
+				char unusual_symbol_error[] = "bash: unusual use of symbol\n";
+				n = write(STDERR_FILENO, unusual_symbol_error, strlen(unusual_symbol_error));
+				if(n < 0){
+					perror("write redirection error");
+				}
+				continue;
+			}
 
-		//cmds_launcher(tab, redirection_type, NULL);
+			/* parser */
+			char *** tab = parser(input, cwd, path_to_tsh);
+			//printf("%d\n", redirection_type);
 
-		//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
-		
-		i = 0;
-		int j;
-		printf("[ ");
-		while(tab[i] != NULL){
-			j = 0;
+			//cmds_launcher(tab, redirection_type, redirection_file);
+
+			//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
+			printf("%s\n", redirection_file);
+			
+			i = 0;
+			int j;
 			printf("[ ");
-			while(tab[i][j] != NULL){
-				printf("%s ", tab[i][j]);
-				j++;
+			while(tab[i] != NULL){
+				j = 0;
+				printf("[ ");
+				while(tab[i][j] != NULL){
+					printf("%s ", tab[i][j]);
+					j++;
+				}
+				printf("] ");
+				i++;
 			}
-			printf("] ");
-			i++;
+			printf("]");
+			printf("\n");		
+			
 		}
-		printf("]");
-		printf("\n");
-		
-		
 	}
 	return 0;
 }
