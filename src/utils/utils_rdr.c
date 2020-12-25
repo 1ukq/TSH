@@ -19,7 +19,7 @@ int rdr_type(char * string, char * cwd){
 
 	if(nb_rdr(string) > 1){
 		//trop de redirections
-		return -1;
+		return -2;
 	}
 
 	char * string_copy = strdup(string);
@@ -38,7 +38,7 @@ int rdr_type(char * string, char * cwd){
 				return STDIN;
 			}
 			// < None
-			return -1;
+			return -3;
 		}
 		// >
 		else if(strcmp(token, ">") == 0){
@@ -53,7 +53,7 @@ int rdr_type(char * string, char * cwd){
 				return STDOUT_1;
 			}
 			// > None
-			return -1;
+			return -3;
 		}
 		// >>
 		else if(strcmp(token, ">>") == 0){
@@ -68,7 +68,7 @@ int rdr_type(char * string, char * cwd){
 				return STDOUT_2;
 			}
 			// >> None
-			return -1;
+			return -3;
 		}
 		// 2>
 		else if(strcmp(token, "2>") == 0){
@@ -83,7 +83,7 @@ int rdr_type(char * string, char * cwd){
 				return STDERR_1;
 			}
 			// 2> None
-			return -1;
+			return -3;
 		}
 		// 2>>
 		else if(strcmp(token, "2>>") == 0){
@@ -98,7 +98,7 @@ int rdr_type(char * string, char * cwd){
 				return STDERR_2;
 			}
 			// 2>> None
-			return -1;
+			return -3;
 		}
 		else{
 			token = strtok(NULL, " ");
@@ -119,6 +119,11 @@ char * rdr_file(char * string, char * cwd){
 		if(next_token == NULL){
 			//get absolute path of last word
 			char * file = strdup(chemin_absolu(cwd, token));
+			//on enlève le / de la fin
+			if(file[strlen(file) - 1] == '/'){
+				file[strlen(file)-1] = '\0';
+			}
+
 			return file;
 		}
 		token = strdup(next_token);
@@ -129,7 +134,7 @@ char * rdr_file(char * string, char * cwd){
 /*
 int main(void){
 	char cwd[] = "/home/rf/Bureau/U2021/Projets/tsh/src/utils/";
-	char input[] = "ls -kjl | > head 2>>> ../../dir/yo/hey";
+	char input[] = "ls -kjl | sad > ../../dir/yo/hey/";
 	int n = rdr_type(input, cwd);
 	printf("%i\n", n);
 	if(n > 0){
