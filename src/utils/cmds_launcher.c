@@ -36,9 +36,11 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
     int in_fildes[2];
 
 	//split file path
-	char path_to_tar[strlen(file)];
+    char path_to_tar[strlen(file)];
 	char path_in_tar[strlen(file)];
-	split_path(file, path_to_tar, path_in_tar);
+    if(file != NULL){
+	    split_path(file, path_to_tar, path_in_tar);
+    }
         
     while(cmds[it] != NULL){
 

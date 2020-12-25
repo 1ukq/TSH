@@ -9,11 +9,11 @@
 
 #define NO_RED 0
 
-#define RED_OUT_APPEND_OUT_TAR 1
-#define RED_OUT_TRUNC_OUT_TAR 2
-#define RED_ERR_APPEND_OUT_TAR 3
-#define RED_ERR_TRUNC_OUT_TAR 4
-#define RED_IN_FROM_FILE 5
+#define RED_OUT_APPEND_OUT_TAR 1 // >>
+#define RED_OUT_TRUNC_OUT_TAR 2 // >
+#define RED_ERR_APPEND_OUT_TAR 3 // 2>>
+#define RED_ERR_TRUNC_OUT_TAR 4 // 2>
+#define RED_IN_FROM_FILE 5 // <
 
 #define RED_OUT_APPEND_IN_TAR 6
 #define RED_OUT_TRUNC_IN_TAR 7
