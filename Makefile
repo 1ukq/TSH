@@ -2,7 +2,7 @@ CC = gcc
 FLAGS = -g -Wall
 
 SRC_DIR = src/
-USR_INPUT_HANDLER_DIR = src/usr_input_handler
+USR_INPUT_HANDLER_DIR = src/usr_input_handler/
 UTILS_DIR = src/utils/
 TYPES_DIR = src/types/
 TESTS_DIR = src/tests/
