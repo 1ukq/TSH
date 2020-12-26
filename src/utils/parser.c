@@ -89,9 +89,11 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 			}
 			if(add_cwd){
 				tab[i][j] = strdup(cwd);
+				tab[i][j+1] = NULL;
 			}
-			//malloc pb?
-			tab[i][j+1] = NULL;
+			else{
+				tab[i][j] = NULL;
+			}
 
 		}
 		else{
@@ -117,7 +119,6 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 	i = 0;
 	while(tab[i] != NULL){
-		//séparer cas ls et pwd des autres cas car peuvent etre appelées sans arguments... + ajouter cwd si pwd ou ls appelé sans arguments
 		j = 0;
 		while(tab[i][j] != NULL){
 			if(j > 0 && tab[i][j][0] != '-'){
