@@ -74,7 +74,7 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 		else if(strcmp(token, "ls") == 0){
 			int add_cwd = 1;
 
-			tab[i] = malloc(sizeof(char *) * count_words(tab_cmd[i]) + 1);
+			tab[i] = malloc(sizeof(char *) * count_words(tab_cmd[i]) + 2);
 			tab[i][0] = strdup(token);
 
 			token = strtok(NULL, " ");
@@ -89,11 +89,11 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 			}
 			if(add_cwd){
 				tab[i][j] = strdup(cwd);
-				tab[i][j+1] = NULL;
 			}
 			else{
 				tab[i][j] = NULL;
 			}
+			tab[i][j+1] = NULL;
 
 		}
 		else{
