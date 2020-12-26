@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <errno.h>
-#include "find_file.h"
+#include "../utils/find_file.h"
 #include "redirection.h"
-#include "fonctions_utiles.h"
+#include "../utils/fonctions_utiles.h"
 
 #define NO_RED 0
 

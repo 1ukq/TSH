@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include "find_file.h"
-#include "utils_string.h"
+#include "../utils/find_file.h"
+#include "../utils/utils_string.h"
 
 //redirection with tar
 int buffarize_output(int fd_read_end, char *buffer);

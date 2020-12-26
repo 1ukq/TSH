@@ -2,12 +2,13 @@ CC = gcc
 FLAGS = -g -Wall
 
 SRC_DIR = src/
+USR_INPUT_HANDLER_DIR = src/usr_input_handler/
 UTILS_DIR = src/utils/
 TYPES_DIR = src/types/
 TESTS_DIR = src/tests/
 MAIN_DIR = src/main/
 
-ALL_DIRS = $(SRC_DIR) $(TYPES_DIR) $(UTILS_DIR) $(MAIN_DIR)
+ALL_DIRS = $(SRC_DIR) $(TYPES_DIR) $(UTILS_DIR) $(MAIN_DIR) $(USR_INPUT_HANDLER_DIR)
 FILES = $(foreach dir, $(ALL_DIRS), $(wildcard $(dir)*.c))
 OBJ = $(FILES:%.c=%.o)
 
@@ -32,6 +33,9 @@ OBJ_RM = src/main/rm_main.o src/remove.o src/utils/find_file.o src/utils/fonctio
 EXEC_CP = cp_t
 OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o
 
+EXEC_TSH = tshell
+OBJ_TSH = src/usr_input_handler/tshell.o src/usr_input_handler/parser.o src/usr_input_handler/utils_rdr.o src/utils/fonctions_utiles.o src/usr_input_handler/cmds_launcher.o src/usr_input_handler/redirection.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/cd.o
+
 %.o : %.c
 	$(CC) -o $@ -c $< $(FLAGS)
 
@@ -55,10 +59,7 @@ $(EXEC_CP) : $(OBJ_CP)
 	$(CC) -o $@ $^ $(FLAGS)
 	mv $(EXEC_CP) src/execs
 
-#cmds_launcher : src/utils/cmds_launcher.o src/redirection.o src/utils/utils_string.o src/utils/init_header.o src/utils/find_file.o src/utils/fonctions_utiles.o
-#	$(CC) -o $@ $^ $(FLAGS)
-
-tshell : src/tshell.o src/utils/parser.o src/utils/utils_rdr.o src/utils/fonctions_utiles.o src/utils/cmds_launcher.o src/utils/redirection.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/cd.o
+$(EXEC_TSH) : $(OBJ_TSH)
 	$(CC) -o $@ $^ $(FLAGS)
 
 all : $(OBJ)
@@ -74,11 +75,12 @@ all : $(OBJ)
 	mv $(EXEC_MKDIR) src/execs
 	$(CC) -o $(EXEC_RM) $(OBJ_RM) $(FLAGS)
 	mv $(EXEC_RM) src/execs
+	$(CC) -o $(EXEC_TSH) $(OBJ_TSH) $(FLAGS)
 	rm $(OBJ)
 
 .PHONY = clean
 clean:
-	rm $(OBJ) src/execs/ls_t src/execs/cat_t src/execs/mv_t src/execs/pwd_t src/execs/mkdir_t src/execs/rm_t
+	rm $(OBJ) src/execs/ls_t src/execs/cat_t src/execs/mv_t src/execs/pwd_t src/execs/mkdir_t src/execs/rm_t tshell
 
 
 test:

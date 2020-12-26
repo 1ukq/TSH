@@ -2,10 +2,10 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
-#include "utils/parser.h"
-#include "utils/utils_rdr.h"
-#include "utils/cmds_launcher.h"
-#include "cd.h"
+#include "parser.h"
+#include "utils_rdr.h"
+#include "cmds_launcher.h"
+#include "../cd.h"
 
 #define PATH_MAX 4096
 

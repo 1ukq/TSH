@@ -1,5 +1,5 @@
 #include <string.h>
-#include "fonctions_utiles.h"
+#include "../utils/fonctions_utiles.h"
 
 #define STDIN 5 // < file
 #define STDOUT_1 2 // > file
