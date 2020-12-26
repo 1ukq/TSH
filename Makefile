@@ -58,7 +58,7 @@ $(EXEC_CP) : $(OBJ_CP)
 #cmds_launcher : src/utils/cmds_launcher.o src/redirection.o src/utils/utils_string.o src/utils/init_header.o src/utils/find_file.o src/utils/fonctions_utiles.o
 #	$(CC) -o $@ $^ $(FLAGS)
 
-tshell : src/tshell.o src/utils/parser.o src/utils/utils_rdr.o src/utils/fonctions_utiles.o src/utils/cmds_launcher.o src/utils/redirection.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o
+tshell : src/tshell.o src/utils/parser.o src/utils/utils_rdr.o src/utils/fonctions_utiles.o src/utils/cmds_launcher.o src/utils/redirection.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/cd.o
 	$(CC) -o $@ $^ $(FLAGS)
 
 all : $(OBJ)

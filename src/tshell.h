@@ -5,6 +5,7 @@
 #include "utils/parser.h"
 #include "utils/utils_rdr.h"
 #include "utils/cmds_launcher.h"
+#include "cd.h"
 
 #define PATH_MAX 4096
 
