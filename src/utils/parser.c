@@ -62,18 +62,51 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 	// split cmd into words and put them in tab structure
 	for(i = 0; i < nb_cmd; i++){
 
-		j = 0;
-		tab[i] = malloc(sizeof(char *) * count_words(tab_cmd[i]) + 1);
-
 		char * cmd_copy = strdup(tab_cmd[i]);
 		token = strtok(cmd_copy, " ");
 
-		while(token != NULL){
-			tab[i][j] = strdup(token);
-			j++;
-			token = strtok(NULL, " ");
+		if(strcmp(token, "pwd") == 0 && strstr(cwd, ".tar") != NULL){
+			tab[i] = malloc(sizeof(char *) * 3);
+			tab[i][0] = strdup(token);
+			tab[i][1] = strdup(cwd);
+			tab[i][2] = NULL;
 		}
-		tab[i][j] = NULL;
+		else if(strcmp(token, "ls") == 0){
+			int add_cwd = 1;
+
+			tab[i] = malloc(sizeof(char *) * count_words(tab_cmd[i]) + 2);
+			tab[i][0] = strdup(token);
+
+			token = strtok(NULL, " ");
+			j = 1;
+			while(token != NULL){
+				if(add_cwd && token[0] != '-'){
+					add_cwd = 0;
+				}
+				tab[i][j] = strdup(token);
+				j++;
+				token = strtok(NULL, " ");
+			}
+			if(add_cwd){
+				tab[i][j] = strdup(cwd);
+			}
+			else{
+				tab[i][j] = NULL;
+			}
+			tab[i][j+1] = NULL;
+
+		}
+		else{
+			tab[i] = malloc(sizeof(char *) * count_words(tab_cmd[i]) + 1);
+			j = 0;
+			while(token != NULL){
+				tab[i][j] = strdup(token);
+				j++;
+				token = strtok(NULL, " ");
+			}
+			tab[i][j] = NULL;
+		}
+
 		free(cmd_copy);
 	}
 	tab[i] = NULL;
@@ -86,7 +119,6 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 	i = 0;
 	while(tab[i] != NULL){
-		//séparer cas ls et pwd des autres cas car peuvent etre appelées sans arguments... + ajouter cwd si pwd ou ls appelé sans arguments
 		j = 0;
 		while(tab[i][j] != NULL){
 			if(j > 0 && tab[i][j][0] != '-'){
