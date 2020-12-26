@@ -1,8 +1,8 @@
-#ifndef REMOVE
-#define REMOVE
+#ifndef REMOVEDIR
+#define REMOVEDIR
 
 #include "types/posix_header.h"
-#include "utils/find_file.h"
+#include "utils/find_file.c"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>
