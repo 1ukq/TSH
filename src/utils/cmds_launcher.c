@@ -126,7 +126,7 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
                     close(in_fildes[0]);
                 }
             }
-            
+
             execvp(cmds[it][0], cmds[it]);
 
 			/* gestion des erreurs */
@@ -156,6 +156,11 @@ int cmds_launcher(char ***cmds, int red_type, char *file){
             if(cmds[it + 1] != NULL){
                 old_fildes[0] = new_fildes[0];
                 old_fildes[1] = new_fildes[1];
+            }
+
+            if(red_type == RED_IN_FROM_TAR){
+                close(in_fildes[0]);
+                close(in_fildes[1]);
             }
 
             //Redirection > et >> dans tar : création d'un buffer pour accueillir le contenu du pipe de redirection
