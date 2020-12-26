@@ -102,34 +102,51 @@ int tshell(void){
 
 			/* parser */
 			char *** tab = parser(input, cwd, path_to_tsh);
-			//printf("%d\n", redirection_type);
 
-			cmds_launcher(tab, redirection_type, redirection_file);
+			/* cd ? */
+			if((strcmp(tab[0][0], "cd") == 0)){
+				// applique cd
+				n = cd(cwd, chemin_absolu(cwd, tab[0][1]));
+				// gère erreur de cd
+				if(n == -2){
+					char error[] = "bash: cd: No such directory\n";
 
-			wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
-
-			//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
-			/*
-			printf("%s\n", redirection_file);
-
-			i = 0;
-			int j;
-			printf("[ ");
-			while(tab[i] != NULL){
-				j = 0;
-				printf("[ ");
-				while(tab[i][j] != NULL){
-					printf("%s ", tab[i][j]);
-					j++;
+					n = write(STDERR_FILENO, error, strlen(error));
+					if(n < 0){
+						perror("write cd error");
+						return -1;
+					}
 				}
-				printf("] ");
-				i++;
+				// do redirection here ?
 			}
-			printf("]");
-			printf("\n");
-			*/
+			else{
+				//printf("%d\n", redirection_type);
 
+				cmds_launcher(tab, redirection_type, redirection_file);
 
+				wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
+
+				//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
+				/*
+				printf("%s\n", redirection_file);
+
+				i = 0;
+				int j;
+				printf("[ ");
+				while(tab[i] != NULL){
+					j = 0;
+					printf("[ ");
+					while(tab[i][j] != NULL){
+						printf("%s ", tab[i][j]);
+						j++;
+					}
+					printf("] ");
+					i++;
+				}
+				printf("]");
+				printf("\n");
+				*/
+			}
 		}
 	}
 	return 0;
