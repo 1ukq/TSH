@@ -148,8 +148,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_cat);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -159,8 +161,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_cp);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -170,8 +174,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_mv);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -181,8 +187,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_ls);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -192,8 +200,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_pwd);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -203,8 +213,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_rm);;
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -214,8 +226,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_rmdir);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
@@ -225,8 +239,10 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 				tab[i][0] = strdup(path_to_mkdir);
 				j = 1;
-				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
-					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+				while(tab[i][j] != NULL){
+					if(tab[i][j][0] != '-'){
+						tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					}
 					j++;
 				}
 			}
