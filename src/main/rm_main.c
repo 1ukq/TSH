@@ -55,7 +55,7 @@ int main(int argc, char ** argv){
 					char path_to_tar[strlen(wd.c_htar) + 1 + strlen(wd.tar_name)];
 					sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
 
-					if(strlen(wd.c_tar) == 0){
+					if(strlen(wd.c_tar) == 0){ // (on peut l'enlever je crois)
 						// execute real rm on tar
 						n = fork();
 						if(n < 0){
