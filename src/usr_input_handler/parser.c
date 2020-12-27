@@ -119,30 +119,16 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 
 	i = 0;
 	while(tab[i] != NULL){
-		j = 0;
+		j = 1;
 		while(tab[i][j] != NULL){
-			if(j > 0 && tab[i][j][0] != '-'){
+			if(implique_tar[i] == 0 && tab[i][j][0] != '-'){
 				// alors tab[i][j] est un chemin
-				char path[strlen(tab[i][j])];
-				sprintf(path, "%s", tab[i][j]);
+				char * path_abs = strdup(chemin_absolu(cwd, tab[i][j]));
 
-				char * path_abs = strdup(chemin_absolu(cwd, path));
-
-				if(strstr(path_abs, ".tar") == NULL){
-					tab[i][j] = strdup(path);
+				if(strstr(path_abs, ".tar") != NULL){
+					implique_tar[i] = 1;
 				}
-				else{
-					tab[i][j] = strdup(path_abs);
-				}
-
 				free(path_abs);
-
-				if(implique_tar[i] == 0){
-					if(strstr(tab[i][j], ".tar") != NULL){
-						implique_tar[i] = 1;
-					}
-				}
-
 			}
 			j++;
 		}
@@ -161,48 +147,88 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 				sprintf(path_to_cat, "%s/%s", path_to_tsh, "src/execs/cat_t");
 
 				tab[i][0] = strdup(path_to_cat);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "cp") == 0){
 				char path_to_cp[PATH_MAX];
 				sprintf(path_to_cp, "%s/%s", path_to_tsh, "src/execs/cp_t");
 
 				tab[i][0] = strdup(path_to_cp);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "mv") == 0){
 				char path_to_mv[PATH_MAX];
 				sprintf(path_to_mv, "%s/%s", path_to_tsh, "src/execs/mv_t");
 
 				tab[i][0] = strdup(path_to_mv);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "ls") == 0){
 				char path_to_ls[PATH_MAX];
 				sprintf(path_to_ls, "%s/%s", path_to_tsh, "src/execs/ls_t");
 
 				tab[i][0] = strdup(path_to_ls);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "pwd") == 0){
 				char path_to_pwd[PATH_MAX];
 				sprintf(path_to_pwd, "%s/%s", path_to_tsh, "src/execs/pwd_t");
 
 				tab[i][0] = strdup(path_to_pwd);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "rm") == 0){
 				char path_to_rm[PATH_MAX];
 				sprintf(path_to_rm, "%s/%s", path_to_tsh, "src/execs/rm_t");
 
 				tab[i][0] = strdup(path_to_rm);;
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "rmdir") == 0){
 				char path_to_rmdir[PATH_MAX];
 				sprintf(path_to_rmdir, "%s/%s", path_to_tsh, "src/execs/rmdir_t");
 
 				tab[i][0] = strdup(path_to_rmdir);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "mkdir") == 0){
 				char path_to_mkdir[PATH_MAX];
 				sprintf(path_to_mkdir, "%s/%s", path_to_tsh, "src/execs/mkdir_t");
 
 				tab[i][0] = strdup(path_to_mkdir);
+				j = 1;
+				while(tab[i][j] != NULL && tab[i][j][0] != '-'){
+					tab[i][j] = strdup(chemin_absolu(cwd, tab[i][j]));
+					j++;
+				}
 			}
 			else if(strcmp(name, "cd") == 0){
 				//cd n'a pas d'executable
