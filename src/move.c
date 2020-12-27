@@ -296,6 +296,9 @@ int mv(char * path_file_source, char * path_file_dest){
 		if(strlen(wd_dest.tar_name) != 0){
 			//source: non-tar -> dest: tar
 			// on lance mv_from_dir_to_tar
+			if(path_file_source[strlen(path_file_source)-1] == '/'){
+				path_file_source[strlen(path_file_source)-1] = '\0';
+			}
 			n = mv_from_dir_to_tar(path_to_tar_dest, path_file_source, path_in_tar_dest);
 
 			return n;
