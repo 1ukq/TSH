@@ -259,7 +259,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
     if(check_sys_call(fd_dest, "open in mv_from_tar_to_dir") == -1) return -2;
 
-    int size_write = write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
+    int size_write = write(fd_dest, buf, sizeof(char) * size);
     if(check_sys_call(size_write, "write in mv_from_tar_to_dir") == -1) return -1;
 
     free(str);
