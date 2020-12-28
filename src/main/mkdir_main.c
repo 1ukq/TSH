@@ -54,7 +54,7 @@ int main(int argc, char ** argv){
 			}
 			else if(n == -2){
 				// invalid path
-				char error[] = "mkdir: cannot create directory: No such file or directory\n";
+				char error[] = "mkdir: cannot create directory: No such directory\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
@@ -76,7 +76,7 @@ int main(int argc, char ** argv){
 		}
 	}
 	else{
-		// mauvais nombre d'arguments
+		// mauvais nombre d'arguments (n'entre jamais ici condition vérifiée plus haut)
 		char error[] = "mkdir: missing operand\n";
 
 		n = write(STDERR_FILENO, error, strlen(error));

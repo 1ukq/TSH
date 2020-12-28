@@ -38,6 +38,9 @@ int main(int argc, char ** argv){
 				if(strlen(wd.tar_name) == 0){
 					// pas de tar impliqué -> chemin invalide
 					// on applique le vrai rm
+					if(argv[i][strlen(argv[i])-1] == '/'){
+						argv[i][strlen(argv[i])-1] = '\0';
+					}
 					n = fork();
 					if(n < 0){
 						perror("rm_main fork");
@@ -55,7 +58,7 @@ int main(int argc, char ** argv){
 					char path_to_tar[strlen(wd.c_htar) + 1 + strlen(wd.tar_name)];
 					sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
 
-					if(strlen(wd.c_tar) == 0){ // (on peut l'enlever je crois)
+					if(strlen(wd.c_tar) == 0){
 						// execute real rm on tar
 						n = fork();
 						if(n < 0){
@@ -90,7 +93,7 @@ int main(int argc, char ** argv){
 
 						if(n == -2){
 							// invalid path
-							char error[] = "rm: No such file or directory\n";
+							char error[] = "rm: No such file\n";
 
 							n = write(STDERR_FILENO, error, strlen(error));
 							if(n < 0){

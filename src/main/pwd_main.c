@@ -11,7 +11,15 @@ int main(int argc, char ** argv){
 		}
 	}
 	else{
-		// mauvais nombre d'arguments donné au main (si erreur voir shell)
+		// mauvais nombre d'arguments donné au main (n'arrive jamais ici aux vues du parser)
+		char error[] = "pwd: ignoring arguments\n";
+
+		n = write(STDERR_FILENO, error, strlen(error));
+		if(n < 0){
+			perror("write pwd main");
+			return -1;
+		}
+
 		n = -2;
 	}
 
