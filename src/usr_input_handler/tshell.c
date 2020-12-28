@@ -46,11 +46,9 @@ int tshell(void){
 	getcwd(cwd, PATH_MAX);
 
 	/* get path_to_tsh */
-	//char path_to_tsh[] = "/home/tsh";
-
-	char path_to_tsh[PATH_MAX];
-	getcwd(path_to_tsh, PATH_MAX);
-
+	char path_to_tsh[] = "/home/tsh";
+	//char path_to_tsh[PATH_MAX];
+	//getcwd(path_to_tsh, PATH_MAX);
 
 	/* boucle principale */
 	while(run){
@@ -135,7 +133,7 @@ int tshell(void){
 				wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
 
 				//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
-				
+				/*
 				printf("%s\n", redirection_file);
 
 				i = 0;
@@ -153,7 +151,7 @@ int tshell(void){
 				}
 				printf("]");
 				printf("\n");
-
+				*/
 			}
 		}
 	}
