@@ -46,8 +46,11 @@ int tshell(void){
 	getcwd(cwd, PATH_MAX);
 
 	/* get path_to_tsh */
-	char path_to_tsh[] = "/home/tsh";
-	// getcwd pour non docker
+	//char path_to_tsh[] = "/home/tsh";
+
+	char path_to_tsh[PATH_MAX];
+	getcwd(path_to_tsh, PATH_MAX);
+
 
 	/* boucle principale */
 	while(run){
@@ -106,7 +109,12 @@ int tshell(void){
 			/* cd ? */
 			if((strcmp(tab[0][0], "cd") == 0)){
 				// applique cd
-				n = cd(cwd, chemin_absolu(cwd, tab[0][1]));
+				if(tab[0][1] != NULL){
+					n = cd(cwd, chemin_absolu(cwd, tab[0][1]));
+				}
+				else{
+					n = cd(cwd, "/");
+				}
 				// gère erreur de cd
 				if(n == -2){
 					char error[] = "bash: cd: No such directory\n";
@@ -127,7 +135,7 @@ int tshell(void){
 				wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
 
 				//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
-				/*
+				
 				printf("%s\n", redirection_file);
 
 				i = 0;
@@ -145,7 +153,7 @@ int tshell(void){
 				}
 				printf("]");
 				printf("\n");
-				*/
+
 			}
 		}
 	}
