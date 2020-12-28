@@ -18,6 +18,7 @@ char *buffarize(const char *restrict path_file_source, struct stat *restrict buf
 
     int nb_blocks = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
     char *file_source_buf = malloc(sizeof(char) * BLOCK_SIZE * nb_blocks);
+    memset(file_source_buf, '\0', BLOCK_SIZE * nb_blocks);
     if(file_source_buf == NULL){
         perror("malloc in buffarize");
         return NULL;
@@ -55,6 +56,11 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
     int size = stat_buf_source.st_size;
     int nb_blocks = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
     wr = write(fd_tar, file_source_buf, nb_blocks * BLOCK_SIZE);
+    if(check_sys_call(wr, "write in insert_file_in_tar") == -1) return -1;
+
+    char *null_buf = malloc(2 * BLOCK_SIZE);
+    memset(null_buf, '\0', 2 * BLOCK_SIZE);
+    wr = write(fd_tar, null_buf, 2 * BLOCK_SIZE);
     if(check_sys_call(wr, "write in insert_file_in_tar") == -1) return -1;
 
     free(file_source_buf);
@@ -165,7 +171,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
 
     char *null_buf = malloc(2 * BLOCK_SIZE);
-    memset(null_buf, '\0', BLOCK_SIZE);
+    memset(null_buf, '\0', 2 * BLOCK_SIZE);
     size_write = write(fd_target, null_buf, 2 * BLOCK_SIZE);
     if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
 
