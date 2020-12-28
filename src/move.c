@@ -1,30 +1,11 @@
 #include "move.h"
 
-int find_last_block(int fd_tar, struct stat *restrict buf_stat){
+int find_last_block(int fd_tar){
 
-    int nb_blocks = 0;
-    int size_tar = buf_stat -> st_size;
-    int pos = 0;
-
-    char *content = malloc(sizeof(char) * size_tar);
-    char *buf1 = malloc(sizeof(char) * BLOCK_SIZE);
-    char *buf2 = malloc(sizeof(char) * BLOCK_SIZE);
-    memset(buf2, '\0', BLOCK_SIZE);
-
-    int n = read(fd_tar, content, size_tar);
-    if(check_sys_call(n, "read in find_last_block") == -1) return -1;
-
-    copy_string(buf1, content, BLOCK_SIZE);
-
-    while(!compare_buffers_of_same_size(buf1, buf2, BLOCK_SIZE)){
-
-        pos += BLOCK_SIZE;
-        copy_string(buf1, content + pos, BLOCK_SIZE);
-        nb_blocks++;
-
-    }
-
-    return nb_blocks;
+    int size_tar = lseek(fd_tar, 0, SEEK_END);
+    int ret = size_tar - (2 * BLOCK_SIZE);
+    int ret_lseek = lseek(fd_tar, 0, SEEK_SET);
+    return ret;
 
 }
 
@@ -55,10 +36,8 @@ int insert_file_in_tar(const char *path_tar, const char *path_file_source, char 
     if(check_sys_call(fd_tar, "open in insert_file_in_tar") == -1) return -2;
 
     //int lseek_ret = lseek(fd_tar, - 2 * BLOCK_SIZE, SEEK_END); //This line is for bsdtar not GNU tar (bsdtar is the default tar utility on MacOS)
-    struct stat stat_tar;
-    stat(path_tar, &stat_tar);
-    int b = find_last_block(fd_tar, &stat_tar);
-    int lseek_ret = lseek(fd_tar, b * BLOCK_SIZE, SEEK_SET);
+    int b = find_last_block(fd_tar);
+    int lseek_ret = lseek(fd_tar, b, SEEK_SET);
     if(check_sys_call(lseek_ret, "lseek in insert_file_in_tar") == -1) return -1;
 
     struct stat stat_buf_source;
@@ -90,11 +69,14 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     int fd_source = open(path_tar_source, O_RDWR);
     if(check_sys_call(fd_source, "open in mv_from_tar_to_tar") == -1) return -2;
 
-    int fd_target = fd_source;
+    int fd_target;
 
     if(strcmp(path_tar_source, path_tar_target)){
         fd_target = open(path_tar_target, O_RDWR);
         if(check_sys_call(fd_target, "open in mv_from_tar_to_tar") == -1) return -2;
+    }
+    else{
+        fd_target = fd_source;
     }
 
     int size_tar = lseek(fd_source, 0, SEEK_END);
@@ -140,6 +122,7 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
         perror("malloc in mv_from_tar_to_tar");
         return -1;
     }
+    memset(buf, '\0', shift * BLOCK_SIZE);
 
     ret_lseek = lseek(fd_source, -BLOCK_SIZE, SEEK_CUR);
     if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_tar") == -1) return -1;
@@ -169,14 +152,21 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
     int check_stat = stat(path_tar_source, &stat_target);
     if(check_sys_call(check_stat, "stat in mv_from_tar_to_tar") == -1) return -1;
 
-    int b = find_last_block(fd_target, &stat_target);
-    ret_lseek = lseek(fd_target, b * BLOCK_SIZE, SEEK_SET);
+    ret_lseek = lseek(fd_target, 0, SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_tar") == -1) return -1;
+    int b = find_last_block(fd_target);
+    ret_lseek = lseek(fd_target, b, SEEK_SET);
     if(check_sys_call(ret_lseek, "lseek in mv_from_tar_to_tar") == -1) return -1;
 
     int size_write = write(fd_target, &hd, BLOCK_SIZE);
     if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
 
     size_write = write(fd_target, buf, shift * BLOCK_SIZE);
+    if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
+
+    char *null_buf = malloc(2 * BLOCK_SIZE);
+    memset(null_buf, '\0', BLOCK_SIZE);
+    size_write = write(fd_target, null_buf, 2 * BLOCK_SIZE);
     if(check_sys_call(size_write, "write in mv_from_tar_to_tar") == -1) return -1;
 
     close(fd_source);
@@ -190,11 +180,10 @@ int mv_from_tar_to_tar(const char *path_tar_source, const char *path_tar_target,
 int mv_from_dir_to_tar(const char *path_tar, const char *path_file_source, char *path_in_tar){
 
     int n = 0;
-    int ret = 0;
-	ret = fork();
-    if(ret == 0) execlp("rm", "rm", path_file_source, NULL);
-    else if(ret == -1) perror("fork in mv_from_ext_to_tar");
-    else n = insert_file_in_tar(path_tar, path_file_source, path_in_tar);
+    int rem = 0;
+    n = insert_file_in_tar(path_tar, path_file_source, path_in_tar);
+	rem = remove(path_file_source);
+    if(check_sys_call(rem, "remove in mv_from_tar_to_tar") == -1) return -1;
     return n;
 
 }
