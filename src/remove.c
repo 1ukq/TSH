@@ -34,6 +34,11 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
         if(check_sys_call(size_read, "read in remove_file_from_tar") == -1) return -1;
     }
 
+    if(header.typeflag == DIRTYPE){
+        printf("Directory\n");
+        return -1;
+    }
+
     sscanf(header.size, "%o", &file_size);
     shift = file_size % BLOCK_SIZE == 0 ? file_size / BLOCK_SIZE : (file_size / BLOCK_SIZE) + 1;
 
@@ -83,6 +88,11 @@ int remove_file_from_tar_r(const char *path_tar, const char *path_dir){
     int file_size = 0;
 
     while(header.name[0] != '\0'){
+
+        if(!strcmp(header.name, path_dir) && header.typeflag != DIRTYPE){
+            printf("Not a directory\n");
+            return -1;
+        }
 
         if(strstr(header.name, path_dir) != NULL){
             if(header.typeflag == DIRTYPE){
