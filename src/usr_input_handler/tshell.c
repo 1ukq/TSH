@@ -46,8 +46,8 @@ int tshell(void){
 	getcwd(cwd, PATH_MAX);
 
 	/* get path_to_tsh */
-	char path_to_tsh[PATH_MAX];
-	getcwd(path_to_tsh, PATH_MAX);
+	char path_to_tsh[] = "/home/tsh";
+	// getcwd pour non docker
 
 	/* boucle principale */
 	while(run){
