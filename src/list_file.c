@@ -245,7 +245,7 @@ int ls(char * option, char * path)
 					return -1;
 				}
 			}
-			if(path_exist == 0)
+			if(path_exist == 0 && strlen(path_in_tar) != 0)
 			{
 				//le chemin n'existe pas
 				return -2;

@@ -31,6 +31,9 @@ int main(int argc, char ** argv){
 			if(strlen(wd.c_tar) == 0){
 				// pas de fichier dans tar impliqué -> chemin invalide
 				// execute real cat
+				if(argv[i][strlen(argv[i])-1] == '/'){
+					argv[i][strlen(argv[i])-1] = '\0';
+				}
 				n = fork();
 				if(n < 0){
 					perror("cat_main fork");
