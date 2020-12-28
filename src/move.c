@@ -259,7 +259,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
     int fd_dest = open(path, O_WRONLY|O_CREAT|O_TRUNC, mode);
     if(check_sys_call(fd_dest, "open in mv_from_tar_to_dir") == -1) return -2;
 
-    int size_write = write(fd_dest, buf, sizeof(char) * shift * BLOCK_SIZE);
+    int size_write = write(fd_dest, buf, sizeof(char) * size);
     if(check_sys_call(size_write, "write in mv_from_tar_to_dir") == -1) return -1;
 
     free(str);
@@ -296,6 +296,9 @@ int mv(char * path_file_source, char * path_file_dest){
 		if(strlen(wd_dest.tar_name) != 0){
 			//source: non-tar -> dest: tar
 			// on lance mv_from_dir_to_tar
+			if(path_file_source[strlen(path_file_source)-1] == '/'){
+				path_file_source[strlen(path_file_source)-1] = '\0';
+			}
 			n = mv_from_dir_to_tar(path_to_tar_dest, path_file_source, path_in_tar_dest);
 
 			return n;

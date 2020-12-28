@@ -62,7 +62,7 @@ int main(int argc, char ** argv){
 				}
 				else if(n == -2){
 					// chemin invalide
-					char error[] = "ls: cannot access: No such file or directory\n";
+					char error[] = "ls: cannot access: No such directory\n";
 
 					n = write(STDERR_FILENO, error, strlen(error));
 					if(n < 0){
