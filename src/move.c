@@ -271,7 +271,7 @@ int mv_from_tar_to_dir(const char *path_tar, const char *path_file_source, char 
 }
 
 int mv(char * path_file_source, char * path_file_dest){
-	int n;
+	int n, taille;
 
 	// get path_to_tar_source & path_in_tar_source
 	struct work_directory wd_source;
@@ -296,8 +296,9 @@ int mv(char * path_file_source, char * path_file_dest){
 		if(strlen(wd_dest.tar_name) != 0){
 			//source: non-tar -> dest: tar
 			// on lance mv_from_dir_to_tar
-			if(path_file_source[strlen(path_file_source)-1] == '/'){
-				path_file_source[strlen(path_file_source)-1] = '\0';
+			taille = strlen(path_file_source);
+			if(path_file_source[taille-1] == '/'){
+				path_file_source[taille-1] = '\0';
 			}
 			n = mv_from_dir_to_tar(path_to_tar_dest, path_file_source, path_in_tar_dest);
 
@@ -311,7 +312,7 @@ int mv(char * path_file_source, char * path_file_dest){
 	}
 	else if(strlen(wd_source.tar_name) != 0){
 		//on enlève le / à la fin de path_in_tar_source si il y en a un
-		int taille = strlen(path_in_tar_source);
+		taille = strlen(path_in_tar_source);
 		if(taille > 0 && path_in_tar_source[taille-1] == '/'){
 			path_in_tar_source[taille-1] = '\0';
 		}
@@ -319,6 +320,10 @@ int mv(char * path_file_source, char * path_file_dest){
 		if(strlen(wd_dest.tar_name) == 0){
 			//source: tar -> dest: non-tar
 			// on lance mv_from_tar_to_dir
+			taille = strlen(path_in_tar_source);
+			if(taille > 0 && path_in_tar_source[taille-1] == '/'){
+				path_in_tar_source[taille-1] = '\0';
+			}
 			n = mv_from_tar_to_dir(path_to_tar_source, path_in_tar_source, path_file_dest);
 
 			return n;
@@ -326,6 +331,10 @@ int mv(char * path_file_source, char * path_file_dest){
 		else{
 			//source: tar -> dest: tar
 			// on lance mv_from_tar_to_tar
+			taille = strlen(path_in_tar_source);
+			if(taille > 0 && path_in_tar_source[taille-1] == '/'){
+				path_in_tar_source[taille-1] = '\0';
+			}
 			n = mv_from_tar_to_tar(path_to_tar_source, path_to_tar_dest, path_in_tar_source, path_in_tar_dest);
 
 			return n;
