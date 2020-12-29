@@ -7,7 +7,7 @@ int read_input(char * input){
 	int n;
 
 	/* write prompt */
-	n = write(STDOUT_FILENO, ">>> ", 5);
+	n = write(STDOUT_FILENO, "### ", 5);
 	if(n < 0){
 		perror("write prompt");
 		return -1;
@@ -23,6 +23,29 @@ int read_input(char * input){
 	//enlever le '\n' de l'input
 	input[n-1] = '\0';
 	return n;
+}
+
+int introduction(void){
+	int n;
+	char intro[] = "\n\t\t\t~ TSHELL by Alessio, Lucas & Luka ~\n\n";
+
+	n = fork();
+	switch (n) {
+		case -1:
+			perror("fork in introduction");
+			return -1;
+		case 0:
+			execlp("clear", "clear", NULL);
+			return -1;
+		default:
+			wait(NULL);
+	}
+	n = write(STDOUT_FILENO, intro, strlen(intro));
+	if(n < 0){
+		perror("write intro");
+		return -1;
+	}
+	return 0;
 }
 
 
@@ -49,6 +72,9 @@ int tshell(void){
 	char path_to_tsh[] = "/home/tsh";
 	//char path_to_tsh[PATH_MAX];
 	//getcwd(path_to_tsh, PATH_MAX);
+
+	/* introduction */
+	n = introduction();
 
 	/* boucle principale */
 	while(run){

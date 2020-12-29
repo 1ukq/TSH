@@ -11,4 +11,6 @@
 
 int read_input(char * input);
 
+int introduction(void);
+
 int tshell(void);
