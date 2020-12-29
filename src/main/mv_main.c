@@ -22,7 +22,10 @@ int main(int argc, char ** argv){
 		//boucle principale, on considère que mv f1 f2 f3 f4 d (=) mv f1 d ; mv f2 d ; ...
 		for(i = 1; i < argc-1; i++){
 			// applique mv
-			if(strstr(argv[argc-1], ".tar") == NULL && strstr(argv[i], ".tar") == NULL){
+			if(strstr(argv[argc-1], ".tar") == NULL && (strstr(argv[i], ".tar") == NULL || (long int)strstr(argv[i], ".tar") > strlen(argv[i])-6)){
+				if(strstr(argv[i], ".tar") != NULL){
+					argv[i][strlen(argv[i])-1] = '\0';
+				}
 				// execute real mv
 				n = fork();
 				if(n < 0){
