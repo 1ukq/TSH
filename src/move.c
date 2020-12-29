@@ -5,6 +5,7 @@ int find_last_block(int fd_tar){
     int size_tar = lseek(fd_tar, 0, SEEK_END);
     int ret = size_tar - (2 * BLOCK_SIZE);
     int ret_lseek = lseek(fd_tar, 0, SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in find_last_block") == -1) return -1;
     return ret;
 
 }
