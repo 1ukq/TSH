@@ -4,6 +4,7 @@
 #include "types/posix_header.h"
 #include "utils/find_file.h"
 #include "utils/init_header.h"
+#include "utils/check_dir.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>

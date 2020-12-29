@@ -16,4 +16,8 @@ char *name(const char *path);
 
 char *concatenate(char *str1, char *str2);
 
+int name_dir_length(const char *path_dir_src);
+
+char *name_dir(const char *path);
+
 #endif
