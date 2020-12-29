@@ -7,7 +7,7 @@ int read_input(char * input){
 	int n;
 
 	/* write prompt */
-	n = write(STDOUT_FILENO, ">>> ", 5);
+	n = write(STDOUT_FILENO, "### ", 5);
 	if(n < 0){
 		perror("write prompt");
 		return -1;
@@ -23,6 +23,29 @@ int read_input(char * input){
 	//enlever le '\n' de l'input
 	input[n-1] = '\0';
 	return n;
+}
+
+int introduction(void){
+	int n;
+	char intro[] = "\n\t\t\t~ TSHELL by Alessio, Lucas & Luka ~\n\n";
+
+	n = fork();
+	switch (n) {
+		case -1:
+			perror("fork in introduction");
+			return -1;
+		case 0:
+			execlp("clear", "clear", NULL);
+			return -1;
+		default:
+			wait(NULL);
+	}
+	n = write(STDOUT_FILENO, intro, strlen(intro));
+	if(n < 0){
+		perror("write intro");
+		return -1;
+	}
+	return 0;
 }
 
 
@@ -47,7 +70,11 @@ int tshell(void){
 
 	/* get path_to_tsh */
 	char path_to_tsh[] = "/home/tsh";
-	// getcwd pour non docker
+	//char path_to_tsh[PATH_MAX];
+	//getcwd(path_to_tsh, PATH_MAX);
+
+	/* introduction */
+	n = introduction();
 
 	/* boucle principale */
 	while(run){
@@ -106,7 +133,12 @@ int tshell(void){
 			/* cd ? */
 			if((strcmp(tab[0][0], "cd") == 0)){
 				// applique cd
-				n = cd(cwd, chemin_absolu(cwd, tab[0][1]));
+				if(tab[0][1] != NULL){
+					n = cd(cwd, chemin_absolu(cwd, tab[0][1]));
+				}
+				else{
+					n = cd(cwd, "/");
+				}
 				// gère erreur de cd
 				if(n == -2){
 					char error[] = "bash: cd: No such directory\n";
