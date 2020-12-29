@@ -98,17 +98,15 @@ char **get_sub_dir(int fd_tar, const char *path_dir_src){
         }
 
         if(strstr(header.name, path_dir_src) != NULL && header.typeflag == DIRTYPE){
-/*
-            sub_dir = malloc(strlen(header.name) + 1);
-            memcpy(sub_dir, header.name, strlen(header.name));
-            sub_dir[strlen(header.name)] = '\0';
-            ret[it] = sub_dir;
-            //printf("%s\n", ret[it]);
-            */
-            ret[it] = malloc(strlen(header.name));
-            memcpy(ret[it], header.name, strlen(header.name));
-            printf("%s\n", ret[it]);
-            //sub_dir[it][strlen(header.name)] = '\0';
+
+            ret[it] = malloc(strlen(header.name) + 1);
+            strcpy(ret[it], header.name);
+            //sub_dir[strlen(header.name)] = '\0';
+            //ret[it] = sub_dir;
+            if(it > 0) printf("%s\n", ret[it - 1]);
+            //printf("%d\n", it);
+            
+            it++; 
 
         }
 
@@ -116,8 +114,7 @@ char **get_sub_dir(int fd_tar, const char *path_dir_src){
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
         ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);    
 
-        rd = read(fd_tar, &header, BLOCK_SIZE);
-        it++;  
+        rd = read(fd_tar, &header, BLOCK_SIZE); 
 
     }
 
@@ -131,10 +128,8 @@ int main(){
 
     int fd = open("test.tar", O_RDWR);
     char **r = get_sub_dir(fd, "dir");
-    char *s = *(r + 4);
-    printf("%s\n", s);
-    //printf("%s\n", r[2]);
-    /*
+    printf("\n");
+    
     char *s = r[0];
     int it = 0;
     while(s != NULL){
@@ -142,5 +137,5 @@ int main(){
         it++;
         s = r[it];
     }
-*/
+
 }
