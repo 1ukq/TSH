@@ -3,8 +3,8 @@
 
 #include "types/posix_header.h"
 #include "types/work_directory.h"
-#include "utils/fonctions_utiles.c"
-#include "utils/find_file.c"
+#include "utils/fonctions_utiles.h"
+#include "utils/find_file.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/uio.h>

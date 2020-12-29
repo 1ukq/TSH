@@ -1,4 +1,4 @@
-#include "../removeDir.c"
+#include "../removeDir.h"
 #include <sys/types.h>
 #include <sys/wait.h>
 
