@@ -89,7 +89,7 @@ all : $(OBJ)
 
 .PHONY = clean
 clean:
-	rm $(OBJ) src/execs/ls_t src/execs/cat_t src/execs/mv_t src/execs/pwd_t src/execs/mkdir_t src/execs/rm_t tshell
+	rm $(OBJ) src/execs/ls_t src/execs/cat_t src/execs/mv_t src/execs/pwd_t src/execs/mkdir_t src/execs/rm_t src/execs/rmdir_t tshell
 
 
 test:
