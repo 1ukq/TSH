@@ -17,7 +17,6 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
     while(strcmp(header.name, path_in_tar)){
 
         if(header.name[0] == '\0'){
-            printf("No such file\n");
             return -1;
         }
 
