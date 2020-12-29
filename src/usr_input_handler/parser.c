@@ -122,8 +122,15 @@ char *** parser(char * input, char * cwd, char * path_to_tsh){
 		j = 1;
 		while(tab[i][j] != NULL){
 			if(implique_tar[i] == 0 && tab[i][j][0] != '-'){
-				// alors tab[i][j] est un chemin
+				// alors tab[i][j] est un chemin ?
 				char * path_abs = strdup(chemin_absolu(cwd, tab[i][j]));
+
+				if(strstr(tab[i][j], "..") != NULL && strstr(cwd, ".tar") != NULL){
+					if(tab[i][j][strlen(tab[i][j])-1] != '/'){
+						path_abs[strlen(path_abs)-1] = '\0';
+					}
+					tab[i][j] = strdup(path_abs);
+				}
 
 				if(strstr(path_abs, ".tar") != NULL){
 					implique_tar[i] = 1;
