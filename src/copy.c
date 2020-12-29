@@ -208,6 +208,8 @@ int copy_from_tar_to_tar(const char *path_tar_src, const char* path_tar_dest, co
     return 0;
 }
 
+int build_tree_structure(const char *path_tar, const char *path_dir_src){}
+
 /*
  * path_tar: chemin absolu vers l'archive
  * path_dit_src: chemin absolu du répertoire source depuis l'archive
