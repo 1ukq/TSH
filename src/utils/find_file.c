@@ -61,6 +61,9 @@ int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
     int size_write = write(fd_tar, buf_sup, size_tar - pos_from);
     if(check_sys_call(size_write, "write in suppress_file") == -1) return -1;
 
+    int ret_trunc = ftruncate(fd_tar, size_tar - (pos_to - pos_from));
+    if(check_sys_call(ret_trunc, "ftruncate in suppress_file") == -1) return -1;
+
     free(buf_sup);
 
     return 0;
