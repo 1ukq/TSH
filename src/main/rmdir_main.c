@@ -1,15 +1,9 @@
-#include "../removeDir.h"
-#include "../types/work_directory.h"
-#include "../utils/fonctions_utiles.h"
+#include "../removeDir.c"
 #include <sys/types.h>
 #include <sys/wait.h>
 
 int main(int argc, char ** argv){
 	int i, n;
-  //afin d'avoir les arguments pour rmdir
-  struct work_directory wd;
-  char path_in_tar[sizeof(wd.c_tar)];
-  char path_to_tar[sizeof(wd.c_htar) + 1 + sizeof(wd.tar_name)];
 
   if(argc >= 2){
 		// recherche de l'option si il y en a une
@@ -43,17 +37,13 @@ int main(int argc, char ** argv){
 				}
 			}
 			else{
-        // !!! Reussir à trouver le path !!!
-        fill_wd(path, &wd);
-        //le chemin n'implique aucun tar
-        if(strlen(wd.tar_name) == 0) return -2;
-				n = removeDirectory(strcat(wd.c_htar,wd.tar_name),strcat(wd.c_tar,argv[i]));
+        n = removedir(argv[i]);
 			}
 
 			if(n == -1){
 				// erreur du type read/write -> voir makedir.c
 				//n'est jamais censé arriver
-				char error[] = "rmdir: error in makedir.c code\n";
+				char error[] = "rmdir: error in removeDir.c code\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
@@ -63,22 +53,22 @@ int main(int argc, char ** argv){
 			}
 			else if(n == -2){
 				// invalid path
-				char error[] = "rmdir: cannot remove directory: directory not empty\n";
+				char error[] = "rmdir: cannot remove directory: No such directory\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
-					perror("rmdir_main write3");
+					perror("rmdir_main write4");
 					return -1;
 				}
 
 			}
 			else if(n == -3){
-				// file already exists
-				char error[] = "rmdir: cannot remove directory: directory does not exists\n";
+				// directory is not empty
+				char error[] = "rmdir: cannot remove directory: Directory not empty\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
 				if(n < 0){
-					perror("rmdir_main write4");
+					perror("rmdir_main write3");
 					return -1;
 				}
 			}

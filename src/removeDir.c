@@ -28,7 +28,7 @@ int removeDirectory(const char *path_tar, const char *path_file_source){
     if(strncmp(header.name, path_file_source, strlen(path_file_source)) == 0){
       count++;
       //directory non vide
-      if(count > 1) return -2;
+      if(count > 1) return -3;
       //pos est le début du header du directory à supprimer.
       pos_dir = pos;
     }
@@ -63,4 +63,28 @@ int removeDirectory(const char *path_tar, const char *path_file_source){
     free(buf_write);
     return 0;
   }
+
+	return -2;
+}
+
+int removedir(char * path){
+	int n;
+	struct work_directory wd;
+
+	fill_wd(path, &wd);
+	if(strlen(wd.tar_name) == 0 || strlen(wd.c_tar) == 0){
+		//le chemin n'implique pas de tar
+		return -2;
+	}
+
+	char path_to_tar[sizeof(wd.c_htar) + 1 + sizeof(wd.tar_name)];
+	char path_in_tar[sizeof(wd.c_tar)];
+
+	sprintf(path_to_tar, "%s/%s", wd.c_htar, wd.tar_name);
+	sprintf(path_in_tar, "%s", wd.c_tar);
+
+	// on applique removeDir
+	n = removeDirectory(path_to_tar, path_in_tar);
+
+	return n;
 }
