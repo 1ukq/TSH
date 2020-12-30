@@ -51,7 +51,7 @@ Partons de `tshell.c` celui-ci est lié aux fichiers `utils_rdr.c`, `parser.c` e
 			- `posix_header.h`
 			- `work_directory.h` *la structure qui y est définie permet de découper un chemin en trois parties: chemin hors-tar, nom du tar et chemin dans le tar*
 		- `usr_input_handler/`
-			- `cmds_launcher.c` & `cmds_launcher.h` *les tubes, les redirections et les appels de fonctions sont gérés ici*
+			- `cmds_launcher.c` & `cmds_launcher.h` *les tubes, les redirections et les appels de fonctions sont gérés ici. Grâce à la fonction cmds_launcher, une série d'une longueur quelconque de pipe peut être exécutée avec éventuellement une redirection à la fin de cette série de commandes. Comme, dans un shell classique, les redirections (sauf redirection de l'entrée standard) ont la priorité sur les pipes, nous avons fait le choix de ne pouvoir faire des redirections qu'après la dernière commande de la série. Il y a cependant un problème avec cette implémentation: la redirection de l'entrée standard ne peut se faire qu'après la dernière commande (comme pour les autres redirection), mais ceci ne correspond pas à l'utilisation de cette redirection dans un shell classique.*
 			- `parser.c` & `parser.h`*permet de "convertir" l'entrée de l'utilisateur en renvoyant un tableau approprié pour faire les bonnes exécutions*
 			- `redirection.c` & `redirection.h`
 			- `tshell.c` & `tshell.h` *fichier principal du projet*
