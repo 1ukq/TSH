@@ -48,6 +48,10 @@ Il nous paraît important de préciser que nous avons investi beaucoup de notre 
 ## Problèmes de `cp -r` et `mv`
 
 ### `mv`
+
 La fonction mv sur un répertoire dans un tar ne fonctionne pas.
 
-### `cp -r`
+### `cp -r` et `cp`
+
+* Notre implémentation de `cp` ne vérifie pas tous les cas d'un `cp` normal. La cible de notre commande `cp` doit toujours être un autre fichier et ne peut pas être un répertoire.
+* Notre implémentation de `cp -r` est également incomplète: nous n'avons pas eu le temps d'écrire la fonction permettant de copier un répertoire (se situant à l'extérieur d'une archive tar) dans un répertoire se situant dans une archive tar.
