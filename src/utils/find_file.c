@@ -78,7 +78,7 @@ char **get_sub_dirs(int fd_tar, const char *path_dir_src){
 
     struct posix_header header;
     int rd = read(fd_tar, &header, BLOCK_SIZE);
-    if(check_sys_call(rd, "read in get_sub_dirs") == -1) return -1;
+    if(check_sys_call(rd, "read in get_sub_dirs") == -1) return NULL;
 
     int size = 0;
     int shift = 0;
@@ -86,8 +86,6 @@ char **get_sub_dirs(int fd_tar, const char *path_dir_src){
 
     char **ret = malloc(11  * sizeof(char *));
     int size_ret = 10;
-
-    char *sub_dir = NULL;
 
     int it = 0;
 
@@ -110,10 +108,10 @@ char **get_sub_dirs(int fd_tar, const char *path_dir_src){
         sscanf(header.size, "%o", &size);
         shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
         ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);   
-        if(check_sys_call(ret_lseek, "lseek in get_sub_dirs") == -1) return -1; 
+        if(check_sys_call(ret_lseek, "lseek in get_sub_dirs") == -1) return NULL; 
 
         rd = read(fd_tar, &header, BLOCK_SIZE); 
-        if(check_sys_call(rd, "read in get_sub_dirs") == -1) return -1;
+        if(check_sys_call(rd, "read in get_sub_dirs") == -1) return NULL;
 
     }
 

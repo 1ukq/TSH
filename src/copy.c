@@ -269,7 +269,6 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
     int fd = 0;
     int ret_lseek = 0;
     int rd = 0;
-    int wr = 0;
 
     ret_lseek = lseek(fd_tar, 0, SEEK_SET);
     if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_dir_r") == -1) return -1;
@@ -286,10 +285,13 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
 
             path = concatenate(path_dir_dest, header.name);
             fd = open(path, O_WRONLY|O_CREAT);
+            if(check_sys_call(fd, "open in copy_from_tar_to_dir_r") == -1) return -1;
             buf = malloc(size);
             rd = read(fd_tar, buf, size);
+            if(check_sys_call(rd, "read in copy_from_tar_to_dir_r") == -1) return -1;
             ret_lseek = lseek(fd_tar, -size, SEEK_CUR);
-            wr = write(fd, buf, size);
+            int wr = write(fd, buf, size);
+            if(check_sys_call(wr, "write in copy_from_tar_to_dir_r") == -1) return -1;
 
         }
 
