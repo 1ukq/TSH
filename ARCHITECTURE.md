@@ -1,3 +1,6 @@
+***Système d'exploitation - projet TSHELL***
+========================
+
 # Introduction
 Pour ce projet, nous avons considérer l'utilisateur au centre de notre objectif. C'est pour cela que l'on a essayé de garder un fonctionnement très proche des shell traditionnels. Cependant cette apparence simple cache de nombreuses lignes de code.
 
@@ -62,7 +65,7 @@ Partons de `tshell.c` celui-ci est lié aux fichiers `utils_rdr.c`, `parser.c` e
 # Fonctionnement du tshell
 Dans cette section nous allons suivre le parcours d'une entrée de l'utilisateur pour se faire une idée du fonctionnement du tshell.
 - Lancement du shell.
-- Le shell gère les signaux et initialise les *variables globales* dont `cwd`.
+- Le shell bloque les signaux et initialise les *variables globales* dont `cwd`.
 - La boucle principale attend une entrée de l'utilisateur. Prenons `input = "ls -l test.tar/dir | head > file"`.
 -	Le shell stocke le type de redirection et le fichier de redirection pour le transmettre aux fonctions qui gèrent ces redirections. L'entrée de l'utilisateur devient `input = "ls -l test.tar/dir | head"`.
 - `input` entre dans le parser qui détermine quelles fonctions sont à appliquer et renvoie un tableau contenant les chemin des executables des fonctions à appliquer ainsi que de leurs arguments en chemin absolu si il le faut. On a alors `tableau = [ [ chemin absolu vers l'exécutable de ls impliquant des tar, -l, chemin absolu vers test.tar/dir ], [head] ]`

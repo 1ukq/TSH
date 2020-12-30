@@ -48,5 +48,6 @@ Il nous paraît important de préciser que nous avons investi beaucoup de notre 
 ## Problèmes de `cp -r` et `mv`
 
 ### `mv`
+La fonction mv sur un répertoire dans un tar ne fonctionne pas.
 
 ### `cp -r`

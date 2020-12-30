@@ -1,13 +1,11 @@
 #include "tshell.h"
-/*
-à lire avant d'utiliser. le problème des chemins n'est pas résolu pour le lancement des executables des fonctions. (je fais reference ici à la partie du parser)
-*/
 
+/*Cette fonction permet de récupérer l'entrée de l'utilisateur et d'afficher le prompt*/
 int read_input(char * input){
 	int n;
 
 	/* write prompt */
-	n = write(STDOUT_FILENO, "### ", 5);
+	n = write(STDOUT_FILENO, "### ", 4);
 	if(n < 0){
 		perror("write prompt");
 		return -1;
@@ -25,6 +23,7 @@ int read_input(char * input){
 	return n;
 }
 
+/* Cette fonction se lance au début du tshell, elle vide la fenêtre et affiche un titre */
 int introduction(void){
 	int n;
 	char intro[] = "\n\t\t\t~ TSHELL by Alessio, Lucas & Luka ~\n\n";
@@ -48,7 +47,7 @@ int introduction(void){
 	return 0;
 }
 
-
+/* tshell */
 int tshell(void){
 	int n, i;
 	_Bool run = 1;
@@ -70,6 +69,7 @@ int tshell(void){
 
 	/* get path_to_tsh */
 	char path_to_tsh[] = "/home/tsh";
+	//les lignes ci-dessous fonctionnent uniquement si le shell est lancé à la racine du projet
 	//char path_to_tsh[PATH_MAX];
 	//getcwd(path_to_tsh, PATH_MAX);
 
@@ -149,43 +149,19 @@ int tshell(void){
 						return -1;
 					}
 				}
-				// do redirection here ?
+				// do redirection here for cd ?
 			}
 			else{
-				//printf("%d\n", redirection_type);
-
+				/* Commands launcher */
 				cmds_launcher(tab, redirection_type, redirection_file);
-
-				wait(NULL); //permet d'attendre la fin des processus dans cmds_launcher ?
-
-				//si tu as besoin de voir le contenu du tableau rétabli le code ci-dessous
-				/*
-				printf("%s\n", redirection_file);
-
-				i = 0;
-				int j;
-				printf("[ ");
-				while(tab[i] != NULL){
-					j = 0;
-					printf("[ ");
-					while(tab[i][j] != NULL){
-						printf("%s ", tab[i][j]);
-						j++;
-					}
-					printf("] ");
-					i++;
-				}
-				printf("]");
-				printf("\n");
-				*/
+				wait(NULL);
 			}
 		}
 	}
 	return 0;
 }
 
-//main
-
+/* main principal pour le shell */
 int main(void){
 
 	int n = tshell();
