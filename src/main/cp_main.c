@@ -2,7 +2,7 @@
 #include "../utils/fonctions_utiles.h"
 #include <sys/types.h>
 #include <sys/wait.h>
-/*
+
 int main(int argc, char ** argv){
 	int n, i, option = 0, dest_tar, ret = 0, fd;
 
@@ -148,11 +148,4 @@ int main(int argc, char ** argv){
 
   return ret;
 }
-*/
 
-int main(){
-	//build_tree_structure("arc.tar", "dir", "./");
-
-	//copy_from_tar_to_dir_r("arc.tar", "src", "./");
-	copy_from_tar_to_tar_r("arc.tar", "dir/", "test.tar", "rep/rep2/");
-}
