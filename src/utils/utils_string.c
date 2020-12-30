@@ -40,12 +40,15 @@ int name_length(const char* path_file_source){
 int name_dir_length(const char *path_dir_src){
 
     int name_length = 0;
+    //printf("%lu\n", strlen(path_dir_src));
     for(int i = strlen(path_dir_src) - 1; i > -1; i--){
         if(path_dir_src[i] == '\0') continue;
-        if(path_dir_src[i] != '/') name_length++;
-        if(path_dir_src[i] == '/' && name_length == 0) name_length++;
-        if(path_dir_src[i] == '/') break;
+        else if(path_dir_src[i] != '/') name_length++;
+        else if(path_dir_src[i] == '/' && name_length == 0) name_length++;
+        else if(path_dir_src[i] == '/') break;
+        //printf("%d\n", name_length);
     }
+    //printf("%d\n", name_length);
     return name_length;
 }
 
@@ -64,6 +67,7 @@ char *name(const char *path){
 char *name_dir(const char *path){
 
     int length = name_dir_length(path);
+    //printf("%d\n", length);
     int len_path = strlen(path);
     char *ret = malloc(sizeof(char) * (length + 1));
     if(ret == NULL) return NULL;
@@ -94,5 +98,29 @@ char *concatenate(char *str1, char *str2){
     ret[len1 + len2] = '\0';
     return ret;
 
+}
+
+int depth_dir(const char *path){
+    int it = 0;
+    int ret = 0;
+    while(path[it] != '\0'){
+        if(path[it] == '/') ret++;
+        it++;
+    }
+    return ret;
+}
+
+int depth_tree_structure(char **dirs){
+    int it = 0;
+    char *dir = dirs[it];
+    int ret = depth_dir(dir);
+    int tmp = 0;
+    while(dir != NULL){
+        tmp = depth_dir(dir);
+        it++;
+        dir = dirs[it];
+        if(tmp > ret) ret = tmp;
+    }
+    return ret;
 }
 

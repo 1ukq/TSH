@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 
@@ -19,5 +20,9 @@ char *concatenate(char *str1, char *str2);
 int name_dir_length(const char *path_dir_src);
 
 char *name_dir(const char *path);
+
+int depth_dir(const char *path);
+
+int depth_tree_structure(char **dirs);
 
 #endif

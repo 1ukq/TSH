@@ -31,7 +31,7 @@ EXEC_RM = rm_t
 OBJ_RM = src/main/rm_main.o src/remove.o src/utils/find_file.o src/utils/fonctions_utiles.o
 
 EXEC_CP = cp_t
-OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/utils/check_file.o
+OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/utils/check_dir.o
 
 EXEC_TSH = tshell
 OBJ_TSH = src/usr_input_handler/tshell.o src/usr_input_handler/parser.o src/usr_input_handler/utils_rdr.o src/utils/fonctions_utiles.o src/usr_input_handler/cmds_launcher.o src/usr_input_handler/redirection.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/cd.o

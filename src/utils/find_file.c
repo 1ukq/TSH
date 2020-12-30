@@ -74,7 +74,7 @@ int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
 /*
  * Permet de trouver le répertoire pointé par path_dir_src et tous ses sous-répertoires dans le tar pointé par fd_tar.
 */
-char **get_sub_dir(int fd_tar, const char *path_dir_src){
+char **get_sub_dirs(int fd_tar, const char *path_dir_src){
 
     struct posix_header header;
     int rd = read(fd_tar, &header, BLOCK_SIZE);
@@ -100,12 +100,8 @@ char **get_sub_dir(int fd_tar, const char *path_dir_src){
         if(strstr(header.name, path_dir_src) != NULL && header.typeflag == DIRTYPE){
 
             ret[it] = malloc(strlen(header.name) + 1);
+            memset(ret[it], '\0', strlen(header.name));
             strcpy(ret[it], header.name);
-            //sub_dir[strlen(header.name)] = '\0';
-            //ret[it] = sub_dir;
-            if(it > 0) printf("%s\n", ret[it - 1]);
-            //printf("%d\n", it);
-            
             it++; 
 
         }
@@ -124,6 +120,7 @@ char **get_sub_dir(int fd_tar, const char *path_dir_src){
 
 }
 
+/*
 int main(){
 
     int fd = open("test.tar", O_RDWR);
@@ -134,8 +131,10 @@ int main(){
     int it = 0;
     while(s != NULL){
         printf("%s\n", s);
+        printf("%d\n", depth_dir(s));
         it++;
         s = r[it];
     }
 
 }
+*/

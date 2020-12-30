@@ -15,4 +15,4 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos);
 
 int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar);
 
-char **get_sub_dir(int fd_tar, const char *path_dir_src);
+char **get_sub_dirs(int fd_tar, const char *path_dir_src);

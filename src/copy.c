@@ -208,38 +208,33 @@ int copy_from_tar_to_tar(const char *path_tar_src, const char* path_tar_dest, co
     return 0;
 }
 
-int build_tree_structure(const char *path_tar, const char *path_dir_src, const char *path_dir_dest){
+int build_tree_structure(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
 
-    char *dir_name = name_dir(path_dir_src);
-    if(contains_entry(path_dir_dest, dir_name) == 0){
-        return -1;
-    }
+    int fd_tar = open(path_tar, O_RDWR);
 
-    int fd_tar = open(path_tar, O_RDONLY);
+    char **dirs = get_sub_dirs(fd_tar, path_dir_src);
+    int dt = depth_tree_structure(dirs);
+    
+    int n = 0;
+    int it = 0;
 
-    struct posix_header header;
-    int rd = read(fd_tar, &header, BLOCK_SIZE);
-
-    int ret_lseek = 0;
-    int nb_blocks = 0;
-    int file_size = 0;
-    int wr = 0;
-
+    char *dir = NULL;
+    char *name_d = NULL;
     char *path = NULL;
 
-    while(header.name[0] != '\0'){
-
-        sscanf(header.size, "%o", &file_size);
-        nb_blocks = file_size % BLOCK_SIZE == 0 ? file_size / BLOCK_SIZE : (file_size / BLOCK_SIZE) + 1;
-
-        if(strstr(header.name, path_dir_src) != NULL && header.typeflag == DIRTYPE){
-
-            dir_name = name_dir(header.name);
-            path = get_path_dir(header.name);
+    while(n <= dt){
+        it = 0;
+        dir = dirs[it];
+        while(dir != NULL){
+            if(depth_dir(dir) == n){
+                name_d = name_dir(dir);
+                path = concatenate(path_dir_dest, dir);
+                mkdir(path, 0700);
+            }
+            it++;
+            dir = dirs[it];
         }
-
-        
-
+        n++;
     }
 
     return 0;
