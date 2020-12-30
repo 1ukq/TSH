@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-
+/* Ce fichier permet de faire de notre cat un executable. C'est aussi ici qu'on gère les erreurs de la fonction aux vues de ce à quoi on s'attend et de ce que renvoie cat */
 int main(int argc, char ** argv){
 	int n, i;
 
@@ -11,7 +11,7 @@ int main(int argc, char ** argv){
 		// recherche de l'option si il y en a une
 		for(i = 1; i < argc; i++){
 			if(argv[i][0] == '-'){
-				// cat ne prends pas d'options dans lorsqu'il est appelé dans un tar
+				// cat ne prends pas d'options lorsqu'il est appelé dans un tar
 				char error[] = "cat: invalid option\n";
 
 				n = write(STDERR_FILENO, error, strlen(error));
@@ -31,6 +31,9 @@ int main(int argc, char ** argv){
 			if(strlen(wd.c_tar) == 0){
 				// pas de fichier dans tar impliqué -> chemin invalide
 				// execute real cat
+				if(argv[i][strlen(argv[i])-1] == '/'){
+					argv[i][strlen(argv[i])-1] = '\0';
+				}
 				n = fork();
 				if(n < 0){
 					perror("cat_main fork");
@@ -73,6 +76,7 @@ int main(int argc, char ** argv){
 		}
 	}
 	else{
+		// le chemin est vide
 		// execute real cat
 		n = fork();
 		if(n < 0){

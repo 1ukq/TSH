@@ -1,5 +1,6 @@
 #include "../move.h"
 
+/* Ce fichier permet de faire de notre mv un executable. C'est aussi ici qu'on gère les erreurs de la fonction aux vues de ce à quoi on s'attend et de ce que renvoie mv */
 int main(int argc, char ** argv){
 	int n, i, ret = 0;
 
@@ -22,7 +23,7 @@ int main(int argc, char ** argv){
 		//boucle principale, on considère que mv f1 f2 f3 f4 d (=) mv f1 d ; mv f2 d ; ...
 		for(i = 1; i < argc-1; i++){
 			// applique mv
-			if(strstr(argv[i], ".tar") == NULL){
+			if(strstr(argv[argc-1], ".tar") == NULL && strstr(argv[i], ".tar") == NULL){
 				// execute real mv
 				n = fork();
 				if(n < 0){

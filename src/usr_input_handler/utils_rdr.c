@@ -1,5 +1,6 @@
 #include "utils_rdr.h"
 
+/* Cette fonction permet de compter le nombre de redirections dans une chaines de caractère. Pour cela on considère que seules les redirections peuvent contenir des des > ou < ainsi, même si celles si sont directement collés à un mot, elles seront prises en compte. */
 int nb_rdr(char * string){
 	int count = 0;
 	char * string_copy = strdup(string);
@@ -15,10 +16,11 @@ int nb_rdr(char * string){
 	return count;
 }
 
+/* Cette fonction permet de déterminer le type de redirection d'une chaine de caractères. Les types sont des entiers définis dans utils_rdr.h. */
 int rdr_type(char * string, char * cwd){
 
 	if(nb_rdr(string) > 1){
-		//trop de redirections
+		//on ne considère au plus qu'une redirection, il y en a plusieurs, on s'arrête.
 		return -2;
 	}
 
@@ -104,10 +106,11 @@ int rdr_type(char * string, char * cwd){
 			token = strtok(NULL, " ");
 		}
 	}
-	// aucunes redirections ou redirection non reconnue
+	// aucunes redirections ou redirection non reconnue par la fonction
 	return 0;
 }
 
+/* Cette fonction permet de déterminer quel fichier est lié à la redirection. Et renvoie son chemin absolu. */
 char * rdr_file(char * string, char * cwd){
 	//use rdr_file after verifying that rdr_type() > 0
 	char * string_copy = strdup(string);
@@ -130,18 +133,3 @@ char * rdr_file(char * string, char * cwd){
 	}
 	return NULL;
 }
-
-/*
-int main(void){
-	char cwd[] = "/home/rf/Bureau/U2021/Projets/tsh/src/utils/";
-	char input[] = "ls -kjl | sad > ../../dir/yo/hey/";
-	int n = rdr_type(input, cwd);
-	printf("%i\n", n);
-	if(n > 0){
-		char * file = strdup(rdr_file(input, cwd));
-		printf("%s\n", file);
-	}
-
-	return 0;
-}
-*/

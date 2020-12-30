@@ -22,7 +22,7 @@
 
 int compare_buffers_of_same_size(char *buf1, char*buf2, int nbytes);
 
-int find_last_block(int fd_tar, struct stat *restrict buf_stat);
+int find_last_block(int fd_tar);
 
 char *buffarize(const char *path_file_source, struct stat *restrict buf);
 

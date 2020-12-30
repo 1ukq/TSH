@@ -53,7 +53,7 @@ int init_header_dir(char * path_in_tar, struct posix_header *p){
 	return 0;
 }
 
-/* Ci-dessous la fonction principale du fichier. Elle prend en argument le chemin absolu du nouveau dossier (cad home/.../test.tar/.../sous_rep/nom_nouveau_rep).
+/* Ci-dessous la fonction principale du fichier. Elle prend en argument le chemin absolu du nouveau dossier (cad /home/.../test.tar/.../sous_rep/nom_nouveau_rep). Pour cela on ouvre le tar, on vérifie qu'un dossier de même nom n'est pas déjà existant, si c'est le cas, on va à la fin du tar (juste avant les deux blocs de '\0') et on y écrit l'entête du dossier, on ajoute deux blocs de '\0' à la fin.
 Renvoie:
  	0 si le répertoire a bien été créé
 	-1 si il y a eu une erreur de type read/write...

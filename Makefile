@@ -33,6 +33,9 @@ OBJ_RM = src/main/rm_main.o src/remove.o src/utils/find_file.o src/utils/fonctio
 EXEC_CP = cp_t
 OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o
 
+EXEC_RMDIR = rmdir_t
+OBJ_RMDIR = src/main/rmdir_main.o src/removeDir.o src/utils/find_file.o src/utils/fonctions_utiles.o
+
 EXEC_TSH = tshell
 OBJ_TSH = src/usr_input_handler/tshell.o src/usr_input_handler/parser.o src/usr_input_handler/utils_rdr.o src/utils/fonctions_utiles.o src/usr_input_handler/cmds_launcher.o src/usr_input_handler/redirection.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/cd.o
 
@@ -59,6 +62,10 @@ $(EXEC_CP) : $(OBJ_CP)
 	$(CC) -o $@ $^ $(FLAGS)
 	mv $(EXEC_CP) src/execs
 
+$(EXEC_RMDIR) : $(OBJ_RMDIR)
+	$(CC) -o $@ $^ $(FLAGS)
+	mv $(EXEC_RMDIR) src/execs
+
 $(EXEC_TSH) : $(OBJ_TSH)
 	$(CC) -o $@ $^ $(FLAGS)
 
@@ -75,12 +82,14 @@ all : $(OBJ)
 	mv $(EXEC_MKDIR) src/execs
 	$(CC) -o $(EXEC_RM) $(OBJ_RM) $(FLAGS)
 	mv $(EXEC_RM) src/execs
+	$(CC) -o $(EXEC_RMDIR) $(OBJ_RMDIR) $(FLAGS)
+	mv $(EXEC_RMDIR) src/execs
 	$(CC) -o $(EXEC_TSH) $(OBJ_TSH) $(FLAGS)
 	rm $(OBJ)
 
 .PHONY = clean
 clean:
-	rm $(OBJ) src/execs/ls_t src/execs/cat_t src/execs/mv_t src/execs/pwd_t src/execs/mkdir_t src/execs/rm_t tshell
+	rm $(OBJ) src/execs/ls_t src/execs/cat_t src/execs/mv_t src/execs/pwd_t src/execs/mkdir_t src/execs/rm_t src/execs/rmdir_t tshell
 
 
 test:

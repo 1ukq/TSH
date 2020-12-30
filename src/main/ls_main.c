@@ -2,6 +2,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/* Ce fichier permet de faire de notre ls un executable. C'est aussi ici qu'on gère les erreurs de la fonction aux vues de ce à quoi on s'attend et de ce que renvoie ls */
 int main(int argc, char ** argv){
 	int i, n;
 	int option = 0;
@@ -62,7 +63,7 @@ int main(int argc, char ** argv){
 				}
 				else if(n == -2){
 					// chemin invalide
-					char error[] = "ls: cannot access: No such file or directory\n";
+					char error[] = "ls: cannot access: No such directory\n";
 
 					n = write(STDERR_FILENO, error, strlen(error));
 					if(n < 0){
@@ -98,7 +99,5 @@ int main(int argc, char ** argv){
 		return -2;
 	}
 
-
-	// return ?
 	return 0;
 }

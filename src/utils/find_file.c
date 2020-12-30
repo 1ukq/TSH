@@ -17,7 +17,6 @@ int pos_file_in_tar(int fd_tar, const char *path_in_tar, int *pos){
     while(strcmp(header.name, path_in_tar)){
 
         if(header.name[0] == '\0'){
-            printf("No such file\n");
             return -1;
         }
 
@@ -60,6 +59,9 @@ int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
 
     int size_write = write(fd_tar, buf_sup, size_tar - pos_from);
     if(check_sys_call(size_write, "write in suppress_file") == -1) return -1;
+
+    int ret_trunc = ftruncate(fd_tar, size_tar - (pos_to - pos_from));
+    if(check_sys_call(ret_trunc, "ftruncate in suppress_file") == -1) return -1;
 
     free(buf_sup);
 
