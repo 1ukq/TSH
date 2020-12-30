@@ -31,7 +31,7 @@ EXEC_RM = rm_t
 OBJ_RM = src/main/rm_main.o src/remove.o src/utils/find_file.o src/utils/fonctions_utiles.o
 
 EXEC_CP = cp_t
-OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/utils/check_dir.o
+OBJ_CP = src/main/cp_main.o src/copy.o src/utils/find_file.o src/utils/init_header.o src/utils/utils_string.o src/utils/check_dir.o src/utils/fonctions_utiles.o
 
 EXEC_RMDIR = rmdir_t
 OBJ_RMDIR = src/main/rmdir_main.o src/removeDir.o src/utils/find_file.o src/utils/fonctions_utiles.o
@@ -84,6 +84,8 @@ all : $(OBJ)
 	mv $(EXEC_RM) src/execs
 	$(CC) -o $(EXEC_RMDIR) $(OBJ_RMDIR) $(FLAGS)
 	mv $(EXEC_RMDIR) src/execs
+	$(CC) -o $(EXEC_CP) $(OBJ_CP) $(FLAGS)
+	mv $(EXEC_CP) src/execs
 	$(CC) -o $(EXEC_TSH) $(OBJ_TSH) $(FLAGS)
 	rm $(OBJ)
 
