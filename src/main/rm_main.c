@@ -101,6 +101,17 @@ int main(int argc, char ** argv){
 								return -1;
 							}
 						}
+
+						if(n == -3){
+							// invalid path 2
+							char error[] = "rm: No such directory\n";
+
+							n = write(STDERR_FILENO, error, strlen(error));
+							if(n < 0){
+								perror("rm_main write3");
+								return -1;
+							}
+						}
 					}
 				}
 			}
