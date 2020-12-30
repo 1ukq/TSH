@@ -3,6 +3,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/* Ce fichier permet de faire de notre cp un executable. C'est aussi ici qu'on gère les erreurs de la fonction aux vues de ce à quoi on s'attend et de ce que renvoie cp */
 int main(int argc, char ** argv){
 	int n, i, option = 0, fd;
 

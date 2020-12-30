@@ -3,9 +3,12 @@
 int remove_file_from_tar(const char *path_tar, const char *path_file_source){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(check_sys_call(fd_tar, "open in remove_file_from_tar") == -1) return -2;
+    if(check_sys_call(fd_tar, "") == -1) return -2;
     int pos[3];
-    pos_file_in_tar(fd_tar, path_file_source, pos);
+    int n = pos_file_in_tar(fd_tar, path_file_source, pos);
+		if(n < 0){
+			return -2;
+		}
     int pos_from = pos[0] - BLOCK_SIZE;
     int pos_to = pos[1];
     int size_tar = lseek(fd_tar, 0, SEEK_END);
@@ -17,12 +20,13 @@ int remove_file_from_tar(const char *path_tar, const char *path_file_source){
 int remove_file_from_tar_r(const char *path_tar, const char *path_dir){
 
     int fd_tar = open(path_tar, O_RDWR);
-    if(check_sys_call(fd_tar, "open in remove_file_from_tar_r") == -1) return -2;
+    if(check_sys_call(fd_tar, "") == -1) return -3;
 
     struct posix_header header;
     int rd = read(fd_tar, &header, BLOCK_SIZE);
     if(check_sys_call(rd, "read in remove_file_from_tar_r") == -1) return -1;
 
+		int nb_file = 0;
     int ret_lseek = 0;
 
     int size_tar = 0;
@@ -59,6 +63,8 @@ int remove_file_from_tar_r(const char *path_tar, const char *path_dir){
             if(check_sys_call(ret_lseek, "lseek in remove_file_from_tar_r") == -1) return -1;
             rd = read(fd_tar, &header, BLOCK_SIZE);
             if(check_sys_call(rd, "read in remove_file_from_tar_r") == -1) return -1;
+
+						nb_file++;
         }
 
         sscanf(header.size, "%o", &file_size);
@@ -70,6 +76,6 @@ int remove_file_from_tar_r(const char *path_tar, const char *path_dir){
 
     }
     close(fd_tar);
-    return 0;
+    return nb_file ? 0 : -3;
 
 }

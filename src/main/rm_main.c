@@ -3,7 +3,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-
+/* Ce fichier permet de faire de notre rm un executable. C'est aussi ici qu'on gère les erreurs de la fonction aux vues de ce à quoi on s'attend et de ce que renvoie rm */
 int main(int argc, char ** argv){
 	int n, i, option = 0;
 
@@ -94,6 +94,17 @@ int main(int argc, char ** argv){
 						if(n == -2){
 							// invalid path
 							char error[] = "rm: No such file\n";
+
+							n = write(STDERR_FILENO, error, strlen(error));
+							if(n < 0){
+								perror("rm_main write3");
+								return -1;
+							}
+						}
+
+						if(n == -3){
+							// invalid path 2
+							char error[] = "rm: No such directory\n";
 
 							n = write(STDERR_FILENO, error, strlen(error));
 							if(n < 0){

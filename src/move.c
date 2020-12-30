@@ -312,7 +312,22 @@ int mv(char * path_file_source, char * path_file_dest){
 		if(taille > 0 && path_in_tar_source[taille-1] == '/'){
 			path_in_tar_source[taille-1] = '\0';
 		}
-
+		//on est dans le cas de déplacement d'un tar
+		if(taille == 0){
+			n = fork();
+			switch (n) {
+				case -1:
+					perror("fork in mv");
+					return -1;
+				case 0:
+					path_file_source[strlen(path_file_source)-1] = '\0'; // on enlève le dernier /
+					execlp("mv", "mv", path_file_source, path_file_dest, NULL);
+					return 0;
+				default:
+					wait(NULL);
+					return 0;
+			}
+		}
 		if(strlen(wd_dest.tar_name) == 0){
 			//source: tar -> dest: non-tar
 			// on lance mv_from_tar_to_dir

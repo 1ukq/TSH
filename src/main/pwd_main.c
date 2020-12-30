@@ -1,5 +1,6 @@
 #include "../pwd.h"
 
+/* Ce fichier permet de faire de notre pwd un executable. C'est aussi ici qu'on gère les erreurs de la fonction. */
 int main(int argc, char ** argv){
 	int n;
 
