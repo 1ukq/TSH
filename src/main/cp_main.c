@@ -70,7 +70,7 @@ int main(int argc, char ** argv){
 	int dest_tar = (strlen(wd_dest.tar_name) == 0 ? 0 : 1);
 
 	//boucle d'execution
-	for(i = 0; i < argc; i++){
+	for(i = 1; i < argc; i++){
 		if(argv[i][0] != '-' && i != last_path){
 			//argv[i] est un chemin source, on le met dans la structure work_directory pour récupérer le chemin vers le tar et le chemin dans le tar
 			struct work_directory wd_source;
@@ -87,7 +87,8 @@ int main(int argc, char ** argv){
 					//non-tar -> tar
 					if(option){
 						//-r (dir to dir)
-						n = copy_from_dir_to_tar_r(path_to_tar_dest, argv[i], path_in_tar_dest);
+						n = -6;
+						//n = copy_from_dir_to_tar_r(path_to_tar_dest, argv[i], path_in_tar_dest);
 					}
 					else{
 						//(file to file)
@@ -142,22 +143,28 @@ int main(int argc, char ** argv){
 						}
 					}
 					else{
-						//(file to file)
-						fd = open(wd_dest.c_htar, O_WRONLY);
-						if(fd < 0){
-							//No such file for destination
-							n = -2;
+						if(strlen(wd_source.c_tar) == 0){
+							//copy d'un fichier .tar vers un répertoire avec option
+							n = -4;
 						}
 						else{
-							if(strlen(wd_source.c_tar) == 0){
-								//copy d'un fichier .tar vers un répertoire sans option
-								n = -4;
+							//(file to file)
+							fd = open(wd_dest.c_htar, O_WRONLY);
+							if(fd < 0){
+								//No such file for destination
+								n = -2;
 							}
 							else{
-								if(path_in_tar_source[strlen(path_in_tar_source)-1] == '/'){
-									path_in_tar_source[strlen(path_in_tar_source)-1] = '\0';
+								if(strlen(wd_source.c_tar) == 0){
+									//copy d'un fichier .tar vers un répertoire sans option
+									n = -4;
 								}
-								n = copy_from_tar(path_to_tar_source, path_in_tar_source, fd);
+								else{
+									if(path_in_tar_source[strlen(path_in_tar_source)-1] == '/'){
+										path_in_tar_source[strlen(path_in_tar_source)-1] = '\0';
+									}
+									n = copy_from_tar(path_to_tar_source, path_in_tar_source, fd);
+								}
 							}
 						}
 					}
@@ -214,6 +221,15 @@ int main(int argc, char ** argv){
 				}
 				else{
 					wait(NULL);
+				}
+			}
+			else if(n == -6){
+				char error[] = "cp: cette partie n'est pas implémentée\n";
+
+				n = write(STDERR_FILENO, error, strlen(error));
+				if(n < 0){
+					perror("cp_main write5");
+					return -1;
 				}
 			}
 			else{

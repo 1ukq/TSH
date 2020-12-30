@@ -35,6 +35,8 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
 
 int build_tree_structure(int fd_tar, const char *path_dir_src, char *path_dir_dest);
 
+int copy_from_dir_to_tar_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest);
+
 int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, char *path_tar_dest, char *path_dir_dest);
 
 #endif
