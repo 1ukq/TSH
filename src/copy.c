@@ -241,6 +241,10 @@ int build_tree_structure(int fd_tar, const char *path_dir_src, char *path_dir_de
         n++;
     }
 
+    free(path);
+    free(name_d);
+    free(dirs);
+
     return 0;
 
 }
@@ -253,6 +257,7 @@ int build_tree_structure(int fd_tar, const char *path_dir_src, char *path_dir_de
 int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
 
     int fd_tar = open(path_tar, O_RDWR);
+    if(check_sys_call(fd_tar, "open in copy_from_tar_to_dir_r") == -1) return -1;
 
     build_tree_structure(fd_tar, path_dir_src, path_dir_dest);
 
@@ -267,7 +272,10 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
     int wr = 0;
 
     ret_lseek = lseek(fd_tar, 0, SEEK_SET);
+    if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_dir_r") == -1) return -1;
+
     rd = read(fd_tar, &header, BLOCK_SIZE);
+    if(check_sys_call(rd, "read in copy_from_tar_to_dir_r") == -1) return -1;
 
     while(header.name[0] != '\0'){
 
@@ -286,9 +294,15 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
         }
 
         ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);
+        if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_dir_r") == -1) return -1;
         rd = read(fd_tar, &header, BLOCK_SIZE);
+        if(check_sys_call(rd, "read in copy_from_tar_to_dir_r") == -1) return -1;
 
     }
+
+    free(path);
+    free(buf);
+    close(fd_tar);
 
     return 0;
 }
@@ -302,9 +316,11 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
 int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, char *path_tar_dest, char *path_dir_dest){
 
     int fd_tar_src = open(path_tar_src, O_RDWR);
+    if(check_sys_call(fd_tar_src, "open in copy_from_tar_to_tar_r") == -1) return -1;
     int fd_tar_dest = 0;
     if(strcmp(path_tar_src, path_tar_dest) != 0){
         fd_tar_dest = open(path_tar_dest, O_RDWR);
+        if(check_sys_call(fd_tar_dest, "open in copy_from_tar_to_tar_r") == -1) return -1;
     }
     else{
         fd_tar_dest = fd_tar_src;
@@ -325,6 +341,7 @@ int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, c
     char *name_dir_src = name_dir(path_dir_src);
     
     rd = read(fd_tar_src, &header, BLOCK_SIZE);
+    if(check_sys_call(rd, "read in copy_from_tar_to_tar_r") == -1) return -1;
     pos += BLOCK_SIZE;
 
     while(header.name[0] != '\0'){
@@ -336,6 +353,7 @@ int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, c
 
             buf = malloc(shift * BLOCK_SIZE);
             rd = read(fd_tar_src, buf, shift * BLOCK_SIZE);
+            if(check_sys_call(rd, "read in copy_from_tar_to_tar_r") == -1) return -1;
 
             //Change header
             char *str = strstr(header.name, name_dir_src);
@@ -353,9 +371,22 @@ int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, c
         if(header.typeflag == DIRTYPE) shift = 1;
         pos += shift * BLOCK_SIZE;
         ret_lseek = lseek(fd_tar_src, pos, SEEK_SET);
-        rd = read(fd_tar_src, &header, BLOCK_SIZE);       
+        if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar_r") == -1) return -1;
+        rd = read(fd_tar_src, &header, BLOCK_SIZE);
+        if(check_sys_call(rd, "read in copy_from_tar_to_tar_r") == -1) return -1;       
 
     }
+
+    if(fd_tar_src == fd_tar_dest){
+        close(fd_tar_src);
+    }
+    else{
+        close(fd_tar_dest);
+        close(fd_tar_src);
+    }
+
+    free(buf);
+    free(path);
 
     return 0;
 
