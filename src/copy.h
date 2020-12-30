@@ -31,8 +31,8 @@ int cat(const char *path_tar, const char *path_file_source);
 
 int copy_from_tar_to_tar(const char *path_tar_src, const char* path_tar_dest, const char *file_src, const char *file_dest);
 
-int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_tar_dest, const char *src, const char *dest);
+int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest);
 
-int build_tree_structure(const char *path_tar, const char *path_dir_src, char *path_dir_dest);
+int build_tree_structure(int fd_tar, const char *path_dir_src, char *path_dir_dest);
 
 #endif

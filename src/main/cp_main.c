@@ -151,5 +151,7 @@ int main(int argc, char ** argv){
 */
 
 int main(){
-	build_tree_structure("test.tar", "dir", "./");
+	//build_tree_structure("arc.tar", "dir", "./");
+
+	copy_from_tar_to_dir_r("arc.tar", "src", "./");
 }

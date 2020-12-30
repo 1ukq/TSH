@@ -208,15 +208,18 @@ int copy_from_tar_to_tar(const char *path_tar_src, const char* path_tar_dest, co
     return 0;
 }
 
-int build_tree_structure(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
-
-    int fd_tar = open(path_tar, O_RDWR);
+/*
+ * Construit l'arborescence du répertoire path_dit_src contenue dans l'archive path_tar, dans le répertoire path_dir_dest (en dehors d'un tar)
+*/
+int build_tree_structure(int fd_tar, const char *path_dir_src, char *path_dir_dest){
 
     char **dirs = get_sub_dirs(fd_tar, path_dir_src);
     int dt = depth_tree_structure(dirs);
-    
+
     int n = 0;
     int it = 0;
+
+    int ret_mkdir = 0;
 
     char *dir = NULL;
     char *name_d = NULL;
@@ -229,7 +232,8 @@ int build_tree_structure(const char *path_tar, const char *path_dir_src, char *p
             if(depth_dir(dir) == n){
                 name_d = name_dir(dir);
                 path = concatenate(path_dir_dest, dir);
-                mkdir(path, 0700);
+                ret_mkdir = mkdir(path, 0700);
+                if(check_sys_call(ret_mkdir, "mkdir in copy_from_tar_to_tar") == -1) return -1;
             }
             it++;
             dir = dirs[it];
@@ -244,10 +248,74 @@ int build_tree_structure(const char *path_tar, const char *path_dir_src, char *p
 /*
  * path_tar: chemin absolu vers l'archive
  * path_dit_src: chemin absolu du répertoire source depuis l'archive
- * path_dir_dest: chemin absolu du répertoire de destination
+ * path_dir_dest: chemin absolu du répertoire de destination (hors tar)
 */
-int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, const char *path_dir_dest){
+int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
+
+    int fd_tar = open(path_tar, O_RDWR);
+
+    build_tree_structure(fd_tar, path_dir_src, path_dir_dest);
+
+    struct posix_header header;
+    int size = 0;
+    int shift = 0;
+    char *path = NULL;
+    char *buf = NULL;
+    int fd = 0;
+    int ret_lseek = 0;
+    int rd = 0;
+    int wr = 0;
+
+    ret_lseek = lseek(fd_tar, 0, SEEK_SET);
+    rd = read(fd_tar, &header, BLOCK_SIZE);
+
+    while(header.name[0] != '\0'){
+
+        sscanf(header.size, "%o", &size);
+        shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+
+        if(strstr(header.name, path_dir_src) != NULL && header.typeflag != DIRTYPE){
+
+            path = concatenate(path_dir_dest, header.name);
+            fd = open(path, O_WRONLY|O_CREAT);
+            buf = malloc(size);
+            rd = read(fd_tar, buf, size);
+            ret_lseek = lseek(fd_tar, -size, SEEK_CUR);
+            wr = write(fd, buf, size);
+
+        }
+
+        ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);
+        rd = read(fd_tar, &header, BLOCK_SIZE);
+
+    }
+
     return 0;
+}
+
+/*
+ * path_tar_src: chemin absolu vers l'archive source
+ * path_tar_dest: chemin absolu vers l'archive de destination
+ * path_dit_src: chemin absolu du répertoire source depuis l'archive source
+ * path_dir_dest: chemin absolu du répertoire de destination depuis l'archive de destination
+*/
+copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, char *path_tar_dest, char *path_dir_dest){
+
+
+
+    return 0;
+
+}
+
+/*
+ * path_tar: chemin absolu vers l'archive
+ * path_dit_src: chemin absolu du répertoire source (hors archive)
+ * path_dir_dest: chemin absolu du répertoire de destination depuis l'archive
+*/
+copy_from_dir_to_tar_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
+
+    return 0;
+
 }
 
 int cat(const char *path_tar, const char *path_file_source){

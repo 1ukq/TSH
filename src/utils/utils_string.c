@@ -40,16 +40,14 @@ int name_length(const char* path_file_source){
 int name_dir_length(const char *path_dir_src){
 
     int name_length = 0;
-    //printf("%lu\n", strlen(path_dir_src));
     for(int i = strlen(path_dir_src) - 1; i > -1; i--){
         if(path_dir_src[i] == '\0') continue;
         else if(path_dir_src[i] != '/') name_length++;
         else if(path_dir_src[i] == '/' && name_length == 0) name_length++;
         else if(path_dir_src[i] == '/') break;
-        //printf("%d\n", name_length);
     }
-    //printf("%d\n", name_length);
     return name_length;
+
 }
 
 char *name(const char *path){
@@ -67,7 +65,6 @@ char *name(const char *path){
 char *name_dir(const char *path){
 
     int length = name_dir_length(path);
-    //printf("%d\n", length);
     int len_path = strlen(path);
     char *ret = malloc(sizeof(char) * (length + 1));
     if(ret == NULL) return NULL;
