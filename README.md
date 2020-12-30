@@ -10,6 +10,10 @@ Voici la manière la plus sûre de compiler et d'utiliser le projet.
 * Faire `cd home/tsh`
 * Compiler avec `make all`
 * Utiliser le shell avec `./tshell`
+  
+## Information Dockerfile
+
+Nous avons peu d'expérience concernant l'utilisation de docker, nous préférons donc préciser ceci: la version de `tar` utilisée dans l'image Alpine est tar busybox (la commande `tar --version` affiche `tar (busybox) 1.31.1`), et il nous paraît important de préciser que certaines fonctions ne marcheront pas si elles sont utilisées sur des archives crées avec `GNU tar`. En effet, les arichives dans notre projet doivent toujours finir avec deux blocs remplis de `\0`, ni plus; ni moins.
 
 
 # Fonctionnalités
