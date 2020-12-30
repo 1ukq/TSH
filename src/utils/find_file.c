@@ -68,3 +68,68 @@ int suppress_file(int fd_tar, int pos_from, int pos_to, int size_tar){
     return 0;
 
 }
+
+
+/*
+ * Permet de trouver le répertoire pointé par path_dir_src et tous ses sous-répertoires dans le tar pointé par fd_tar.
+*/
+char **get_sub_dirs(int fd_tar, const char *path_dir_src){
+
+    struct posix_header header;
+    int rd = read(fd_tar, &header, BLOCK_SIZE);
+    if(check_sys_call(rd, "read in get_sub_dirs") == -1) return NULL;
+
+    int size = 0;
+    int shift = 0;
+    int ret_lseek;
+
+    char **ret = malloc(11  * sizeof(char *));
+    int size_ret = 10;
+
+    int it = 0;
+
+    while(header.name[0] != '\0'){
+
+        if(it == size_ret){
+            size_ret += 10;
+            ret = realloc(ret, size_ret + 1);
+        }
+
+        if(strstr(header.name, path_dir_src) != NULL && header.typeflag == DIRTYPE){
+
+            ret[it] = malloc(strlen(header.name) + 1);
+            memset(ret[it], '\0', strlen(header.name));
+            strcpy(ret[it], header.name);
+            it++; 
+
+        }
+
+        sscanf(header.size, "%o", &size);
+        shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+        ret_lseek = lseek(fd_tar, shift * BLOCK_SIZE, SEEK_CUR);   
+        if(check_sys_call(ret_lseek, "lseek in get_sub_dirs") == -1) return NULL; 
+
+        rd = read(fd_tar, &header, BLOCK_SIZE); 
+        if(check_sys_call(rd, "read in get_sub_dirs") == -1) return NULL;
+
+    }
+
+    ret[it] = NULL;
+
+    return ret;
+
+}
+
+int insert_end_tar(int fd_tar, void *buf, int size_buf){
+
+    int last = lseek(fd_tar, -2 * BLOCK_SIZE, SEEK_END);
+    if(check_sys_call(last, "lseek in insert_end_tar") == -1) return -1;
+    int wr = write(fd_tar, buf, size_buf);
+    if(check_sys_call(wr, "write in insert_end_tar") == -1) return -1;
+    char *null_buf = malloc(2 * BLOCK_SIZE);
+    wr = write(fd_tar, null_buf, 2 * BLOCK_SIZE);
+    if(check_sys_call(wr, "write in insert_end_tar") == -1) return -1;
+
+    return 0;
+
+}
