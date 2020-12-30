@@ -1,15 +1,12 @@
 #include "list_file.h"
 
 
-
+/* La fonction vérifie que le fichier est à afficher et si il l'est, elle convertit le fullname en name exact. Renvoie false (0) si le fichier n'est pas à afficher, true (!= 0) sinon et ajoute le nom exact dans name
+- name : emplacement nouvelle variable name
+- fullname : p.name (nom à vérifier puis convertir)
+- path_cwd : path_cwd */
 int verif_convert_name(char * name, char * fullname, const char * path_cwd)
 {
-	/*
-	La fonction vérifie que le fichier est à afficher et si il l'est, il convertit le fullname en name exact. Renvoie false (0) si le fichier n'est pas à afficher, true (!= 0) sinon et ajoute le nom exact dans name
-	- name : emplacement nouvelle variable name
-	- fullname : p.name (nom à vérifier puis convertir)
-	- path_cwd : path_cwd
-	*/
 
 	int i, j, size_name;
 	int size_fullname = 100;
@@ -40,6 +37,7 @@ int verif_convert_name(char * name, char * fullname, const char * path_cwd)
 	return 0;
 }
 
+/* Cette fonction met le type dans la variable type sous forme de chaine de caractère. Celle-ci se base sur LTYPE défini dans list_file.h */
 void get_type(char ptypeflag, char * type)
 {
 	//char * ltype = "-7lcbdps";
@@ -47,6 +45,7 @@ void get_type(char ptypeflag, char * type)
 	type[1] = '\0';
 }
 
+/* Cette fonction réalise la conversion d'un char * octal en char * décimal */
 void oct_to_dec(char * oct, char * dec)
 {
 	int dec_int;
@@ -55,6 +54,7 @@ void oct_to_dec(char * oct, char * dec)
 	sprintf(dec, "%i", dec_int);
 }
 
+/* Cette fonction fait la conversion d'un char * decimal en char * binaire */
 void dec_to_bin(char * dec, char * bin)
 {
 	int i;
@@ -67,6 +67,7 @@ void dec_to_bin(char * dec, char * bin)
 	}
 }
 
+/* Cette fonction fait la conversion d'un char * octal en char * binaire */
 void oct_to_bin(char * oct, char * bin)
 {
     char dec_str[sizeof(oct)];
@@ -75,6 +76,7 @@ void oct_to_bin(char * oct, char * bin)
 	dec_to_bin(dec_str, bin);
 }
 
+/* Cette fonction permet de traduire les permissions en octal vers les permissions en alphabétique pour l'affichage dans ls -l */
 void get_permissions(char * perm_oct, char * perm_str)
 {
 	//char * lperm = "rwxrwxrwx";
@@ -96,6 +98,7 @@ void get_permissions(char * perm_oct, char * perm_str)
 	perm_str[sizeof(perm_str)+1] = '\0';
 }
 
+/* Cette fonction permet de convertir dans un système plus compréhensible les dates de dernières modifications d'un fichier lors de l'appelle de ls -l */
 void get_time(char * time_oct, char * time)
 {
 	int i;
@@ -163,21 +166,17 @@ void get_time(char * time_oct, char * time)
 }
 
 
+/* ls tente de réagir comme un ls "normal" à ceci prêt qu'elle est à aplliquer sur un tar. La fonction fait appelle à la structure tsh/src/types/work_directory.h pour séparer le chemin absolu donné en argument. Son fonctionnement consiste à lire chaque entête du tar et afficher son nom / ses informations ssi l'entete est à afficher aux vu du path cad si le nom de l'entete est du type chemin_de_path_dans_le_tar/...
 
+- option : NULL pour un ls et "-l" pour un ls -l
+- path : chemin absolu (impliquant un unique tar)
+
+return value:
+- (>= 0) nb fichiers si tout se passe bien
+- -1 si erreur de type write...
+- -2 si le chemin n'existe pas ou n'implique aucun tar */
 int ls(char * option, char * path)
 {
-	/*
-	- !! REMARQUE IMPORTANTE !! on considère que les path fournis existent (en effet ils seront "filtrés" par les processus lors de l'input de l'utilisateur
-	- ls(...) : renvoie le nombre de fichiers si tout s'est bien passé et -1 sinon
-	- option : NULL pour un ls et "-l" pour un ls -l
-	- path : chemin absolu (impliquant un unique tar)
-
-	return value:
-	- (>= 0) nb fichiers si tout se passe bien
-	- -1 si erreur de type write...
-	- -2 si le chemin n'existe pas
-	*/
-
 	//Note : la fonction ne prend pas encore en compte le nombre de liens pour chaque fichiers
 	struct work_directory wd;
 
@@ -204,13 +203,14 @@ int ls(char * option, char * path)
 	char gid[8];
 	char perm_str[sizeof(p.mode)];
 
-
+	// check option
 	if(option != NULL){
 		if(strcmp(option,"-l") != 0){
 			return -3;
 		}
 	}
 
+	// on rempli la structure pour l'étude
 	fill_wd(path, &wd);
 	if(strlen(wd.tar_name) == 0)
 	{
@@ -233,7 +233,7 @@ int ls(char * option, char * path)
 	{
 		if(p.name[0] == '\0')
 		{
-			/* Fin du tar */
+			//fin du tar
 			close(fd);
 
 			if((total > 0) && (option == NULL))
@@ -269,7 +269,7 @@ int ls(char * option, char * path)
 
 		sscanf(p.size, "%o", &size_dec); //conversion str octal -> int décimal
 
-		/* Vérification + conversion (à gauche) que le fichier est à afficher */
+		/* Vérification que le fichier est à afficher + conversion (à gauche) */
 		if(path_exist && verif_convert_name(name, p.name, path_in_tar) != 0)
 		{
 			/* Ici name a son nom exact */

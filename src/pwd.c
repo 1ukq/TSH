@@ -1,5 +1,6 @@
 #include "pwd.h"
 
+/* pwd agit qu'en simple "afficheur" de ce qu'on lui passe en argument, on lui donnera à chaque fois la variable "globale" cwd. La fonction renvoie 0 si tout s'est bien passé, -1 sinon. */
 int pwd(char * path_cwd)
 {
 	int n;

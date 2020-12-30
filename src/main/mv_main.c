@@ -1,5 +1,6 @@
 #include "../move.h"
 
+/* Ce fichier permet de faire de notre mv un executable. C'est aussi ici qu'on gère les erreurs de la fonction aux vues de ce à quoi on s'attend et de ce que renvoie mv */
 int main(int argc, char ** argv){
 	int n, i, ret = 0;
 
