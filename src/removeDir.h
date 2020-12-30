@@ -1,7 +1,9 @@
-#ifndef REMOVE
-#define REMOVE
+#ifndef REMOVEDIR
+#define REMOVEDIR
 
 #include "types/posix_header.h"
+#include "types/work_directory.h"
+#include "utils/fonctions_utiles.h"
 #include "utils/find_file.h"
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -17,7 +19,8 @@
 
 #define BLOCK_SIZE 512
 
-int remove_file_from_tar(const char *path_tar, const char *path_file_source);
-int remove_file_from_tar_r(const char *path_tar, const char *path_file_source);
+int removeDirectory(const char *path_tar, const char *path_file_source);
+
+int removedir(char * path);
 
 #endif

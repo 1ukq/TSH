@@ -1,4 +1,14 @@
-La chose, qui attendait, s'est alertée, elle a fondu sur moi, elle se coule en moi, j'en suis plein. - Ce n'est rien: la Chose, 
+#!/bin/bash
+
+mkdir targets
+mkdir targets/test_dir
+mkdir targets/dest
+
+touch targets/test_dir/foo
+touch targets/test_dir/helloworld
+touch targets/bar
+
+echo -n "La chose, qui attendait, s'est alertée, elle a fondu sur moi, elle se coule en moi, j'en suis plein. - Ce n'est rien: la Chose, 
 c'est moi. L'existence, libérée, dégagée, reflue sur moi. J'existe. J'existe. C'est doux, si doux, si lent. Et léger: on dirait 
 que ça tient en l'air tout seul. Ça remue. Ce sont des effleurements partout qui fondent et s'évanouissent. Tout doux, tout doux. 
 Il y a de l'eau mousseuse dans ma bouche. Je l'avale, elle glisse dans ma gorge, elle me caresse - et la voila qui renaît dans 
@@ -13,4 +23,39 @@ bêtes qui s'agitent au bout de mes bras. Ma main gratte une de ses pattes, avec
 table qui n'est pas moi. C'est long, long, cette impression de poids, ça ne passe pas. Il n'y a pas de raison pour que ça passe. 
 A la longue, c'est intolérable... Je retire ma main, je la mets dans ma poche. Mais je sens tout de suite, à travers l'étoffe, la 
 chaleur de ma cuisse. Aussitôt, je fais sauter ma main de ma poche; je la laisse pendre contre le dossier de la chaise. 
-Maintenant, je sens son poids au bout de mon bras. Elle tire un peu, à peine, mollement, moelleusement, elle existe.
+Maintenant, je sens son poids au bout de mon bras. Elle tire un peu, à peine, mollement, moelleusement, elle existe." > targets/bar
+
+echo -n "123456789
+AZERTYUIO" > targets/test_dir/foo
+
+echo -n "Hello world !" > targets/test_dir/helloworld
+
+#tar file use for all tests
+tar cf targets/test_1.tar targets/bar targets/test_dir
+
+#tar file for suppress_file test
+tar cf targets/expected_suppress_test.tar targets/test_dir
+
+#tar file for remove_file_from_tar test
+tar cf targets/expected_remove_file_from_tar_test.tar targets/test_dir
+
+touch targets/dest
+
+
+#ls & ls -l
+#tar cf targets/test.tar targets
+#mkdir targets/test_dir_ls
+
+#touch targets/test_dir_ls/ls_expected.txt
+#touch targets/test_dir_ls/lsl_expected.txt
+
+#echo -n -e "test_dir\tbar\tdest\t
+#" > targets/test_dir_ls/ls_expected.txt
+
+#echo -n "drwxr-xr-x  rf/L  0  $(date +%F) $(date +%R)  test_dir
+#-rw-r--r--  rf/L  19  $(date +%F) $(date +%R)  bar
+#-rw-r--r--  rf/L  2090  $(date +%F) $(date +%R)  dest
+#" > targets/test_dir_ls/lsl_expected.txt
+
+#pwd
+#mkdir targets/test_dir_pwd
