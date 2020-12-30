@@ -120,6 +120,17 @@ char **get_sub_dirs(int fd_tar, const char *path_dir_src){
 
 }
 
+int insert_end_tar(int fd_tar, void *buf, int size_buf){
+
+    int last = lseek(fd_tar, -2 * BLOCK_SIZE, SEEK_END);
+    int wr = write(fd_tar, buf, size_buf);
+    char *null_buf = malloc(2 * BLOCK_SIZE);
+    wr = write(fd_tar, null_buf, 2 * BLOCK_SIZE);
+
+    return 0;
+
+}
+
 /*
 int main(){
 

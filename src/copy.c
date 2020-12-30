@@ -299,9 +299,63 @@ int copy_from_tar_to_dir_r(const char *path_tar, const char *path_dir_src, char 
  * path_dit_src: chemin absolu du répertoire source depuis l'archive source
  * path_dir_dest: chemin absolu du répertoire de destination depuis l'archive de destination
 */
-copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, char *path_tar_dest, char *path_dir_dest){
+int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, char *path_tar_dest, char *path_dir_dest){
 
+    int fd_tar_src = open(path_tar_src, O_RDWR);
+    int fd_tar_dest = 0;
+    if(strcmp(path_tar_src, path_tar_dest) != 0){
+        fd_tar_dest = open(path_tar_dest, O_RDWR);
+    }
+    else{
+        fd_tar_dest = fd_tar_src;
+    }
 
+    struct posix_header header;
+
+    int rd = 0;
+    int size = 0;
+    int shift = 0;
+    int ret_lseek = 0;
+    char *buf = NULL;
+
+    char *path = NULL;
+
+    int pos = 0;
+
+    char *name_dir_src = name_dir(path_dir_src);
+    
+    rd = read(fd_tar_src, &header, BLOCK_SIZE);
+    pos += BLOCK_SIZE;
+
+    while(header.name[0] != '\0'){
+
+        sscanf(header.size, "%o", &size);
+        shift = size % BLOCK_SIZE == 0 ? size / BLOCK_SIZE : (size / BLOCK_SIZE) + 1;
+
+        if(strstr(header.name, path_dir_src) != NULL){
+
+            buf = malloc(shift * BLOCK_SIZE);
+            rd = read(fd_tar_src, buf, shift * BLOCK_SIZE);
+
+            //Change header
+            char *str = strstr(header.name, name_dir_src);
+            path = concatenate(path_dir_dest, str);
+            memset(header.name, '\0', 100);
+            strcpy(header.name, path);
+            printf("%s\n", str);
+            set_checksum(&header);
+
+            insert_end_tar(fd_tar_dest, &header, BLOCK_SIZE);
+            insert_end_tar(fd_tar_dest, buf, shift * BLOCK_SIZE);
+
+        } 
+
+        if(header.typeflag == DIRTYPE) shift = 1;
+        pos += shift * BLOCK_SIZE;
+        ret_lseek = lseek(fd_tar_src, pos, SEEK_SET);
+        rd = read(fd_tar_src, &header, BLOCK_SIZE);       
+
+    }
 
     return 0;
 
@@ -312,7 +366,7 @@ copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, char 
  * path_dit_src: chemin absolu du répertoire source (hors archive)
  * path_dir_dest: chemin absolu du répertoire de destination depuis l'archive
 */
-copy_from_dir_to_tar_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
+int copy_from_dir_to_tar_r(const char *path_tar, const char *path_dir_src, char *path_dir_dest){
 
     return 0;
 
