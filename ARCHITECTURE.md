@@ -25,16 +25,16 @@ Partons de `tshell.c` celui-ci est lié aux fichiers `utils_rdr.c`, `parser.c` e
 	- `Makefile` *pour lancer le tshell*
 	- `README.md` *à lire absolument*
 	- `src/`
-		- `cd.c` & `cd.h`
+		- `cd.c` & `cd.h` *cd vérifie que le nouveau chemin existe et remplace la variable globale cwd par ce nouveau chemin, sinon il ne fait rien*
 		- `copy.c` & `copy.h`
-		- `list_file.c` & `list_file.h`
-		- `makedir.c` & `makedir.h`
+		- `list_file.c` & `list_file.h` *ls parcourt toutes les entêtes du tar et affiche les noms (et informations) des entêtes dont le nom contient le chemin donné en argument*
+		- `makedir.c` & `makedir.h` *mkdir parcourt toutes les entêtes et vérifie qu'il n'existe pas déjà un répertoire de même nom puis ajout l'entête appropriée en fin de tar*
 		- `move.c` & `move.h` *cat se trouve ici*
-		- `pwd.c` & `pwd.h`
+		- `pwd.c` & `pwd.h` *pwd ne fait qu'afficher ce qu'on lui donne en argument. En pratique on lui donne à chaque fois la variable globale cwd*
 		- `remove.c` & `remove.h`
-		- `removeDir.c` & `removeDir.h`
+		- `removeDir.c` & `removeDir.h` *rmdir parcourt toutes les entêtes du tar et supprime le répertoire concerné ssi il est vide*
 		- `execs/` *rempli d'exécutables après avoir make*
-		- `main/`*remarque: étant donné que cd modifie la variable globale cwd dans le shell, nous avons décidé de ne pas appeler cd par un executable*
+		- `main/`*Ces mains permettent principalement de faire plusieurs appels en même temps sur une fonction et de créer des exécutables pour chacune d'entre elles. Remarque: étant donné que cd modifie la variable globale cwd dans le shell, nous avons décidé de ne pas appeler cd par un exécutable*
 			- `cat_main.c`
 			- `cp_main.c`
 			- `ls_main.c`
@@ -49,13 +49,13 @@ Partons de `tshell.c` celui-ci est lié aux fichiers `utils_rdr.c`, `parser.c` e
 			- `work_directory.h` *la structure qui y est définie permet de découper un chemin en trois parties: chemin hors-tar, nom du tar et chemin dans le tar*
 		- `usr_input_handler/`
 			- `cmds_launcher.c` & `cmds_launcher.h` *les tubes, les redirections et les appels de fonctions sont gérés ici*
-			- `parser.c` & `parser.h`
+			- `parser.c` & `parser.h`*permet de "convertir" l'entrée de l'utilisateur en renvoyant un tableau approprié pour faire les bonnes exécutions*
 			- `redirection.c` & `redirection.h`
-			- `tshell.c` & `tshell.h`
-			- `utils_rdr.c` & `utils_rdr.h`
+			- `tshell.c` & `tshell.h` *fichier principal du projet*
+			- `utils_rdr.c` & `utils_rdr.h` *ces fonctions permettent de déterminer le type et le fichier de redirection*
 		- `utils/`
 			- `find_file.c` & `find_file.h`
-			- `fonctions_utiles.c` & `fonctions_utiles.h` *la fonction chemin_absolu définie dans ce fichier renvoie un chemin absolu commençant et se terminant par un /*
+			- `fonctions_utiles.c` & `fonctions_utiles.h` *la fonction chemin_absolu définie dans ce fichier renvoie un chemin absolu commençant et se terminant par un /, les autres fonctions sont fortement liées à work_directory.h*
 			- `init_header.c` & `init_header.h`
 			- `utils_string.c` & `utils_string.h`
 
@@ -70,4 +70,4 @@ Dans cette section nous allons suivre le parcours d'une entrée de l'utilisateur
 - On retourne en haut de la boucle principale
 
 # Réponse au sujet
-Après ces quelques mois de travail, nous avons réussi à rendre un shell fonctionnel sur un docker (voir `README.md`) qui répond aux grandes lignes du sujet. Néanmoins nous sommes conscients que certaines choses seraient à améliorer comme la gestion des erreurs, la propreté et la cohérence du code ou encore le déroulement de certaines fonctions. Cependant il nous a fallu faire des choix cruciaux pour respecter les délais.
+Après ces quelques mois de travail, nous avons réussi à rendre un shell fonctionnel sur un docker (voir `README.md`) qui répond aux grandes lignes du sujet. Néanmoins nous sommes conscients que certaines choses seraient à améliorer comme la gestion des erreurs, la propreté et la cohérence du code ou encore le déroulement de certaines fonctions. Cependant il nous a fallu faire des choix cruciaux pour respecter les délais imposés.
