@@ -341,7 +341,7 @@ int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, c
     int pos = 0;
 
     char *name_dir_src = name_dir(path_dir_src);
-    
+
     rd = read(fd_tar_src, &header, BLOCK_SIZE);
     if(check_sys_call(rd, "read in copy_from_tar_to_tar_r") == -1) return -1;
     pos += BLOCK_SIZE;
@@ -368,14 +368,14 @@ int copy_from_tar_to_tar_r(const char *path_tar_src, const char *path_dir_src, c
             insert_end_tar(fd_tar_dest, &header, BLOCK_SIZE);
             insert_end_tar(fd_tar_dest, buf, shift * BLOCK_SIZE);
 
-        } 
+        }
 
         if(header.typeflag == DIRTYPE) shift = 1;
         pos += shift * BLOCK_SIZE;
         ret_lseek = lseek(fd_tar_src, pos, SEEK_SET);
         if(check_sys_call(ret_lseek, "lseek in copy_from_tar_to_tar_r") == -1) return -1;
         rd = read(fd_tar_src, &header, BLOCK_SIZE);
-        if(check_sys_call(rd, "read in copy_from_tar_to_tar_r") == -1) return -1;       
+        if(check_sys_call(rd, "read in copy_from_tar_to_tar_r") == -1) return -1;
 
     }
 
@@ -406,7 +406,70 @@ int copy_from_dir_to_tar_r(const char *path_tar, const char *path_dir_src, char 
 }
 
 int cat(const char *path_tar, const char *path_file_source){
-    int n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
-    return n;
+	int n;
+	int size_dec;
+	int shift;
+	char link_path[100];
 
+	struct posix_header p;
+
+	int fd = open(path_tar, O_RDONLY);
+	if(fd < 0){
+		perror("open tar");
+		return -2;
+	}
+
+	while(read(fd, &p, BLOCK_SIZE) > 0){
+		/*fin du tar*/
+		if(p.name[0] == '\0'){
+			//end of tar: No such file in tar
+			close(fd);
+			return -2;
+		}
+
+		/*récupère le nom*/
+		if(strcmp(p.name, path_file_source) == 0){
+			//c'est le fichier qui nous interresse
+			/*vérifie si c'est un lien symbolique ou non*/
+			if(p.linkname[0] != '\0'){
+				n = fork();
+				if(n < 0){
+					perror("cat fork");
+					return -1;
+				}
+				else if(n != 0){
+					sprintf(link_path, "%s", p.linkname);
+					execlp("/home/tsh/src/execs/cat_t", "cat_t", link_path, NULL);
+
+					perror("exec in cat");
+					return -1;
+				}
+				else{
+					wait(NULL);
+					close(fd);
+					return 0;
+				}
+			}
+			else{
+				//ce n'est pas un lien on copie le fichier sur STDOUT_FILENO
+				close(fd);
+				n = copy_from_tar(path_tar, path_file_source, STDOUT_FILENO);
+
+			  return n;
+			}
+		}
+
+
+		/* Passe à l'en-tête suivant */
+		sscanf(p.size, "%o", &size_dec);
+		shift = (size_dec + BLOCK_SIZE -1)/BLOCK_SIZE;
+		n = lseek(fd, shift*BLOCK_SIZE, SEEK_CUR);
+		if(n < 0)
+		{
+			perror("lseek");
+			return -1;
+		}
+	}
+
+	return -1;
 }
