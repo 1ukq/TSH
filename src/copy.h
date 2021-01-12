@@ -18,7 +18,6 @@
 #include <grp.h>
 #include <time.h>
 #include <dirent.h>
-#include <sys/wait.h>
 
 int copy_from_tar(const char *path_tar, const char *path_file_source, int fd_dest);
 
